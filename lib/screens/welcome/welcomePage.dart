@@ -30,15 +30,15 @@ class _WelcomPageState extends State<WelcomPage> {
             children: <Widget>[
               SizedBox(height: MediaQuery.of(context).size.height / 4.3),
               Image.asset(
-                'img/logo.png',
-                scale: .75,
+                'img/Logo.png',
+                scale: 3.0,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 50,
               ),
               Text(
-                'Easytrack',
-                style: TextStyle(color: Color(0xff2681C9), fontSize: 40.0),
+                'easytrak',
+                style: TextStyle(color: Color(0xff000000), fontSize: 40.0),
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 50,
@@ -71,7 +71,7 @@ class _WelcomPageState extends State<WelcomPage> {
                       children: <Widget>[
                         Text(
                           'Demarrer',
-                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                          style: TextStyle(color: Colors.white, fontSize: 15.0),
                         ),
                         Spacer(),
                         Icon(

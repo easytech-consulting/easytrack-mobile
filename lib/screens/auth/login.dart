@@ -61,18 +61,21 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 80.0,
+                      height: MediaQuery.of(context).size.height / 15.0,
                     ),
-                    Image.asset('img/logo.png'),
+                    Image.asset(
+                      'img/Logo.png',
+                      scale: 7.0,
+                    ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 23.0,
+                      height: MediaQuery.of(context).size.height / 25.0,
                     ),
                     Text(
                       'Connexion',
                       style:
                           TextStyle(color: Color(0xff000000), fontSize: 33.0),
                     ),
-                    SizedBox(height: 8.0),
+                    SizedBox(height: MediaQuery.of(context).size.height / 80.0),
                     Text(
                       'Authentification pour acces',
                       style: TextStyle(
@@ -86,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 18.0),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 9.5,
+                      height: MediaQuery.of(context).size.height / 11,
                     ),
                     Stack(
                       children: <Widget>[
@@ -134,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 35.0,
+                      height: MediaQuery.of(context).size.height / 31.0,
                     ),
                     Stack(
                       children: <Widget>[
@@ -182,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 35.0,
+                      height: MediaQuery.of(context).size.height / 31.0,
                     ),
                     InkWell(
                       onTap: () {

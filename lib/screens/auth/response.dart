@@ -28,8 +28,8 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Image.asset(
-                  'img/logo.png',
-                  scale: .75,
+                  'img/Logo.png',
+                  scale: 3.0,
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 50,
@@ -43,11 +43,11 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                 ),
                 Text(
                   'Votre mot de passe a ete',
-                  style: TextStyle(color: Color(0xff000000), fontSize: 17.0),
+                  style: TextStyle(color: Color(0xff000000), fontSize: 18.0),
                 ),
                 Text(
                   'reinitialise avec succes',
-                  style: TextStyle(color: Color(0xff000000), fontSize: 17.0),
+                  style: TextStyle(color: Color(0xff000000), fontSize: 18.0),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 20,

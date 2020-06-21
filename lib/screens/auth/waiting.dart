@@ -41,8 +41,8 @@ class _WaitingResetPasswordState extends State<WaitingResetPassword> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset(
-                'img/logo.png',
-                scale: .75,
+                'img/Logo.png',
+                scale: 3.0,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 50,
@@ -61,7 +61,7 @@ class _WaitingResetPasswordState extends State<WaitingResetPassword> {
               Text(
                 'Traitement en cours...',
                 style: TextStyle(
-                    color: Color(0xff000000).withOpacity(.7), fontSize: 14.0),
+                    color: Color(0xff000000).withOpacity(.7), fontSize: 18.0),
               ),
               SizedBox(height: 20.0)
             ],

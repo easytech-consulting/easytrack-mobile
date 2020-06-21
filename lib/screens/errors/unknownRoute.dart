@@ -8,8 +8,8 @@ class UnknownRoute extends StatefulWidget {
 class _UnknownRouteState extends State<UnknownRoute> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red,
+    return Scaffold(
+      body: Center(child: Text('Route inconnue mon ami(e)'),),
     );
   }
 }

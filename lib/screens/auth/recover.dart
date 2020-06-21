@@ -57,11 +57,14 @@ class _RecoverPageState extends State<RecoverPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 30.0,
+                      height: MediaQuery.of(context).size.height / 10.0,
                     ),
-                    Image.asset('img/logo.png'),
+                    Image.asset(
+                      'img/Logo.png',
+                      scale: 7.0,
+                    ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 23.0,
+                      height: MediaQuery.of(context).size.height / 20.0,
                     ),
                     Text(
                       'Mot de passe',
@@ -82,7 +85,7 @@ class _RecoverPageState extends State<RecoverPage> {
                           fontSize: 18.0),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 8.5,
+                      height: MediaQuery.of(context).size.height / 10,
                     ),
                     Stack(
                       children: <Widget>[
@@ -106,7 +109,7 @@ class _RecoverPageState extends State<RecoverPage> {
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 50.0),
-                                prefixIcon: Icon(Icons.account_circle,
+                                prefixIcon: Icon(AmazingIcon.account_icon,
                                     color: Color(0xff000000), size: 17.0),
                                 hintText: 'Email',
                                 hintStyle: TextStyle(
