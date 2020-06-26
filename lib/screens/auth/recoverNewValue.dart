@@ -1,21 +1,20 @@
 import 'dart:async';
-
 import 'package:easytrack/commons/globals.dart';
 import 'package:flutter/material.dart';
-
 import '../../styles/style.dart';
+import 'response.dart';
 
-class LoginPage extends StatefulWidget {
+class RecoverNewValuePage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RecoverNewValuePageState createState() => _RecoverNewValuePageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  TextEditingController _loginController = new TextEditingController();
+class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
   TextEditingController _passwordController = new TextEditingController();
+  TextEditingController _cPasswordController = new TextEditingController();
 
-  FocusNode _loginNode = new FocusNode();
   FocusNode _passwordNode = new FocusNode();
+  FocusNode _cPasswordNode = new FocusNode();
 
   bool isLoading = false;
   bool isError = true;
@@ -27,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                height: 275.0,
+                height: 256.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -37,22 +36,18 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20.0,
                     ),
                     Text(
-                      'Erreur d\'authentification',
+                      'Erreur de validation',
                       style: alertDialogTitleStyle,
                     ),
                     SizedBox(
                       height: 7.0,
                     ),
                     Text(
-                      'Desole, nous n\'avons pas pu vous',
+                      'Les deux mots de',
                       style: alertDialogContentStyle,
                     ),
                     Text(
-                      'identifier. Votre nom d\'utilisateur',
-                      style: alertDialogContentStyle,
-                    ),
-                    Text(
-                      'ou mot de passe incorrecte.',
+                      'passe ne coincident pas',
                       style: alertDialogContentStyle,
                     ),
                     SizedBox(
@@ -65,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(30.0))),
-                            borderSide: BorderSide(color: Color(0xff000000)),
+                            borderSide: BorderSide(color: Colors.black),
                             onPressed: () => Navigator.pop(context),
                             child: Container(
                                 alignment: Alignment.center,
@@ -81,9 +76,11 @@ class _LoginPageState extends State<LoginPage> {
             ));
   }
 
-  void homeRedirection() {
+  void finalisationRecoverRedirection() {
     new Timer(
-        Duration(seconds: 3), () => Navigator.pushNamed(context, '/home'));
+        Duration(seconds: 3),
+        () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ResponsePasswordReset())));
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -92,6 +89,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
+      bottom: true,
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -117,16 +115,17 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height / 25.0,
                           ),
-                          Text('Connexion', style: subLogoTitleStyle),
+                          Text(
+                            'Reinitialisation',
+                            style: subLogoTitleStyle,
+                          ),
                           SizedBox(
                               height:
                                   MediaQuery.of(context).size.height / 80.0),
+                          Text('Entrez votre nouveau',
+                              style: subLogoSubtitleStyle),
                           Text(
-                            'Authentification pour acces',
-                            style: subLogoSubtitleStyle,
-                          ),
-                          Text(
-                            'a la plate-forme',
+                            'mot de passe',
                             style: subLogoSubtitleStyle,
                           ),
                           SizedBox(
@@ -134,23 +133,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Stack(
                             children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Container(
-                                  height: 48.0,
-                                  decoration: textFormFieldBoxDecoration,
-                                ),
+                              Container(
+                                height: 48.0,
+                                decoration: textFormFieldBoxDecoration,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
                                 child: TextFormField(
-                                  controller: _loginController,
-                                  focusNode: _loginNode,
+                                  controller: _passwordController,
+                                  focusNode: _passwordNode,
                                   textInputAction: TextInputAction.next,
                                   onFieldSubmitted: (_) {
-                                    _loginNode.unfocus();
+                                    _passwordNode.unfocus();
                                     FocusScope.of(context)
-                                        .requestFocus(_passwordNode);
+                                        .requestFocus(_cPasswordNode);
                                   },
                                   validator: (value) {
                                     if (value.isEmpty) {
@@ -163,11 +159,12 @@ class _LoginPageState extends State<LoginPage> {
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
-                                          /* AmazingIcon.user_icon, */ Icons
-                                              .account_circle,
+                                          /* 
+                                          AmazingIcon.password_icon */
+                                          Icons.security,
                                           color: Color(0xff000000),
                                           size: 15.0),
-                                      hintText: 'Nom d\'utilisateur',
+                                      hintText: 'Mot de passe',
                                       hintStyle: TextStyle(
                                           color: Color(0xff000000)
                                               .withOpacity(.35),
@@ -187,21 +184,19 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Stack(
                             children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.5),
-                                child: Container(
-                                    height: 48.0,
-                                    decoration: textFormFieldBoxDecoration),
+                              Container(
+                                height: 48.0,
+                                decoration: textFormFieldBoxDecoration,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
                                 child: TextFormField(
                                   obscureText: true,
-                                  controller: _passwordController,
-                                  focusNode: _passwordNode,
+                                  controller: _cPasswordController,
+                                  focusNode: _cPasswordNode,
                                   textInputAction: TextInputAction.done,
                                   onFieldSubmitted: (_) {
-                                    _passwordNode.unfocus();
+                                    _cPasswordNode.unfocus();
                                   },
                                   validator: (value) {
                                     if (value.isEmpty) {
@@ -215,11 +210,11 @@ class _LoginPageState extends State<LoginPage> {
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
                                           /* 
-                                          AmazingIcon.password_icon, */
+                                          AmazingIcon.password_icon */
                                           Icons.security,
                                           color: Color(0xff000000),
                                           size: 15.0),
-                                      hintText: 'Mot de passe',
+                                      hintText: 'Ressaisissez le mot de passe',
                                       fillColor: Colors.black,
                                       hintStyle: TextStyle(
                                           color: Color(0xff000000)
@@ -244,33 +239,33 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() {
                                   isLoading = true;
                                 });
-                                if (isError &&
-                                    (_loginController.text != 'yvan' ||
-                                        _passwordController.text != 'yvan')) {
+                                if (_cPasswordController.text !=
+                                    _passwordController.text) {
                                   setState(() {
                                     isLoading = false;
                                   });
                                   showErrorMessage();
                                 } else {
-                                  homeRedirection();
+                                  finalisationRecoverRedirection();
                                 }
                               }
                             },
                             child: Container(
                                 height: 48.0,
                                 decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30.0)),
-                                    gradient: LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [gradient1, gradient2])),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0)),
+                                  gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [gradient1, gradient2]),
+                                ),
                                 child: Padding(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Center(
                                     child: Text(
-                                      'Se connecter',
+                                      'Confirmer',
                                       style: TextStyle(
                                           color: Color(0xffffffff),
                                           fontSize: 18),
@@ -280,37 +275,14 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Spacer(),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 20.0, horizontal: 10.0),
-                            child: Container(
-                              height: 70.0,
-                              child: Row(
-                                children: <Widget>[
-                                  InkWell(
-                                    onTap: () => Navigator.pop(context),
-                                    child: Container(
-                                        child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                            /* AmazingIcon.arrow_left_solid_icon */ Icons
-                                                .arrow_back,
-                                            size: 13),
-                                        SizedBox(width: 10.0),
-                                        Text('Retour', style: bottomTextStyle)
-                                      ],
-                                    )),
-                                  ),
-                                  Spacer(),
-                                  InkWell(
-                                    onTap: () => Navigator.pushNamed(
-                                        context, '/recover'),
-                                    child: Text('Mot de passe oublie',
-                                        style: bottomTextStyle),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 40.0, horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  'Version 1.0.0',
+                                  style: versionStyle,
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -318,12 +290,9 @@ class _LoginPageState extends State<LoginPage> {
                         ? Container(
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height,
-                            color: Color(0xffffffff).withOpacity(.89),
+                            color: Color(0xffffffff).withOpacity(.8),
                             child: Center(
-                              child: CircularProgressIndicator(
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                    gradient1),
-                              ),
+                              child: CircularProgressIndicator(),
                             ))
                         : Container(),
                   ],

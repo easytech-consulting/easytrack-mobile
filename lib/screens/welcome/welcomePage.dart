@@ -1,6 +1,7 @@
-import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/services/externalService.dart';
 import 'package:flutter/material.dart';
+
+import '../../styles/style.dart';
 
 class WelcomPage extends StatefulWidget {
   @override
@@ -13,15 +14,6 @@ class _WelcomPageState extends State<WelcomPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
-        bottomNavigationBar: Container(
-          height: 30.0,
-          child: Center(
-              child: Text(
-            'Version 1.0.0',
-            style: TextStyle(
-                color: Color(0xff000000).withOpacity(.4), fontSize: 14),
-          )),
-        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(
@@ -37,19 +29,19 @@ class _WelcomPageState extends State<WelcomPage> {
                 height: MediaQuery.of(context).size.height / 50,
               ),
               Text(
-                'easytrak',
-                style: TextStyle(color: Color(0xff000000), fontSize: 40.0),
+                'easytrack',
+                style: subLogoTitleStyle,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 50,
               ),
               Text(
                 'La meilleure plateforme pour',
-                style: TextStyle(color: Color(0xff000000), fontSize: 17.0),
+                style: subLogoSubtitleStyle,
               ),
               Text(
                 'votre gestion de stock',
-                style: TextStyle(color: Color(0xff000000), fontSize: 17.0),
+                style: subLogoSubtitleStyle,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 11,
@@ -61,7 +53,7 @@ class _WelcomPageState extends State<WelcomPage> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       gradient: LinearGradient(
-                          colors: [Color(0xff267EC9), Color(0xff26B1C3)],
+                          colors: [gradient1, gradient2],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight)),
                   child: Padding(
@@ -74,8 +66,9 @@ class _WelcomPageState extends State<WelcomPage> {
                           style: TextStyle(color: Colors.white, fontSize: 15.0),
                         ),
                         Spacer(),
-                        Icon(
-                          AmazingIcon.arrow_right_icon,
+                        Icon(/* 
+                          AmazingIcon.arrow_right_icon, */
+                          Icons.arrow_forward_ios,
                           size: 11.0,
                           color: Colors.white,
                         )
@@ -93,7 +86,15 @@ class _WelcomPageState extends State<WelcomPage> {
                       color: Color(0xff000000).withOpacity(.7), fontSize: 14.0),
                 ),
               ),
-              SizedBox(height: 20.0)
+              SizedBox(height: 20.0),
+              Container(
+                height: 30.0,
+                child: Center(
+                    child: Text(
+                  'Version 1.0.0',
+                  style: versionStyle,
+                )),
+              )
             ],
           ),
         ),

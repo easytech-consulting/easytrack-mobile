@@ -1,7 +1,8 @@
 import 'dart:async';
-
-import 'package:easytrack/screens/auth/response.dart';
+import 'package:easytrack/screens/auth/recoverNewValue.dart';
 import 'package:flutter/material.dart';
+
+import '../../styles/style.dart';
 
 class WaitingResetPassword extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _WaitingResetPasswordState extends State<WaitingResetPassword> {
     Timer(
         Duration(seconds: 5),
         () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ResponsePasswordReset())));
+            MaterialPageRoute(builder: (context) => RecoverNewValuePage())));
   }
 
   @override
@@ -32,8 +33,7 @@ class _WaitingResetPasswordState extends State<WaitingResetPassword> {
           child: Center(
               child: Text(
             'Version 1.0.0',
-            style: TextStyle(
-                color: Color(0xff000000).withOpacity(.4), fontSize: 14),
+            style: versionStyle,
           )),
         ),
         body: Center(
@@ -49,20 +49,16 @@ class _WaitingResetPasswordState extends State<WaitingResetPassword> {
               ),
               Text(
                 'Reinitialisation',
-                style: TextStyle(color: Color(0xff000000), fontSize: 33.0),
+                style: subLogoTitleStyle,
               ),
               Text(
                 'du mot de passe',
-                style: TextStyle(color: Color(0xff000000), fontSize: 33.0),
+                style: subLogoTitleStyle,
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 50,
               ),
-              Text(
-                'Traitement en cours...',
-                style: TextStyle(
-                    color: Color(0xff000000).withOpacity(.7), fontSize: 18.0),
-              ),
+              Text('Traitement en cours...', style: subLogoSubtitleStyle),
               SizedBox(height: 20.0)
             ],
           ),

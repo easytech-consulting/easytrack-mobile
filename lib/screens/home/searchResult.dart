@@ -1,0 +1,169 @@
+import 'package:easytrack/screens/home/calendar.dart';
+import 'package:easytrack/screens/home/chat.dart';
+import 'package:easytrack/screens/home/shopping.dart';
+import 'package:flutter/material.dart';
+import '../../styles/style.dart';
+import 'package:bmnav/bmnav.dart' as bmnav;
+import 'home.dart';
+
+class SearchResult extends StatefulWidget {
+  final int index;
+  SearchResult({this.index});
+  @override
+  _SearchResultState createState() => _SearchResultState();
+}
+
+class _SearchResultState extends State<SearchResult> {
+  @override
+  void initState() {
+    super.initState();
+    currentTab = widget.index;
+  }
+
+  TextEditingController _controller = TextEditingController();
+  int currentTab;
+  final List<Widget> screens = [
+    HomePage(),
+    ShoppingPage(),
+    CalendarPage(),
+    ChatPage()
+  ];
+  Widget currentScreen = HomePage();
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: true,
+      child: Scaffold(
+        backgroundColor: Color(0xffffffff),
+        bottomNavigationBar: Container(
+          width: 56.0,
+          height: 56.0,
+          decoration: BoxDecoration(
+              color: gradient1.withOpacity(.9),
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          child: bmnav.BottomNav(
+            index: currentTab,
+            onTap: (i) {
+              setState(() {
+                currentTab = i;
+                currentScreen = screens[i];
+              });
+            },
+            iconStyle: bmnav.IconStyle(size: 18.0),
+            items: [
+              bmnav.BottomNavItem(Icons.home),
+              bmnav.BottomNavItem(Icons.shopping_cart),
+              bmnav.BottomNavItem(Icons.calendar_today),
+              bmnav.BottomNavItem(Icons.bubble_chart)
+            ],
+          ),
+        ),
+        body: ListView(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              height: MediaQuery.of(context).size.height / 10,
+              decoration: BoxDecoration(
+                  gradient: widget.index == 0
+                      ? LinearGradient(
+                          colors: [gradient1, gradient2],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight)
+                      : LinearGradient(
+                          colors: [Color(0xffffffff), Color(0xffffffff)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Container(
+                        height: 36.0,
+                        decoration: textFormFieldBoxDecoration,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Container(
+                        height: 36.0,
+                        child: TextFormField(
+                          controller: _controller,
+                          textInputAction: TextInputAction.done,
+                          style: TextStyle(
+                              color: widget.index == 0
+                                  ? Color(0xffffffff)
+                                  : Color(0xff000000)),
+                          decoration: InputDecoration(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                              prefixIcon: Icon(
+                                  /* AmazingIcon.user_icon, */ Icons.search,
+                                  color: widget.index == 0
+                                      ? Color(0xffffffff)
+                                      : Color(0xff000000),
+                                  size: 20.0),
+                              suffixIcon: IconButton(
+                                  onPressed: () {},
+                                  /* AmazingIcon.user_icon, */ icon: Icon(
+                                      Icons.close,
+                                      color: widget.index == 0
+                                          ? Color(0xffffffff)
+                                          : Color(0xff000000),
+                                      size: 20.0)),
+                              hintText: 'Recherche...',
+                              hintStyle: TextStyle(
+                                  color: widget.index == 0
+                                      ? Color(0xffffffff).withOpacity(.35)
+                                      : Color(0xff000000).withOpacity(.35),
+                                  fontSize: 18.0),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              )),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 27.0),
+              child: Divider(),
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height / 20.0),
+            Icon(
+              Icons.error_outline,
+              size: 109.0,
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Center(
+              child: Text(
+                'Desole',
+                style: subLogoTitleStyle,
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Center(
+              child: Text(
+                'Nous n\'avons pas trouve',
+                style: subLogoSubtitleStyle,
+              ),
+            ),
+            Center(
+              child: Text(
+                'de resultats pour votre recherche',
+                style: subLogoSubtitleStyle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

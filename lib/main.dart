@@ -1,7 +1,7 @@
+import 'package:easytrack/layouts/template.dart';
 import 'package:easytrack/screens/auth/login.dart';
 import 'package:easytrack/screens/auth/recover.dart';
 import 'package:easytrack/screens/errors/unknownRoute.dart';
-import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/screens/welcome/welcomePage.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => WelcomPage(),
         '/login': (context) => LoginPage(),
         '/recover': (context) => RecoverPage(),
-        '/home': (context) => HomePage()
+        '/home': (context) => TemplatePage()
       },
     );
   }

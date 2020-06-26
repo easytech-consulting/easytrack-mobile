@@ -1,5 +1,6 @@
-import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:flutter/material.dart';
+
+import '../../styles/style.dart';
 
 class ResponsePasswordReset extends StatefulWidget {
   @override
@@ -36,18 +37,18 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                 ),
                 Text(
                   'Termine',
-                  style: TextStyle(color: Color(0xff000000), fontSize: 33.0),
+                  style: subLogoTitleStyle,
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 50,
                 ),
                 Text(
                   'Votre mot de passe a ete',
-                  style: TextStyle(color: Color(0xff000000), fontSize: 18.0),
+                  style: subLogoSubtitleStyle,
                 ),
                 Text(
                   'reinitialise avec succes',
-                  style: TextStyle(color: Color(0xff000000), fontSize: 18.0),
+                  style: subLogoSubtitleStyle,
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 20,
@@ -59,7 +60,7 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                         gradient: LinearGradient(
-                            colors: [Color(0xff267EC9), Color(0xff26B1C3)],
+                            colors: [gradient1, gradient2],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight)),
                     child: Padding(
@@ -74,7 +75,9 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                           ),
                           Spacer(),
                           Icon(
-                            AmazingIcon.arrow_right_icon,
+                            /* 
+                            AmazingIcon.arrow_right_icon, */
+                            Icons.arrow_forward_ios,
                             size: 11.0,
                             color: Colors.white,
                           )
