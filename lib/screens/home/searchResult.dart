@@ -1,9 +1,10 @@
+import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/home/calendar.dart';
 import 'package:easytrack/screens/home/chat.dart';
 import 'package:easytrack/screens/home/shopping.dart';
 import 'package:flutter/material.dart';
 import '../../styles/style.dart';
-import 'package:bmnav/bmnav.dart' as bmnav;
 import 'home.dart';
 
 class SearchResult extends StatefulWidget {
@@ -35,34 +36,11 @@ class _SearchResultState extends State<SearchResult> {
       top: true,
       child: Scaffold(
         backgroundColor: Color(0xffffffff),
-        bottomNavigationBar: Container(
-          width: 56.0,
-          height: 56.0,
-          decoration: BoxDecoration(
-              color: gradient1.withOpacity(.9),
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          child: bmnav.BottomNav(
-            index: currentTab,
-            onTap: (i) {
-              setState(() {
-                currentTab = i;
-                currentScreen = screens[i];
-              });
-            },
-            iconStyle: bmnav.IconStyle(size: 18.0),
-            items: [
-              bmnav.BottomNavItem(Icons.home),
-              bmnav.BottomNavItem(Icons.shopping_cart),
-              bmnav.BottomNavItem(Icons.calendar_today),
-              bmnav.BottomNavItem(Icons.bubble_chart)
-            ],
-          ),
-        ),
         body: ListView(
           children: <Widget>[
             Container(
               alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height / 10,
+              height: screenSize(context).height / 10,
               decoration: BoxDecoration(
                   gradient: widget.index == 0
                       ? LinearGradient(
@@ -132,9 +110,9 @@ class _SearchResultState extends State<SearchResult> {
               padding: const EdgeInsets.symmetric(horizontal: 27.0),
               child: Divider(),
             ),
-            SizedBox(height: MediaQuery.of(context).size.height / 20.0),
+            SizedBox(height: screenSize(context).height / 20.0),
             Icon(
-              Icons.error_outline,
+              AmazingIcon.emotion_sad_line,
               size: 109.0,
             ),
             SizedBox(

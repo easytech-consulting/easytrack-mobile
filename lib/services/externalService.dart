@@ -4,6 +4,10 @@ void launchNDA() {
   launch('http://google.com');
 }
 
-void openEmailApp() {
-  launch('mailto:yvan@gmail.com');
+void launchMail(String email) {
+  launch('mailto:$email');
+}
+
+void launchCall(String phone) {
+  launch('tel://$phone');
 }

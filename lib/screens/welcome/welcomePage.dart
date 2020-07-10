@@ -1,3 +1,5 @@
+import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/services/externalService.dart';
 import 'package:flutter/material.dart';
 
@@ -20,36 +22,40 @@ class _WelcomPageState extends State<WelcomPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: MediaQuery.of(context).size.height / 4.3),
+              SizedBox(height: screenSize(context).height / 4.3),
               Image.asset(
                 'img/Logo.png',
-                scale: 3.0,
+                width: screenSize(context).height / 5,
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 50,
+                height: screenSize(context).height / 50,
               ),
               Text(
                 'easytrack',
-                style: subLogoTitleStyle,
+                style: TextStyle(fontSize: screenSize(context).height / 20),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 50,
+                height: screenSize(context).height / 50,
               ),
               Text(
                 'La meilleure plateforme pour',
-                style: subLogoSubtitleStyle,
+                style: TextStyle(
+                    color: Color(0xff000000).withOpacity(.7),
+                    fontSize: screenSize(context).height / 39),
               ),
               Text(
                 'votre gestion de stock',
-                style: subLogoSubtitleStyle,
+                style: TextStyle(
+                    color: Color(0xff000000).withOpacity(.7),
+                    fontSize: screenSize(context).height / 39),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 11,
+                height: screenSize(context).height / 11,
               ),
               InkWell(
                 onTap: () => Navigator.pushNamed(context, '/login'),
                 child: Container(
-                  height: 55.0,
+                  height: screenSize(context).height / 13,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       gradient: LinearGradient(
@@ -63,14 +69,15 @@ class _WelcomPageState extends State<WelcomPage> {
                       children: <Widget>[
                         Text(
                           'Demarrer',
-                          style: TextStyle(color: Colors.white, fontSize: 15.0),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screenSize(context).height / 47),
                         ),
                         Spacer(),
-                        Icon(/* 
-                          AmazingIcon.arrow_right_icon, */
-                          Icons.arrow_forward_ios,
-                          size: 11.0,
+                        Icon(
+                          AmazingIcon.arrow_drop_right_line,
                           color: Colors.white,
+                          size: screenSize(context).height / 25,
                         )
                       ],
                     ),
@@ -79,21 +86,20 @@ class _WelcomPageState extends State<WelcomPage> {
               ),
               Spacer(),
               InkWell(
-                onTap: launchNDA,
-                child: Text(
-                  'voir notre politique de confidentialite',
-                  style: TextStyle(
-                      color: Color(0xff000000).withOpacity(.7), fontSize: 14.0),
-                ),
-              ),
-              SizedBox(height: 20.0),
+                  onTap: launchNDA,
+                  child: Text(
+                    'voir notre politique de confidentialite',
+                    style: TextStyle(
+                        color: Color(0xff000000).withOpacity(.7),
+                        fontSize: screenSize(context).height / 50),
+                  )),
+              SizedBox(height: screenSize(context).height / 20),
               Container(
-                height: 30.0,
+                height: screenSize(context).height / 30,
                 child: Center(
-                    child: Text(
-                  'Version 1.0.0',
-                  style: versionStyle,
-                )),
+                    child: Text('Version 1.0.0',
+                        style: TextStyle(
+                            fontSize: screenSize(context).height / 70))),
               )
             ],
           ),

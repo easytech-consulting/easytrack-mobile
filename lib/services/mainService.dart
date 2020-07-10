@@ -1,4 +1,4 @@
-import 'package:easytrack/services/models/mainModels.dart';
+import 'package:easytrack/models/mainModels.dart';
 
 Product getProductById(int id) {
   Product response;

@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/icons/amazingIcon.dart';
+import 'package:easytrack/services/authService.dart';
+import 'package:easytrack/services/userService.dart';
 import 'package:flutter/material.dart';
-
 import '../../styles/style.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,126 +11,428 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _loginController = new TextEditingController();
-  TextEditingController _passwordController = new TextEditingController();
+  TextEditingController _loginController;
+  TextEditingController _passwordController;
 
-  FocusNode _loginNode = new FocusNode();
-  FocusNode _passwordNode = new FocusNode();
+  FocusNode _loginNode;
+  FocusNode _passwordNode;
 
-  bool isLoading = false;
-  bool isError = true;
+  bool _isLoading;
+  var _formKey;
 
-  void showErrorMessage() {
+  @override
+  void initState() {
+    super.initState();
+    _formKey = GlobalKey<FormState>();
+    _isLoading = false;
+
+    _loginNode = new FocusNode();
+    _passwordNode = new FocusNode();
+
+    _loginController = new TextEditingController();
+    _passwordController = new TextEditingController();
+  }
+
+  _connectionAttempt() async {
+    if (_formKey.currentState.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      Map<String, dynamic> params = Map<String, dynamic>();
+      params['login'] = _loginController.text;
+      params['password'] = _passwordController.text;
+
+      await login(params).then((success) async {
+        if (success) {
+          await fetchUserDetails(userId).then((user) {
+            if (user != null) {
+              Navigator.pushNamed(context, '/home');
+            } else {
+              _retrieveUserDataError();
+            }
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          _showErrorMessage();
+        }
+      });
+    }
+  }
+
+  _showErrorMessage() {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                height: 275.0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    errorAlertIcon(),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Text(
-                      'Erreur d\'authentification',
-                      style: alertDialogTitleStyle,
-                    ),
-                    SizedBox(
-                      height: 7.0,
-                    ),
-                    Text(
-                      'Desole, nous n\'avons pas pu vous',
-                      style: alertDialogContentStyle,
-                    ),
-                    Text(
-                      'identifier. Votre nom d\'utilisateur',
-                      style: alertDialogContentStyle,
-                    ),
-                    Text(
-                      'ou mot de passe incorrecte.',
-                      style: alertDialogContentStyle,
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: OutlineButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30.0))),
-                            borderSide: BorderSide(color: Color(0xff000000)),
-                            onPressed: () => Navigator.pop(context),
-                            child: Container(
-                                alignment: Alignment.center,
-                                height: 40.0,
-                                child: Text('Fermer')),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
+                  height: screenSize(context).height / 2.5,
+                  child: errorStatusCode == 401
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            errorAlertIcon(context),
+                            SizedBox(
+                              height: screenSize(context).height / 40,
+                            ),
+                            Text(
+                              'Erreur d\'authentification',
+                              style: TextStyle(
+                                  color: Color(0xff000000),
+                                  fontSize: screenSize(context).width / 22),
+                            ),
+                            SizedBox(height: screenSize(context).height / 80),
+                            Text(
+                              'Desole, nous n\'avons pas pu vous',
+                              style: TextStyle(
+                                  color: Color(0xff000000).withOpacity(.5),
+                                  fontSize: screenSize(context).width / 25),
+                            ),
+                            Text(
+                              'identifier. Votre nom d\'utilisateur',
+                              style: TextStyle(
+                                  color: Color(0xff000000).withOpacity(.5),
+                                  fontSize: screenSize(context).width / 25),
+                            ),
+                            Text(
+                              'ou mot de passe est incorrecte.',
+                              style: TextStyle(
+                                  color: Color(0xff000000).withOpacity(.5),
+                                  fontSize: screenSize(context).width / 25),
+                            ),
+                            SizedBox(
+                              height: screenSize(context).height / 40,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: OutlineButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30.0))),
+                                    borderSide:
+                                        BorderSide(color: Color(0xff000000)),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        height: 40.0,
+                                        child: Text('Fermer')),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      : errorStatusCode == 404
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                errorAlertIcon(context),
+                                SizedBox(
+                                  height: screenSize(context).height / 40,
+                                ),
+                                Text(
+                                  'Erreur d\'authentification',
+                                  style: TextStyle(
+                                      color: Color(0xff000000),
+                                      fontSize: screenSize(context).width / 22),
+                                ),
+                                SizedBox(
+                                    height: screenSize(context).height / 80),
+                                Text(
+                                  'Desole, nous n\'avons pas pu vous',
+                                  style: TextStyle(
+                                      color: Color(0xff000000).withOpacity(.5),
+                                      fontSize: screenSize(context).width / 25),
+                                ),
+                                Text(
+                                  'identifier. Votre nom d\'utilisateur',
+                                  style: TextStyle(
+                                      color: Color(0xff000000).withOpacity(.5),
+                                      fontSize: screenSize(context).width / 25),
+                                ),
+                                Text(
+                                  'n\'existe pas dans notre base.',
+                                  style: TextStyle(
+                                      color: Color(0xff000000).withOpacity(.5),
+                                      fontSize: screenSize(context).width / 25),
+                                ),
+                                SizedBox(
+                                  height: screenSize(context).height / 40,
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: OutlineButton(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(30.0))),
+                                        borderSide: BorderSide(
+                                            color: Color(0xff000000)),
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Container(
+                                            alignment: Alignment.center,
+                                            height: 40.0,
+                                            child: Text('Fermer')),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )
+                          : errorStatusCode == 500
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    errorAlertIcon(context),
+                                    SizedBox(
+                                      height: screenSize(context).height / 40,
+                                    ),
+                                    Text(
+                                      'Erreur de serveur',
+                                      style: TextStyle(
+                                          color: Color(0xff000000),
+                                          fontSize:
+                                              screenSize(context).width / 22),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            screenSize(context).height / 80),
+                                    Text(
+                                      'Desole, nous n\'avons pas pu vous',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    Text(
+                                      'identifier car Notre serveur est',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    Text(
+                                      'indisponible pour l\'instant',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    SizedBox(
+                                      height: screenSize(context).height / 40,
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: OutlineButton(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30.0))),
+                                            borderSide: BorderSide(
+                                                color: Color(0xff000000)),
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Container(
+                                                alignment: Alignment.center,
+                                                height: 40.0,
+                                                child: Text('Fermer')),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    errorAlertIcon(context),
+                                    SizedBox(
+                                      height: screenSize(context).height / 40,
+                                    ),
+                                    Text(
+                                      'Erreur de connectivite',
+                                      style: TextStyle(
+                                          color: Color(0xff000000),
+                                          fontSize:
+                                              screenSize(context).width / 22),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            screenSize(context).height / 80),
+                                    Text(
+                                      'Desole, nous n\'avons pas pu vous',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    Text(
+                                      'identifier. Verifier votre acces',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    Text(
+                                      'internet.',
+                                      style: TextStyle(
+                                          color:
+                                              Color(0xff000000).withOpacity(.5),
+                                          fontSize:
+                                              screenSize(context).width / 25),
+                                    ),
+                                    SizedBox(
+                                      height: screenSize(context).height / 40,
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: OutlineButton(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30.0))),
+                                            borderSide: BorderSide(
+                                                color: Color(0xff000000)),
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Container(
+                                                alignment: Alignment.center,
+                                                height: 40.0,
+                                                child: Text('Fermer')),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )),
             ));
   }
 
-  void homeRedirection() {
-    new Timer(
-        Duration(seconds: 3), () => Navigator.pushNamed(context, '/home'));
+  _retrieveUserDataError() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
+              content: Container(
+                  height: screenSize(context).height / 2.5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      errorAlertIcon(context),
+                      SizedBox(
+                        height: screenSize(context).height / 40,
+                      ),
+                      Text(
+                        'Erreur d\'authentification',
+                        style: TextStyle(
+                            color: Color(0xff000000),
+                            fontSize: screenSize(context).width / 22),
+                      ),
+                      SizedBox(height: screenSize(context).height / 80),
+                      Text(
+                        'Desole, nous n\'avons pas pu vous',
+                        style: TextStyle(
+                            color: Color(0xff000000).withOpacity(.5),
+                            fontSize: screenSize(context).width / 25),
+                      ),
+                      Text(
+                        'recuperer toutes vos informations',
+                        style: TextStyle(
+                            color: Color(0xff000000).withOpacity(.5),
+                            fontSize: screenSize(context).width / 25),
+                      ),
+                      Text(
+                        'veuillez reessayer plus tard.',
+                        style: TextStyle(
+                            color: Color(0xff000000).withOpacity(.5),
+                            fontSize: screenSize(context).width / 25),
+                      ),
+                      SizedBox(
+                        height: screenSize(context).height / 40,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: OutlineButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              borderSide: BorderSide(color: Color(0xff000000)),
+                              onPressed: () => Navigator.pop(context),
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  height: 40.0,
+                                  child: Text('Fermer')),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+            ));
   }
-
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
       child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
+        body: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      height: screenSize(context).height,
+                      width: screenSize(context).width,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 15.0,
+                            height: screenSize(context).height / 15.0,
                           ),
                           Image.asset(
                             'img/Logo.png',
-                            scale: 7.0,
+                            width: screenSize(context).height / 13,
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 25.0,
+                            height: screenSize(context).height / 30.0,
                           ),
-                          Text('Connexion', style: subLogoTitleStyle),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height / 80.0),
+                          Text('Connexion',
+                              style: TextStyle(
+                                  fontSize: screenSize(context).height / 20)),
+                          SizedBox(height: screenSize(context).height / 80.0),
                           Text(
-                            'Authentification pour acces',
-                            style: subLogoSubtitleStyle,
+                            'Authentifiez-vous pour acceder',
+                            style: TextStyle(
+                                color: Color(0xff000000).withOpacity(.7),
+                                fontSize: screenSize(context).height / 39),
                           ),
                           Text(
                             'a la plate-forme',
-                            style: subLogoSubtitleStyle,
+                            style: TextStyle(
+                                color: Color(0xff000000).withOpacity(.7),
+                                fontSize: screenSize(context).height / 39),
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 11,
+                            height: screenSize(context).height / 18,
                           ),
                           Stack(
                             children: <Widget>[
@@ -147,11 +449,8 @@ class _LoginPageState extends State<LoginPage> {
                                   controller: _loginController,
                                   focusNode: _loginNode,
                                   textInputAction: TextInputAction.next,
-                                  onFieldSubmitted: (_) {
-                                    _loginNode.unfocus();
-                                    FocusScope.of(context)
-                                        .requestFocus(_passwordNode);
-                                  },
+                                  onFieldSubmitted: (_) => nextNode(
+                                      context, _loginNode, _passwordNode),
                                   validator: (value) {
                                     if (value.isEmpty) {
                                       return 'Champs obligatoire';
@@ -162,11 +461,8 @@ class _LoginPageState extends State<LoginPage> {
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
-                                      prefixIcon: Icon(
-                                          /* AmazingIcon.user_icon, */ Icons
-                                              .account_circle,
-                                          color: Color(0xff000000),
-                                          size: 15.0),
+                                      prefixIcon: Icon(AmazingIcon.user_6_line,
+                                          color: Color(0xff000000), size: 15.0),
                                       hintText: 'Nom d\'utilisateur',
                                       hintStyle: TextStyle(
                                           color: Color(0xff000000)
@@ -183,7 +479,7 @@ class _LoginPageState extends State<LoginPage> {
                             ],
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 31.0,
+                            height: screenSize(context).height / 31.0,
                           ),
                           Stack(
                             children: <Widget>[
@@ -214,9 +510,7 @@ class _LoginPageState extends State<LoginPage> {
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
-                                          /* 
-                                          AmazingIcon.password_icon, */
-                                          Icons.security,
+                                          AmazingIcon.lock_password_line,
                                           color: Color(0xff000000),
                                           size: 15.0),
                                       hintText: 'Mot de passe',
@@ -236,26 +530,10 @@ class _LoginPageState extends State<LoginPage> {
                             ],
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 31.0,
+                            height: screenSize(context).height / 31.0,
                           ),
                           InkWell(
-                            onTap: () {
-                              if (_formKey.currentState.validate()) {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                if (isError &&
-                                    (_loginController.text != 'yvan' ||
-                                        _passwordController.text != 'yvan')) {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  showErrorMessage();
-                                } else {
-                                  homeRedirection();
-                                }
-                              }
-                            },
+                            onTap: () => _connectionAttempt(),
                             child: Container(
                                 height: 48.0,
                                 decoration: BoxDecoration(
@@ -280,32 +558,31 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Spacer(),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 20.0, horizontal: 10.0),
+                            padding: const EdgeInsets.fromLTRB(
+                                10.0, 0.0, 10.0, 10.0),
                             child: Container(
-                              height: 70.0,
+                              height: screenSize(context).height / 10,
                               child: Row(
                                 children: <Widget>[
                                   InkWell(
-                                    onTap: () => Navigator.pop(context),
+                                    onTap: () => Navigator.pushNamed(
+                                        context, '/register'),
                                     child: Container(
-                                        child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                            /* AmazingIcon.arrow_left_solid_icon */ Icons
-                                                .arrow_back,
-                                            size: 13),
-                                        SizedBox(width: 10.0),
-                                        Text('Retour', style: bottomTextStyle)
-                                      ],
-                                    )),
+                                        child: Text('Inscription',
+                                            style: TextStyle(
+                                                fontSize:
+                                                    screenSize(context).height /
+                                                        43))),
                                   ),
                                   Spacer(),
                                   InkWell(
                                     onTap: () => Navigator.pushNamed(
                                         context, '/recover'),
                                     child: Text('Mot de passe oublie',
-                                        style: bottomTextStyle),
+                                        style: TextStyle(
+                                            fontSize:
+                                                screenSize(context).height /
+                                                    43)),
                                   )
                                 ],
                               ),
@@ -314,21 +591,21 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    isLoading
-                        ? Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            color: Color(0xffffffff).withOpacity(.89),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                    gradient1),
-                              ),
-                            ))
-                        : Container(),
-                  ],
-                ),
-              )),
+                  )),
+            ),
+            _isLoading
+                ? Container(
+                    width: screenSize(context).width,
+                    height: screenSize(context).height,
+                    color: Color(0xffffffff).withOpacity(.89),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            new AlwaysStoppedAnimation<Color>(gradient1),
+                      ),
+                    ))
+                : Container(),
+          ],
         ),
       ),
     );

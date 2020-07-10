@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 ThemeData appTheme =
-    ThemeData(primaryColor: Color(0xffffffff), fontFamily: 'Roboto');
+    ThemeData(primaryColor: Color(0xffffffff), fontFamily: 'Ubuntu');
 
 Color gradient1 = Color(0xfff267FC9);
 Color gradient2 = Color(0xff26B1C3);
@@ -17,14 +17,16 @@ Color lightBlueColor = Color(0xff2BD9F0);
 TextStyle alertDialogContentStyle =
     TextStyle(color: Color(0xff000000).withOpacity(.5));
 TextStyle alertDialogTitleStyle = TextStyle(fontSize: 20.0);
+TextStyle recapInfo = TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold);
 TextStyle subLogoTitleStyle =
     TextStyle(color: Color(0xff000000), fontSize: 33.0);
 TextStyle subLogoSubtitleStyle =
     TextStyle(color: Color(0xff000000).withOpacity(.7), fontSize: 18.0);
 TextStyle bottomTextStyle = TextStyle(color: Color(0xff000000), fontSize: 16.0);
-
+TextStyle policiesTextStyle =
+    TextStyle(color: Color(0xff000000).withOpacity(.7), fontSize: 14.0);
 BoxDecoration textFormFieldBoxDecoration = BoxDecoration(
-    color: Color(0xff000000).withOpacity(.06),
+    color: Color(0xff000000).withOpacity(.1),
     borderRadius: BorderRadius.all(Radius.circular(30.0)));
 TextStyle versionStyle =
     TextStyle(color: Color(0xff000000).withOpacity(.4), fontSize: 14);

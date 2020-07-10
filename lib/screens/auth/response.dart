@@ -1,3 +1,4 @@
+import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:flutter/material.dart';
 
 import '../../styles/style.dart';
@@ -75,10 +76,8 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                           ),
                           Spacer(),
                           Icon(
-                            /* 
-                            AmazingIcon.arrow_right_icon, */
-                            Icons.arrow_forward_ios,
-                            size: 11.0,
+                            AmazingIcon.arrow_drop_right_line,
+                            size: 20.0,
                             color: Colors.white,
                           )
                         ],

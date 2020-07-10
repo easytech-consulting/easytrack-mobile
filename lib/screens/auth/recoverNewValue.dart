@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:flutter/material.dart';
 import '../../styles/style.dart';
 import 'response.dart';
@@ -31,7 +32,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    errorAlertIcon(),
+                    errorAlertIcon(context),
                     SizedBox(
                       height: 20.0,
                     ),
@@ -159,9 +160,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
-                                          /* 
-                                          AmazingIcon.password_icon */
-                                          Icons.security,
+                                          AmazingIcon.lock_password_line,
                                           color: Color(0xff000000),
                                           size: 15.0),
                                       hintText: 'Mot de passe',
@@ -209,9 +208,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
-                                          /* 
-                                          AmazingIcon.password_icon */
-                                          Icons.security,
+                                          AmazingIcon.lock_password_line,
                                           color: Color(0xff000000),
                                           size: 15.0),
                                       hintText: 'Ressaisissez le mot de passe',
