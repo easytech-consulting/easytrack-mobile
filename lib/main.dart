@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Easytrack',
       theme: appTheme,
-      initialRoute: '/',
+      initialRoute: '/welcome',
       onUnknownRoute: (context) =>
           MaterialPageRoute(builder: (context) => UnknownRoute()),
       routes: {

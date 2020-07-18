@@ -42,38 +42,90 @@ class _HomePageState extends State<HomePage> {
           value == 1
               ? Navigator.push(
                   context, MaterialPageRoute(builder: (context) => SitePage()))
-              : _logoutUser();
+              : value == 2
+                  ? _logoutUser()
+                  : value == 3
+                      ? Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => SitePage()))
+                      : Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()));
         },
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 1,
-            enabled: userRoles.contains("boss") ? true : false,
-            child: Row(
-              children: <Widget>[
-                Icon(AmazingIcon.community_line),
-                SizedBox(width: 3.0),
-                Text(
-                  "Gerer les sites",
-                  style: TextStyle(fontWeight: FontWeight.w700),
+        itemBuilder: (context) => userRoles.contains('boss')
+            ? [
+                PopupMenuItem(
+                  value: 1,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(AmazingIcon.community_line),
+                      SizedBox(width: 3.0),
+                      Text(
+                        "Gerer les sites",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: 2,
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.exit_to_app, color: redColor),
-                SizedBox(width: 3.0),
-                Text(
-                  "Deconnexion",
-                  style:
-                      TextStyle(color: redColor, fontWeight: FontWeight.w700),
+                PopupMenuItem(
+                  value: 2,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.exit_to_app, color: redColor),
+                      SizedBox(width: 3.0),
+                      Text(
+                        "Deconnexion",
+                        style: TextStyle(
+                            color: redColor, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ],
+              ]
+            : userRoles.contains('superboss')
+                ? [
+                    PopupMenuItem(
+                      value: 3,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(AmazingIcon.community_line),
+                          SizedBox(width: 3.0),
+                          Text(
+                            "Gerer les snacks",
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 2,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.exit_to_app, color: redColor),
+                          SizedBox(width: 3.0),
+                          Text(
+                            "Deconnexion",
+                            style: TextStyle(
+                                color: redColor, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
+                : [
+                    PopupMenuItem(
+                      value: 2,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.exit_to_app, color: redColor),
+                          SizedBox(width: 3.0),
+                          Text(
+                            "Deconnexion",
+                            style: TextStyle(
+                                color: redColor, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
         icon: Icon(Icons.library_add, color: Colors.transparent),
         offset: Offset(0, 100),
       );

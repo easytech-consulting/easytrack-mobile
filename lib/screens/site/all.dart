@@ -85,7 +85,7 @@ class _SitePageState extends State<SitePage> {
     _showConfirmationMessage(index);
   }
 
-  _showDetails(Site site, User director) {
+  _showDetails(Site _site, User director) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -104,7 +104,7 @@ class _SitePageState extends State<SitePage> {
                 Row(
                   children: <Widget>[
                     Text(
-                      'Site - ${site.street}',
+                      'Site - ${_site.street}',
                       style: TextStyle(
                           fontSize: screenSize(context).height / 30,
                           fontWeight: FontWeight.bold),
@@ -127,7 +127,7 @@ class _SitePageState extends State<SitePage> {
                       width: screenSize(context).width / 50,
                     ),
                     Text(
-                      '${site.town}, Cameroun',
+                      '${_site.town}, Cameroun',
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: screenSize(context).height / 38.0),
@@ -200,7 +200,8 @@ class _SitePageState extends State<SitePage> {
                 ),
                 Spacer(),
                 InkWell(
-                  onTap: () => launchCall(site.tel2),
+                  onTap: () =>
+                      launchCall(_site.tel2 == null ? _site.tel1 : _site.tel2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -214,7 +215,7 @@ class _SitePageState extends State<SitePage> {
                         width: screenSize(context).width / 50,
                       ),
                       Text(
-                        '${site.tel2}',
+                        _site.tel2 == null ? '${_site.tel1}' : '${_site.tel2}',
                         style: TextStyle(
                             fontSize: screenSize(context).height / 33,
                             fontWeight: FontWeight.bold),
@@ -238,7 +239,7 @@ class _SitePageState extends State<SitePage> {
                         width: screenSize(context).width / 50,
                       ),
                       Text(
-                        '${snack.email}',
+                        '${_site.email}',
                         style: TextStyle(
                             fontSize: screenSize(context).height / 33,
                             fontWeight: FontWeight.bold),
@@ -251,7 +252,7 @@ class _SitePageState extends State<SitePage> {
                 ),
                 Spacer(),
                 InkWell(
-                  onTap: () => launchCall(site.tel1),
+                  onTap: () => launchCall(_site.tel1),
                   child: Container(
                       height: 48.0,
                       decoration: BoxDecoration(
@@ -299,6 +300,11 @@ class _SitePageState extends State<SitePage> {
   }
 
   _createSite() {
+    _siteemailController.clear();
+    _sitephone1Controller.clear();
+    _sitephone2Controller.clear();
+    _sitestreetController.clear();
+    _sitetownController.clear();
     showDialog(
       context: context,
       builder: (context) => ListView(
@@ -592,6 +598,11 @@ class _SitePageState extends State<SitePage> {
   }
 
   _updateSite(Site site) {
+    _siteemailController.clear();
+    _sitephone1Controller.clear();
+    _sitephone2Controller.clear();
+    _sitestreetController.clear();
+    _sitetownController.clear();
     showDialog(
       context: context,
       builder: (context) => ListView(
@@ -1061,7 +1072,7 @@ class _SitePageState extends State<SitePage> {
                                                 children: <Widget>[
                                                   InkWell(
                                                     onTap: () => _showDetails(
-                                                        site, _director),
+                                                        _sites[index], _director),
                                                     child: Text(
                                                       'Site - ${_sites[index].street}',
                                                       style: TextStyle(
@@ -1119,8 +1130,14 @@ class _SitePageState extends State<SitePage> {
                                                                             gradient1,
                                                                       ),
                                                                       InkWell(
-                                                                        onTap: () =>
-                                                                            _updateSite(_sites[index]),
+                                                                        onTap:
+                                                                            () {
+                                                                          _scaffoldKey
+                                                                              .currentState
+                                                                              .hideCurrentSnackBar();
+                                                                          _updateSite(
+                                                                              _sites[index]);
+                                                                        },
                                                                         child:
                                                                             Padding(
                                                                           padding:
@@ -1172,9 +1189,13 @@ class _SitePageState extends State<SitePage> {
                                                                   ),
                                                                 ),
                                                                 InkWell(
-                                                                  onTap: () =>
-                                                                      _deleteSite(
-                                                                          index),
+                                                                  onTap: () {
+                                                                    _scaffoldKey
+                                                                        .currentState
+                                                                        .hideCurrentSnackBar();
+                                                                    _deleteSite(
+                                                                        index);
+                                                                  },
                                                                   child:
                                                                       Padding(
                                                                     padding: const EdgeInsets

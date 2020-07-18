@@ -90,7 +90,7 @@ class _SplashPageState extends State<SplashPage> {
                       height: MediaQuery.of(context).size.height / 50,
                     ),
                     Text(
-                      'Connexion...',
+                      'Bienvenue...',
                       style: TextStyle(
                           color: Color(0xff000000).withOpacity(.7),
                           fontSize: screenSize(context).height / 39),

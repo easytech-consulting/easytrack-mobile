@@ -19,12 +19,20 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isLoading;
   var _formKey;
+  bool _obscureText;
+
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _isLoading = false;
+    _obscureText = true;
 
     _loginNode = new FocusNode();
     _passwordNode = new FocusNode();
@@ -492,7 +500,7 @@ class _LoginPageState extends State<LoginPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
                                 child: TextFormField(
-                                  obscureText: true,
+                                  obscureText: _obscureText,
                                   controller: _passwordController,
                                   focusNode: _passwordNode,
                                   textInputAction: TextInputAction.done,
@@ -521,6 +529,15 @@ class _LoginPageState extends State<LoginPage> {
                                           fontSize: 18.0),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide.none,
+                                      ),
+                                      suffixIcon: InkWell(
+                                        onTap: () => _toggle(),
+                                        child: Icon(
+                                            _obscureText
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: Color(0xff000000),
+                                            size: 15.0),
                                       ),
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide.none,

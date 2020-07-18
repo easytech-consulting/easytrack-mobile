@@ -33,3 +33,17 @@ Future<User> fetchUserDetails(int id) async {
     throw Exception('fetchUserDetails with error $ex');
   }
 }
+
+Future fetchUniques() async {
+  try {
+    final response = await http.get('$endPoint/uniques');
+    if (response.statusCode == 200) {
+      final res = json.decode(response.body);
+      return res['data'];
+    }
+
+    throw Exception('fetchUniques exited with ${response.statusCode}');
+  } catch (ex) {
+    throw Exception('fetchUniques with error $ex');
+  }
+}
