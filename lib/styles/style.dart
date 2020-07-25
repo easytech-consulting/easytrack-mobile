@@ -27,7 +27,7 @@ TextStyle policiesTextStyle =
     TextStyle(color: Color(0xff000000).withOpacity(.7), fontSize: 14.0);
 BoxDecoration textFormFieldBoxDecoration = BoxDecoration(
     color: Color(0xff000000).withOpacity(.1),
-    borderRadius: BorderRadius.all(Radius.circular(30.0)));
+    borderRadius: BorderRadius.all(Radius.circular(30.0))); 
 TextStyle versionStyle =
     TextStyle(color: Color(0xff000000).withOpacity(.4), fontSize: 14);
 
@@ -36,7 +36,7 @@ TextStyle topCardTitleStyle =
 TextStyle topCardDescriptionStyle =
     TextStyle(color: Color(0xff000000), fontSize: 15.0);
 TextStyle topCardPercentStyle =
-    TextStyle(color: Color(0xff000000), fontSize: 44.0);
+    TextStyle(color: Color(0xff000000), fontSize: 44.0, fontFamily: 'Roboto');
 TextStyle mainPartTitleStyle =
     TextStyle(color: Color(0xff000000), fontSize: 16.0);
 TextStyle listCardItemTitleStyle =

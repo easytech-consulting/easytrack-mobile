@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/models/site.dart';
-import 'package:easytrack/models/snack.dart';
+import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
 import 'package:easytrack/screens/auth/login.dart';
 import 'package:easytrack/screens/home/home.dart';
@@ -33,14 +33,14 @@ class _SplashPageState extends State<SplashPage> {
         userToken = await getUserToken();
         user = User.fromJson(await getUser());
         site = Site.fromJson(await getUserSite());
-        userRoles = await getUserRoles();
-        snack = Snack.fromJson(await getUserSnack());
+        userRole = await getUserRoles();
+        company = Company.fromJson(await getUserSnack());
         Timer(
             Duration(seconds: 3),
             () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => _login ? HomePage() : LoginPage())));
+                    builder: (context) => _login ? MainPage(): LoginPage())));
       } else {
         await getFirstConnexion().then((res) {
           if (res) {

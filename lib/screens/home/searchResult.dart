@@ -24,12 +24,12 @@ class _SearchResultState extends State<SearchResult> {
   TextEditingController _controller = TextEditingController();
   int currentTab;
   final List<Widget> screens = [
-    HomePage(),
+    MainPage(),
     ShoppingPage(),
     CalendarPage(),
     ChatPage()
   ];
-  Widget currentScreen = HomePage();
+  Widget currentScreen = MainPage();
   @override
   Widget build(BuildContext context) {
     return SafeArea(

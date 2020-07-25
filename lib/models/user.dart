@@ -4,8 +4,8 @@ class User {
   final String email;
   final String address;
   final String username;
-  final String isAdmin;
-  final String cniNumber;
+  final String tel;
+  final int isAdmin;
   final String photo;
 
   User(
@@ -14,8 +14,8 @@ class User {
       this.email,
       this.address,
       this.username,
+      this.tel,
       this.isAdmin,
-      this.cniNumber,
       this.photo});
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -25,8 +25,8 @@ class User {
         email: json['email'],
         address: json['address'],
         username: json['username'],
-        isAdmin: json['is_admin'],
-        cniNumber: json['cni_number'],
+        tel: json['phone'],
+        isAdmin: int.parse(json['is_admin'].toString()),
         photo: json['photo']);
   }
 
@@ -37,7 +37,7 @@ class User {
         'address': address.toString(),
         'username': username.toString(),
         'is_admin': isAdmin.toString,
-        'cni_number': cniNumber.toString(),
+        'phone': tel.toString(),
         'photo': photo.toString()
       };
 }

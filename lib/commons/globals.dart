@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
-import 'package:easytrack/models/snack.dart';
+import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,17 +37,21 @@ storeToken(String token) async {
   await prefs.setBool('isLogged', true);
 }
 
-storeUserDetails(userData, userHasSite) async {
+storeUserDetails(
+    userData, siteData, userHasSite, companyData, userHasCompany) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String user = json.encode(userData);
-  await prefs.setString('user', user);
-  await prefs.setStringList(
-      'roles', userRoles.map((role) => role.toString()).toList());
+  String prefsUser = json.encode(userData), roleData = json.encode(userRole);
+  await prefs.setString('user', prefsUser);
+  await prefs.setString('roles', roleData);
+  if (userHasCompany) {
+    String prefsCompany = json.encode(companyData);
+    await prefs.setString('company', prefsCompany);
+  }
   if (userHasSite) {
-    String site = json.encode(userData['site']),
-        snack = json.encode(userData['site']['snack']);
-    await prefs.setString('site', site);
-    await prefs.setString('snack', snack);
+    String prefsSite = json.encode(siteData);
+    String prefsCompany = json.encode(companyData);
+    await prefs.setString('site', prefsSite);
+    await prefs.setString('company', prefsCompany);
   }
 }
 
@@ -105,15 +109,16 @@ disconnectUser() async {
   prefs.setBool('isLogged', false);
 }
 
-final String endPoint = 'https://easytracknew.azurewebsites.net/api';
-int errorStatusCode;
-List userRoles = [];
+final String endPoint =
+    'https://easytracknew-easytrackdev.azurewebsites.net/api';
+
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
 }
 
+int errorStatusCode, userId;
+Map userRole;
 String userToken;
 User user;
 Site site;
-Snack snack;
-int userId;
+Company company;

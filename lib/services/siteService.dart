@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:easytrack/commons/globals.dart';
 import 'package:http/http.dart' as http;
 
-Future fetchSiteOfSnack(int id) async {
+Future fetchSiteOfCompany(int id) async {
   try {
-    final response = await http.get('$endPoint/snacks/$id',
+    final response = await http.get('$endPoint/companies/$id',
         headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
 
     if (response.statusCode == 200) {
@@ -22,6 +22,7 @@ Future fetchSiteOfSnack(int id) async {
 }
 
 Future createSite(params) async {
+  print(params.toString());
   try {
     final response = await http.post('$endPoint/sites',
         body: params,

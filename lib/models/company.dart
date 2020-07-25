@@ -1,4 +1,4 @@
-class Site {
+class Company {
   final int id;
   final String email;
   final String name;
@@ -7,10 +7,12 @@ class Site {
   final String deleteAt;
   final String tel1;
   final String tel2;
+  final String photo;
   final String town;
+  final bool isActive;
   final String street;
 
-  Site(
+  Company(
       {this.name,
       this.slug,
       this.createdAt,
@@ -18,13 +20,15 @@ class Site {
       this.id,
       this.email,
       this.street,
+      this.photo,
       this.tel1,
       this.tel2,
+      this.isActive,
       this.town});
 
-  factory Site.fromJson(Map<String, dynamic> json) {
-    return Site(
-        id: int.parse(json['site_id'].toString()),
+  factory Company.fromJson(Map<String, dynamic> json) {
+    return Company(
+        id: int.parse(json['id'].toString()),
         name: json['name'],
         slug: json['slug'],
         createdAt: json['created_at'],
@@ -33,18 +37,22 @@ class Site {
         tel2: json['phone2'],
         street: json['street'],
         town: json['town'],
+        photo: json['photo'],
+        isActive: json['is_active'] == 1 ? false : true,
         deleteAt: json['deleteAt']);
   }
 
   Map<String, dynamic> toJson() => {
-        'site_id': id.toString(),
+        'id': id.toString(),
         'name': name.toString(),
         'email': email.toString(),
-        'tel1': tel1.toString(),
-        'tel2': tel2.toString(),
+        'phone1': tel1.toString(),
+        'phone2': tel2.toString(),
         'street': street.toString(),
         'town': town.toString(),
         'created_at': createdAt.toString(),
         'deleted_at': deleteAt.toString(),
+        'photo': photo.toString(),
+        'is_active': isActive ? 0 : 1
       };
 }

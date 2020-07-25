@@ -13,7 +13,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool _isLoading, _obscureText;
+  bool _isLoading, _obscureText, _cObscureText;
   var _formKey;
   int _currentPage;
   Plan _selectedPlan;
@@ -26,6 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _useremailController;
   TextEditingController _userloginController;
   TextEditingController _userpasswordController;
+  TextEditingController _usercPasswordController;
   TextEditingController _snacknameController;
   TextEditingController _snackemailController;
   TextEditingController _snacktownController;
@@ -44,6 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
   FocusNode _useremailNode;
   FocusNode _userloginNode;
   FocusNode _userpasswordNode;
+  FocusNode _usercPasswordNode;
   FocusNode _snacknameNode;
   FocusNode _snackemailNode;
   FocusNode _snacktownNode;
@@ -64,6 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _listOfPlans = [];
     _currentPage = 0;
     _obscureText = true;
+    _cObscureText = true;
     _plans = fetchAllPlans();
 
     _usernameController = new TextEditingController();
@@ -72,6 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
+    _usercPasswordController = new TextEditingController();
     _snacknameController = new TextEditingController();
     _snackemailController = new TextEditingController();
     _snacktownController = new TextEditingController();
@@ -90,6 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _useremailNode = new FocusNode();
     _userloginNode = new FocusNode();
     _userpasswordNode = new FocusNode();
+    _usercPasswordNode = new FocusNode();
     _snacknameNode = new FocusNode();
     _snackemailNode = new FocusNode();
     _snacktownNode = new FocusNode();
@@ -110,18 +115,18 @@ class _RegisterPageState extends State<RegisterPage> {
     Map<String, dynamic> _params = Map();
     _params['username'] = _usernameController.text;
     _params['useraddress'] = _useraddressController.text;
-    _params['usertel'] = _userphoneController.text;
+    _params['userphone'] = _userphoneController.text;
     _params['useremail'] = _useremailController.text;
     _params['userusername'] = _userloginController.text;
     _params['userpassword'] = _userpasswordController.text;
 
-    _params['snackname'] = _snacknameController.text;
-    _params['snackemail'] = _snackemailController.text;
-    _params['snacktown'] = _snacktownController.text;
-    _params['snackstreet'] = _snackstreetController.text;
-    _params['snacktel1'] = _snackphone1Controller.text;
+    _params['companyname'] = _snacknameController.text;
+    _params['companyemail'] = _snackemailController.text;
+    _params['companytown'] = _snacktownController.text;
+    _params['companystreet'] = _snackstreetController.text;
+    _params['companyphone1'] = _snackphone1Controller.text;
     if (_snackphone2Controller.text.isNotEmpty) {
-      _params['snacktel2'] = _snackphone2Controller.text;
+      _params['companyphone2'] = _snackphone2Controller.text;
     }
 
     _params['sitename'] =
@@ -129,9 +134,9 @@ class _RegisterPageState extends State<RegisterPage> {
     _params['siteemail'] = _siteemailController.text;
     _params['sitetown'] = _sitetownController.text;
     _params['sitestreet'] = _sitestreetController.text;
-    _params['sitetel1'] = _sitephone1Controller.text;
+    _params['sitephone1'] = _sitephone1Controller.text;
     if (_sitephone2Controller.text.isNotEmpty) {
-      _params['sitetel2'] = _sitephone2Controller.text;
+      _params['sitephone2'] = _sitephone2Controller.text;
     }
 
     _params['type'] = _selectedPlan.id.toString();
@@ -151,6 +156,12 @@ class _RegisterPageState extends State<RegisterPage> {
   _toggle() {
     setState(() {
       _obscureText = !_obscureText;
+    });
+  }
+
+   _cToggle() {
+    setState(() {
+      _cObscureText = !_cObscureText;
     });
   }
 
@@ -416,10 +427,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: _obscureText,
                     controller: _userpasswordController,
                     focusNode: _userpasswordNode,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) {
-                      _userpasswordNode.unfocus();
-                    },
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => nextNode(
+                        context, _userpasswordNode, _usercPasswordNode),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Champs obligatoire';
@@ -439,6 +449,70 @@ class _RegisterPageState extends State<RegisterPage> {
                           onPressed: () => _toggle(),
                           icon: Icon(
                               _obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Color(0xff000000),
+                              size: 15.0),
+                        ),
+                        hintStyle: TextStyle(
+                            color: Color(0xff000000).withOpacity(.35),
+                            fontSize: 18.0),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        )),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: screenSize(context).height / 31.0,
+            ),
+            Stack(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Container(
+                    height: 48.0,
+                    decoration: textFormFieldBoxDecoration,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: TextFormField(
+                    obscureText: _cObscureText,
+                    controller: _usercPasswordController,
+                    focusNode: _usercPasswordNode,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) {
+                      _usercPasswordNode.unfocus();
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Champs obligatoire';
+                      }
+                      if (value.length < 8) {
+                        return 'Au minimum 8 carateres';
+                      }
+                      if (_usercPasswordController.text
+                              .compareTo(_userpasswordController.text) !=
+                          0) {
+                        return 'les mots de passe ne coincident pas';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        prefixIcon: Icon(AmazingIcon.lock_password_line,
+                            color: Color(0xff000000), size: 15.0),
+                        hintText: 'Confirmation de mot de passe',
+                        suffixIcon: IconButton(
+                          onPressed: () => _cToggle(),
+                          icon: Icon(
+                              _cObscureText
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                               color: Color(0xff000000),
@@ -717,7 +791,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) {
                   _snackphone2Node.unfocus();
                 },
-               decoration: InputDecoration(
+                decoration: InputDecoration(
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
