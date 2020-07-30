@@ -3,7 +3,6 @@ import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/role.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/user.dart';
-import 'package:easytrack/screens/site/all.dart';
 import 'package:easytrack/services/employeeService.dart';
 import 'package:easytrack/services/externalService.dart';
 import 'package:easytrack/services/roleService.dart';
@@ -27,10 +26,11 @@ class _UserPageState extends State<UserPage> {
   List _roles;
   Role _role;
   int _selectedRoleId;
-  bool _obscureText, _cObscureText;
+  bool _obscureText;
   TextEditingController _controller;
   List _users = [], _userRole = [];
   Site _site;
+  Future _futureEmployees;
   bool _searchMode;
   GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _usernameController;
@@ -39,7 +39,6 @@ class _UserPageState extends State<UserPage> {
   TextEditingController _useremailController;
   TextEditingController _userloginController;
   TextEditingController _userpasswordController;
-  TextEditingController _usercPasswordController;
 
   FocusNode _usernameNode;
   FocusNode _useraddressNode;
@@ -47,7 +46,6 @@ class _UserPageState extends State<UserPage> {
   FocusNode _useremailNode;
   FocusNode _userloginNode;
   FocusNode _userpasswordNode;
-  FocusNode _usercPasswordNode;
 
   @override
   void initState() {
@@ -74,7 +72,6 @@ class _UserPageState extends State<UserPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-    _usercPasswordController = new TextEditingController();
 
     _usernameNode = new FocusNode();
     _useraddressNode = new FocusNode();
@@ -82,10 +79,8 @@ class _UserPageState extends State<UserPage> {
     _useremailNode = new FocusNode();
     _userloginNode = new FocusNode();
     _userpasswordNode = new FocusNode();
-    _usercPasswordNode = new FocusNode();
 
     _obscureText = true;
-    _cObscureText = true;
     _showErrorRole = false;
   }
 
@@ -313,9 +308,8 @@ class _UserPageState extends State<UserPage> {
     await createEmployee(_params).then((employee) {
       setState(() {
         _isLoading = false;
+        _futureEmployees = fetchEmployeesOfSite(_site.id);
       });
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SitePage()));
     });
   }
 
@@ -326,7 +320,6 @@ class _UserPageState extends State<UserPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-    _usercPasswordController = new TextEditingController();
 
     showDialog(
       context: context,
@@ -469,9 +462,8 @@ class _UserPageState extends State<UserPage> {
                                 keyboardType: TextInputType.number,
                                 onFieldSubmitted: (_) => nextNode(
                                     context, _userphoneNode, _useremailNode),
-                                validator: (value) {
-                                  return null;
-                                },
+                                validator: (value) => checkNumberValidity(value,
+                                    canBeEmpty: true),
                                 decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 50.0),
@@ -513,9 +505,8 @@ class _UserPageState extends State<UserPage> {
                                 keyboardType: TextInputType.emailAddress,
                                 onFieldSubmitted: (_) => nextNode(
                                     context, _useremailNode, _userloginNode),
-                                validator: (value) {
-                                  return null;
-                                },
+                                validator: (value) =>
+                                    checkEmailValidity(value, canBeEmpty: true),
                                 decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 50.0),
@@ -627,7 +618,6 @@ class _UserPageState extends State<UserPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-    _usercPasswordController = new TextEditingController();
 
     showDialog(
       context: context,
@@ -673,7 +663,8 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 controller: _usernameController,
                                 focusNode: _usernameNode,
@@ -687,8 +678,8 @@ class _UserPageState extends State<UserPage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(
                                         AmazingIcon.account_circle_line,
                                         color: Color(0xff000000),
@@ -720,7 +711,8 @@ class _UserPageState extends State<UserPage> {
                                   decoration: textFormFieldBoxDecoration),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 obscureText: false,
                                 controller: _useraddressController,
@@ -735,8 +727,8 @@ class _UserPageState extends State<UserPage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                                         color: Color(0xff000000), size: 15.0),
                                     hintText: 'Adresse',
@@ -768,7 +760,8 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 controller: _userphoneController,
                                 focusNode: _userphoneNode,
@@ -776,15 +769,11 @@ class _UserPageState extends State<UserPage> {
                                 keyboardType: TextInputType.number,
                                 onFieldSubmitted: (_) => nextNode(
                                     context, _userphoneNode, _useremailNode),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  return null;
-                                },
+                                validator: (value) =>
+                                    checkNumberValidity(value),
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(AmazingIcon.phone_line,
                                         color: Color(0xff000000), size: 15.0),
                                     hintText: 'Telephone',
@@ -815,7 +804,8 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 controller: _useremailController,
                                 focusNode: _useremailNode,
@@ -823,15 +813,10 @@ class _UserPageState extends State<UserPage> {
                                 keyboardType: TextInputType.emailAddress,
                                 onFieldSubmitted: (_) => nextNode(
                                     context, _useremailNode, _userloginNode),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  return null;
-                                },
+                                validator: (value) => checkEmailValidity(value),
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(AmazingIcon.at_line,
                                         color: Color(0xff000000), size: 15.0),
                                     hintText: 'Email',
@@ -862,7 +847,8 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 controller: _userloginController,
                                 focusNode: _userloginNode,
@@ -876,8 +862,8 @@ class _UserPageState extends State<UserPage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(AmazingIcon.user_6_line,
                                         color: Color(0xff000000), size: 15.0),
                                     hintText: 'Nom d\'utilisateur',
@@ -908,14 +894,15 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: TextFormField(
                                 obscureText: _obscureText,
                                 controller: _userpasswordController,
                                 focusNode: _userpasswordNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(context,
-                                    _userpasswordNode, _usercPasswordNode),
+                                textInputAction: TextInputAction.done,
+                                onFieldSubmitted: (_) =>
+                                    _userpasswordNode.unfocus(),
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Champs obligatoire';
@@ -926,8 +913,8 @@ class _UserPageState extends State<UserPage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 50.0),
                                     prefixIcon: Icon(
                                         AmazingIcon.lock_password_line,
                                         color: Color(0xff000000),
@@ -941,77 +928,6 @@ class _UserPageState extends State<UserPage> {
                                       },
                                       icon: Icon(
                                           _obscureText
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
-                                          color: Color(0xff000000),
-                                          size: 15.0),
-                                    ),
-                                    hintStyle: TextStyle(
-                                        color:
-                                            Color(0xff000000).withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: screenSize(context).height / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: textFormFieldBoxDecoration,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                obscureText: _cObscureText,
-                                controller: _usercPasswordController,
-                                focusNode: _usercPasswordNode,
-                                textInputAction: TextInputAction.done,
-                                onFieldSubmitted: (_) {
-                                  _usercPasswordNode.unfocus();
-                                },
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  if (value.length < 8) {
-                                    return 'Au minimum 8 carateres';
-                                  }
-                                  if (_usercPasswordController.text.compareTo(
-                                          _userpasswordController.text) !=
-                                      0) {
-                                    return 'les mots de passe ne coincident pas';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(
-                                        AmazingIcon.lock_password_line,
-                                        color: Color(0xff000000),
-                                        size: 15.0),
-                                    hintText: 'Confirmation de mot de passe',
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _cObscureText = !_cObscureText;
-                                        });
-                                      },
-                                      icon: Icon(
-                                          _cObscureText
                                               ? Icons.visibility
                                               : Icons.visibility_off,
                                           color: Color(0xff000000),
@@ -1050,7 +966,21 @@ class _UserPageState extends State<UserPage> {
                                 hint: Text('Selectionnez un role'),
                                 items: _roles.map((role) {
                                   return DropdownMenuItem<Role>(
-                                    child: Text(role.name),
+                                    child: Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 10.0),
+                                              child: Icon(
+                                                  AmazingIcon.community_line,
+                                                  size: 15.0)),
+                                          Text(role.name),
+                                        ],
+                                      ),
+                                    ),
                                     value: role,
                                   );
                                 }).toList(),
@@ -1314,268 +1244,526 @@ class _UserPageState extends State<UserPage> {
                     color: greyColor,
                   ),
                 ),
-                FutureBuilder(
-                  future: _futureRoles,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
-                      _roles = snapshot.data;
-                      return Container(
-                        width: screenSize(context).width,
-                        height: screenSize(context).height * .86,
-                        child:  _users.length == 0 
-                            ? Center(
-                                child: Text('Aucun personnel'),
-                              )
-                            : ListView.builder(
-                                itemCount: _users.length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Container(
-                                          height:
-                                              screenSize(context).height / 5.2,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10.0)),
-                                              border: Border.all(
-                                                  color: Colors.black38)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 5.0),
+                _futureEmployees != null
+                    ? FutureBuilder(
+                        future: _futureEmployees,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            _users = snapshot.data['employees']
+                                .map((e) => User.fromJson(e['user']))
+                                .toList();
+                            _userRole = snapshot.data['employees']
+                                .map((e) => Role.fromJson(e['user']['role']))
+                                .toList();
+                            return Container(
+                              width: screenSize(context).width,
+                              height: screenSize(context).height * .86,
+                              child: ListView.builder(
+                                  itemCount: _users.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Container(
+                                            height: screenSize(context).height /
+                                                5.2,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10.0)),
+                                                border: Border.all(
+                                                    color: Colors.black38)),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left:
-                                                            screenSize(context)
-                                                                    .width /
-                                                                80),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        InkWell(
-                                                          onTap: () =>
-                                                              _showDetails(
-                                                                  _users[index],
-                                                                  _userRole[
-                                                                      index]),
-                                                          child: Text(
-                                                            _users[index].name,
-                                                            style: TextStyle(
-                                                                fontSize: screenSize(
-                                                                            context)
-                                                                        .height /
-                                                                    30,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
+                                              padding: const EdgeInsets.only(
+                                                  left: 5.0),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              80),
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          InkWell(
+                                                            onTap: () =>
+                                                                _showDetails(
+                                                                    _users[
+                                                                        index],
+                                                                    _userRole[
+                                                                        index]),
+                                                            child: Text(
+                                                              _users[index]
+                                                                  .name,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          30,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Spacer(),
-                                                        InkWell(
-                                                            onTap: () {
-                                                              _scaffoldKey
-                                                                  .currentState
-                                                                  .showSnackBar(
-                                                                      SnackBar(
-                                                                duration:
-                                                                    Duration(
-                                                                        seconds:
-                                                                            30),
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                content:
-                                                                    Container(
-                                                                  height: 145.0,
-                                                                  child: Column(
-                                                                    children: <
-                                                                        Widget>[
+                                                          Spacer(),
+                                                          InkWell(
+                                                              onTap: () {
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  duration:
+                                                                      Duration(
+                                                                          seconds:
+                                                                              30),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  content:
                                                                       Container(
-                                                                        decoration: BoxDecoration(
-                                                                            color:
-                                                                                greyColor,
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(5.0))),
-                                                                        height:
-                                                                            5.0,
-                                                                        width:
-                                                                            150.0,
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            15.0,
-                                                                      ),
-                                                                      Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(vertical: 10.0),
-                                                                        child:
-                                                                            Row(
-                                                                          children: <
-                                                                              Widget>[
-                                                                            Icon(
-                                                                              AmazingIcon.edit_2_line,
-                                                                              size: 15.0,
-                                                                              color: gradient1,
-                                                                            ),
-                                                                            InkWell(
-                                                                              onTap: () {
-                                                                                _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                                _updateUser(_users[index]);
-                                                                              },
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.only(left: 20.0),
-                                                                                child: Text(
-                                                                                  'Modifier',
-                                                                                  style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          ],
+                                                                    height:
+                                                                        145.0,
+                                                                    child:
+                                                                        Column(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Container(
+                                                                          decoration: BoxDecoration(
+                                                                              color: greyColor,
+                                                                              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                                                          height:
+                                                                              5.0,
+                                                                          width:
+                                                                              150.0,
                                                                         ),
-                                                                      ),
-                                                                      Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(vertical: 10.0),
-                                                                        child:
-                                                                            Row(
-                                                                          children: <
-                                                                              Widget>[
-                                                                            Icon(
-                                                                              AmazingIcon.repeat_2_line,
-                                                                              size: 15.0,
-                                                                              color: gradient1,
-                                                                            ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 20.0),
-                                                                              child: Text(
-                                                                                'Dupliquer',
-                                                                                style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                              ),
-                                                                            )
-                                                                          ],
+                                                                        SizedBox(
+                                                                          height:
+                                                                              15.0,
                                                                         ),
-                                                                      ),
-                                                                      InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          _scaffoldKey
-                                                                              .currentState
-                                                                              .hideCurrentSnackBar();
-                                                                          _deleteSite(
-                                                                              index);
-                                                                        },
-                                                                        child:
-                                                                            Padding(
+                                                                        Padding(
                                                                           padding:
                                                                               const EdgeInsets.symmetric(vertical: 10.0),
                                                                           child:
                                                                               Row(
                                                                             children: <Widget>[
                                                                               Icon(
-                                                                                AmazingIcon.delete_bin_6_line,
+                                                                                AmazingIcon.edit_2_line,
                                                                                 size: 15.0,
-                                                                                color: redColor,
+                                                                                color: gradient1,
+                                                                              ),
+                                                                              InkWell(
+                                                                                onTap: () {
+                                                                                  _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                                  _updateUser(_users[index]);
+                                                                                },
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.only(left: 20.0),
+                                                                                  child: Text(
+                                                                                    'Modifier',
+                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                  ),
+                                                                                ),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.symmetric(vertical: 10.0),
+                                                                          child:
+                                                                              Row(
+                                                                            children: <Widget>[
+                                                                              Icon(
+                                                                                AmazingIcon.repeat_2_line,
+                                                                                size: 15.0,
+                                                                                color: gradient1,
                                                                               ),
                                                                               Padding(
                                                                                 padding: const EdgeInsets.only(left: 20.0),
                                                                                 child: Text(
-                                                                                  'Supprimer',
+                                                                                  'Dupliquer',
                                                                                   style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
                                                                                 ),
                                                                               )
                                                                             ],
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    ],
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                            _deleteSite(index);
+                                                                          },
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.symmetric(vertical: 10.0),
+                                                                            child:
+                                                                                Row(
+                                                                              children: <Widget>[
+                                                                                Icon(
+                                                                                  AmazingIcon.delete_bin_6_line,
+                                                                                  size: 15.0,
+                                                                                  color: redColor,
+                                                                                ),
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 20.0),
+                                                                                  child: Text(
+                                                                                    'Supprimer',
+                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ));
-                                                            },
-                                                            child: Icon(
-                                                              AmazingIcon
-                                                                  .more_2_fill,
-                                                              size: 25.0,
+                                                                ));
+                                                              },
+                                                              child: Icon(
+                                                                AmazingIcon
+                                                                    .more_2_fill,
+                                                                size: 25.0,
+                                                                color: Colors
+                                                                    .black54,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height:
+                                                          screenSize(context)
+                                                                  .height /
+                                                              40.0,
+                                                    ),
+                                                    Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          AmazingIcon
+                                                              .map_pin_2_line,
+                                                        ),
+                                                        SizedBox(
+                                                          width: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              70,
+                                                        ),
+                                                        Text(
+                                                          '${_users[index].address}, Cameroun',
+                                                          style: TextStyle(
                                                               color: Colors
                                                                   .black54,
-                                                            ))
+                                                              fontSize: screenSize(
+                                                                          context)
+                                                                      .height /
+                                                                  38.0),
+                                                        ),
                                                       ],
                                                     ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: screenSize(context)
-                                                            .height /
-                                                        40.0,
-                                                  ),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        AmazingIcon
-                                                            .map_pin_2_line,
-                                                      ),
-                                                      SizedBox(
-                                                        width:
-                                                            screenSize(context)
-                                                                    .width /
-                                                                70,
-                                                      ),
-                                                      Text(
-                                                        '${_users[index].address}, Cameroun',
+                                                    SizedBox(
+                                                      height:
+                                                          screenSize(context)
+                                                                  .height /
+                                                              40.0,
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              80),
+                                                      child: Text(
+                                                        _userRole[index].name,
                                                         style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
+                                                            color: gradient1,
                                                             fontSize: screenSize(
                                                                         context)
                                                                     .height /
-                                                                38.0),
+                                                                40.0),
                                                       ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: screenSize(context)
-                                                            .height /
-                                                        40.0,
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left:
-                                                            screenSize(context)
-                                                                    .width /
-                                                                80),
-                                                    child: Text(
-                                                      _userRole[index].name,
-                                                      style: TextStyle(
-                                                          color: gradient1,
-                                                          fontSize: screenSize(
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )));
+                                  }),
+                            );
+                          }
+                          return Container(
+                            height: screenSize(context).height * .86,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    new AlwaysStoppedAnimation(gradient1),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : FutureBuilder(
+                        future: _futureRoles,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            _roles = snapshot.data;
+                            return Container(
+                              width: screenSize(context).width,
+                              height: screenSize(context).height * .86,
+                              child: _users.length == 0
+                                  ? Center(
+                                      child: Text('Aucun personnel'),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _users.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Container(
+                                                height: screenSize(context)
+                                                        .height /
+                                                    5.2,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    border: Border.all(
+                                                        color: Colors.black38)),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 5.0),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding: EdgeInsets.only(
+                                                              left: screenSize(
+                                                                          context)
+                                                                      .width /
+                                                                  80),
+                                                          child: Row(
+                                                            children: <Widget>[
+                                                              InkWell(
+                                                                onTap: () => _showDetails(
+                                                                    _users[
+                                                                        index],
+                                                                    _userRole[
+                                                                        index]),
+                                                                child: Text(
+                                                                  _users[index]
+                                                                      .name,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          screenSize(context).height /
+                                                                              30,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                              Spacer(),
+                                                              InkWell(
+                                                                  onTap: () {
+                                                                    _scaffoldKey
+                                                                        .currentState
+                                                                        .showSnackBar(
+                                                                            SnackBar(
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              30),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      content:
+                                                                          Container(
+                                                                        height:
+                                                                            145.0,
+                                                                        child:
+                                                                            Column(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            Container(
+                                                                              decoration: BoxDecoration(color: greyColor, borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                                                              height: 5.0,
+                                                                              width: 150.0,
+                                                                            ),
+                                                                            SizedBox(
+                                                                              height: 15.0,
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                                              child: Row(
+                                                                                children: <Widget>[
+                                                                                  Icon(
+                                                                                    AmazingIcon.edit_2_line,
+                                                                                    size: 15.0,
+                                                                                    color: gradient1,
+                                                                                  ),
+                                                                                  InkWell(
+                                                                                    onTap: () {
+                                                                                      _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                                      _updateUser(_users[index]);
+                                                                                    },
+                                                                                    child: Padding(
+                                                                                      padding: const EdgeInsets.only(left: 20.0),
+                                                                                      child: Text(
+                                                                                        'Modifier',
+                                                                                        style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                      ),
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                                              child: Row(
+                                                                                children: <Widget>[
+                                                                                  Icon(
+                                                                                    AmazingIcon.repeat_2_line,
+                                                                                    size: 15.0,
+                                                                                    color: gradient1,
+                                                                                  ),
+                                                                                  Padding(
+                                                                                    padding: const EdgeInsets.only(left: 20.0),
+                                                                                    child: Text(
+                                                                                      'Dupliquer',
+                                                                                      style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            InkWell(
+                                                                              onTap: () {
+                                                                                _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                                _deleteSite(index);
+                                                                              },
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    Icon(
+                                                                                      AmazingIcon.delete_bin_6_line,
+                                                                                      size: 15.0,
+                                                                                      color: redColor,
+                                                                                    ),
+                                                                                    Padding(
+                                                                                      padding: const EdgeInsets.only(left: 20.0),
+                                                                                      child: Text(
+                                                                                        'Supprimer',
+                                                                                        style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                      ),
+                                                                                    )
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ));
+                                                                  },
+                                                                  child: Icon(
+                                                                    AmazingIcon
+                                                                        .more_2_fill,
+                                                                    size: 25.0,
+                                                                    color: Colors
+                                                                        .black54,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: screenSize(
                                                                       context)
                                                                   .height /
-                                                              40.0),
+                                                              40.0,
+                                                        ),
+                                                        Row(
+                                                          children: <Widget>[
+                                                            Icon(
+                                                              AmazingIcon
+                                                                  .map_pin_2_line,
+                                                            ),
+                                                            SizedBox(
+                                                              width: screenSize(
+                                                                          context)
+                                                                      .width /
+                                                                  70,
+                                                            ),
+                                                            Text(
+                                                              '${_users[index].address}, Cameroun',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          38.0),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: screenSize(
+                                                                      context)
+                                                                  .height /
+                                                              40.0,
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(
+                                                              left: screenSize(
+                                                                          context)
+                                                                      .width /
+                                                                  80),
+                                                          child: Text(
+                                                            _userRole[index]
+                                                                .name,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    gradient1,
+                                                                fontSize: screenSize(
+                                                                            context)
+                                                                        .height /
+                                                                    40.0),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          )));
-                                }),
-                      );
-                    }
-                    return Container(
-                      height: screenSize(context).height * .86,
-                      color: Colors.transparent,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation(gradient1),
-                        ),
-                      ),
-                    );
-                  },
-                )
+                                                )));
+                                      }),
+                            );
+                          }
+                          return Container(
+                            height: screenSize(context).height * .86,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    new AlwaysStoppedAnimation(gradient1),
+                              ),
+                            ),
+                          );
+                        },
+                      )
               ],
             ),
             _isLoading

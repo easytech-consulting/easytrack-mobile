@@ -52,7 +52,7 @@ class _StatsPageState extends State<StatsPage> {
                       : Navigator.push(context,
                           MaterialPageRoute(builder: (context) => LoginPage()));
         },
-        itemBuilder: (context) => userRole['slug'] == 'boss'
+        itemBuilder: (context) => userRole['slug'] == 'boss' || user.isAdmin == 2
             ? [
                 PopupMenuItem(
                   value: 1,

@@ -23,12 +23,14 @@ class _SitePageState extends State<SitePage> {
   bool _searchMode;
   GlobalKey<ScaffoldState> _scaffoldKey;
 
+  TextEditingController _sitenameController;
   TextEditingController _siteemailController;
   TextEditingController _sitetownController;
   TextEditingController _sitestreetController;
   TextEditingController _sitephone1Controller;
   TextEditingController _sitephone2Controller;
 
+  FocusNode _sitenameNode;
   FocusNode _siteemailNode;
   FocusNode _sitetownNode;
   FocusNode _sitestreetNode;
@@ -44,11 +46,13 @@ class _SitePageState extends State<SitePage> {
     _searchMode = false;
     _scaffoldKey = GlobalKey();
     _isLoading = false;
+    _sitenameController = new TextEditingController();
     _siteemailController = new TextEditingController();
     _sitetownController = new TextEditingController();
     _sitestreetController = new TextEditingController();
     _sitephone1Controller = new TextEditingController();
     _sitephone2Controller = new TextEditingController();
+    _sitenameNode = new FocusNode();
     _siteemailNode = new FocusNode();
     _sitetownNode = new FocusNode();
     _sitestreetNode = new FocusNode();
@@ -58,9 +62,8 @@ class _SitePageState extends State<SitePage> {
 
   _attemptUpdate(Site site) async {
     Map<String, dynamic> _params = Map();
-    _params['name'] = _sitestreetController.text.isEmpty
-        ? "${company.name} ${site.street}"
-        : "${company.name} ${_siteemailController.text}";
+    _params['name'] =
+        _sitenameController.text.isEmpty ? site.name : _sitenameController.text;
     _params['email'] = _siteemailController.text.isEmpty
         ? site.email
         : _siteemailController.text;
@@ -162,8 +165,29 @@ class _SitePageState extends State<SitePage> {
                   color: greyColor,
                 ),
                 SizedBox(
-                  height: screenSize(context).height / 20.0,
+                  height: screenSize(context).height / 40.0,
                 ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Nom',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: screenSize(context).height / 38.0),
+                    ),
+                    SizedBox(
+                      width: screenSize(context).width / 50,
+                    ),
+                    Text(
+                      '${_site.name}',
+                      style: TextStyle(
+                          fontSize: screenSize(context).height / 33,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -290,7 +314,7 @@ class _SitePageState extends State<SitePage> {
 
   _attemptSave() async {
     Map<String, dynamic> _params = Map();
-    _params['name'] = "${company.name} ${_sitestreetController.text}";
+    _params['name'] = _sitenameController.text;
     _params['email'] = _siteemailController.text;
     _params['town'] = _sitetownController.text;
     _params['street'] = _sitestreetController.text;
@@ -311,6 +335,7 @@ class _SitePageState extends State<SitePage> {
   }
 
   _createSite() {
+    _sitenameController.clear();
     _siteemailController.clear();
     _sitephone1Controller.clear();
     _sitephone2Controller.clear();
@@ -358,15 +383,14 @@ class _SitePageState extends State<SitePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: TextFormField(
-                            controller: _siteemailController,
-                            focusNode: _siteemailNode,
+                            controller: _sitenameController,
+                            focusNode: _sitenameNode,
                             textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.emailAddress,
                             onFieldSubmitted: (_) => nextNode(
-                                context, _siteemailNode, _sitetownNode),
-                            validator: (String value) {
+                                context, _sitenameNode, _siteemailNode),
+                            validator: (value) {
                               if (value.isEmpty) {
                                 return 'Champs obligatoire';
                               }
@@ -374,8 +398,49 @@ class _SitePageState extends State<SitePage> {
                               return null;
                             },
                             decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
+                                prefixIcon: Icon(AmazingIcon.community_line,
+                                    color: Color(0xff000000), size: 15.0),
+                                hintText: 'Nom',
+                                hintStyle: TextStyle(
+                                    color: Color(0xff000000).withOpacity(.35),
+                                    fontSize: 18.0),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: screenSize(context).height / 31.0,
+                    ),
+                    Stack(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Container(
+                            height: 48.0,
+                            decoration: textFormFieldBoxDecoration,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: TextFormField(
+                            controller: _siteemailController,
+                            focusNode: _siteemailNode,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.emailAddress,
+                            onFieldSubmitted: (_) => nextNode(
+                                context, _siteemailNode, _sitetownNode),
+                            validator: (value) => checkEmailValidity(value),
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
                                 prefixIcon: Icon(AmazingIcon.at_line,
                                     color: Color(0xff000000), size: 15.0),
                                 hintText: 'Email',
@@ -405,7 +470,7 @@ class _SitePageState extends State<SitePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: TextFormField(
                             controller: _sitetownController,
                             focusNode: _sitetownNode,
@@ -420,8 +485,8 @@ class _SitePageState extends State<SitePage> {
                             onFieldSubmitted: (_) => nextNode(
                                 context, _sitetownNode, _sitestreetNode),
                             decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
                                 prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                                     color: Color(0xff000000), size: 15.0),
                                 hintText: 'Ville',
@@ -451,7 +516,7 @@ class _SitePageState extends State<SitePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: TextFormField(
                             controller: _sitestreetController,
                             focusNode: _sitestreetNode,
@@ -466,8 +531,8 @@ class _SitePageState extends State<SitePage> {
                             onFieldSubmitted: (_) => nextNode(
                                 context, _sitestreetNode, _sitephone1Node),
                             decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
                                 prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                                     color: Color(0xff000000), size: 15.0),
                                 hintText: 'Rue',
@@ -497,27 +562,21 @@ class _SitePageState extends State<SitePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: TextFormField(
                             controller: _sitephone1Controller,
                             focusNode: _sitephone1Node,
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.next,
-                            validator: (String value) {
-                              if (value.isEmpty) {
-                                return 'Champs obligatoire';
-                              }
-
-                              return null;
-                            },
+                            validator: (value) => checkNumberValidity(value),
                             onFieldSubmitted: (_) => nextNode(
                                 context, _sitephone1Node, _sitephone2Node),
                             decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
                                 prefixIcon: Icon(AmazingIcon.phone_line,
                                     color: Color(0xff000000), size: 15.0),
-                                hintText: 'Telphone No 1',
+                                hintText: 'Telephone No 1',
                                 hintStyle: TextStyle(
                                     color: Color(0xff000000).withOpacity(.35),
                                     fontSize: 18.0),
@@ -544,7 +603,7 @@ class _SitePageState extends State<SitePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: TextFormField(
                             controller: _sitephone2Controller,
                             focusNode: _sitephone2Node,
@@ -553,12 +612,14 @@ class _SitePageState extends State<SitePage> {
                             onFieldSubmitted: (_) {
                               _sitephone2Node.unfocus();
                             },
+                            validator: (value) =>
+                                checkNumberValidity(value, canBeEmpty: true),
                             decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
+                                contentPadding: const EdgeInsets.only(
+                                    left: 50.0),
                                 prefixIcon: Icon(AmazingIcon.phone_line,
                                     color: Color(0xff000000), size: 15.0),
-                                hintText: 'Telphone No 2',
+                                hintText: 'Telephone No 2',
                                 hintStyle: TextStyle(
                                     color: Color(0xff000000).withOpacity(.35),
                                     fontSize: 18.0),
@@ -613,6 +674,7 @@ class _SitePageState extends State<SitePage> {
   }
 
   _updateSite(Site site) {
+    _sitenameController.clear();
     _siteemailController.clear();
     _sitephone1Controller.clear();
     _sitephone2Controller.clear();
@@ -650,12 +712,58 @@ class _SitePageState extends State<SitePage> {
                   ),
                   Stack(
                     children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Container(
+                          height: 48.0,
+                          decoration: textFormFieldBoxDecoration,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: TextFormField(
+                          controller: _sitenameController,
+                          focusNode: _sitenameNode,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) =>
+                              nextNode(context, _sitenameNode, _siteemailNode),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Champs obligatoire';
+                            }
+
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              contentPadding:
+                                  const EdgeInsets.only(left: 50.0),
+                              prefixIcon: Icon(AmazingIcon.community_line,
+                                  color: Color(0xff000000), size: 15.0),
+                              hintText: '${site.name}',
+                              hintStyle: TextStyle(
+                                  color: Color(0xff000000).withOpacity(.35),
+                                  fontSize: 18.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              )),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: screenSize(context).height / 31.0,
+                  ),
+                  Stack(
+                    children: <Widget>[
                       Container(
                         height: 48.0,
                         decoration: textFormFieldBoxDecoration,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: TextFormField(
                           controller: _siteemailController,
                           focusNode: _siteemailNode,
@@ -663,9 +771,11 @@ class _SitePageState extends State<SitePage> {
                           keyboardType: TextInputType.emailAddress,
                           onFieldSubmitted: (_) =>
                               nextNode(context, _siteemailNode, _sitetownNode),
+                          validator: (value) =>
+                              checkEmailValidity(value, canBeEmpty: true),
                           decoration: InputDecoration(
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                                  const EdgeInsets.only(left: 50.0),
                               prefixIcon: Icon(AmazingIcon.at_line,
                                   color: Color(0xff000000), size: 15.0),
                               hintText: '${site.email}',
@@ -692,7 +802,7 @@ class _SitePageState extends State<SitePage> {
                         decoration: textFormFieldBoxDecoration,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: TextFormField(
                           controller: _sitetownController,
                           focusNode: _sitetownNode,
@@ -701,7 +811,7 @@ class _SitePageState extends State<SitePage> {
                               nextNode(context, _sitetownNode, _sitestreetNode),
                           decoration: InputDecoration(
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                                  const EdgeInsets.only(left: 50.0),
                               prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                                   color: Color(0xff000000), size: 15.0),
                               hintText: '${site.town}',
@@ -728,7 +838,7 @@ class _SitePageState extends State<SitePage> {
                         decoration: textFormFieldBoxDecoration,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: TextFormField(
                           controller: _sitestreetController,
                           focusNode: _sitestreetNode,
@@ -737,7 +847,7 @@ class _SitePageState extends State<SitePage> {
                               context, _sitestreetNode, _sitephone1Node),
                           decoration: InputDecoration(
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                                  const EdgeInsets.only(left: 50.0),
                               prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                                   color: Color(0xff000000), size: 15.0),
                               hintText: '${site.street}',
@@ -764,7 +874,7 @@ class _SitePageState extends State<SitePage> {
                         decoration: textFormFieldBoxDecoration,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: TextFormField(
                           controller: _sitephone1Controller,
                           focusNode: _sitephone1Node,
@@ -772,9 +882,11 @@ class _SitePageState extends State<SitePage> {
                           keyboardType: TextInputType.number,
                           onFieldSubmitted: (_) => nextNode(
                               context, _sitephone1Node, _sitephone2Node),
+                          validator: (value) =>
+                              checkNumberValidity(value, canBeEmpty: true),
                           decoration: InputDecoration(
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                                  const EdgeInsets.only(left: 50.0),
                               prefixIcon: Icon(AmazingIcon.phone_line,
                                   color: Color(0xff000000), size: 15.0),
                               hintText: '${site.tel1}',
@@ -801,7 +913,7 @@ class _SitePageState extends State<SitePage> {
                         decoration: textFormFieldBoxDecoration,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: TextFormField(
                           controller: _sitephone2Controller,
                           focusNode: _sitephone2Node,
@@ -810,9 +922,11 @@ class _SitePageState extends State<SitePage> {
                           onFieldSubmitted: (_) {
                             _sitephone2Node.unfocus();
                           },
+                          validator: (value) =>
+                              checkEmailValidity(value, canBeEmpty: true),
                           decoration: InputDecoration(
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 50.0),
+                                  const EdgeInsets.only(left: 50.0),
                               prefixIcon: Icon(AmazingIcon.phone_line,
                                   color: Color(0xff000000), size: 15.0),
                               hintText: '${site.tel2}',
@@ -953,7 +1067,7 @@ class _SitePageState extends State<SitePage> {
                               child: Stack(
                                 children: <Widget>[
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                     child: Container(
                                       height: 36.0,
                                       decoration: textFormFieldBoxDecoration,
@@ -1067,254 +1181,252 @@ class _SitePageState extends State<SitePage> {
                         return Container(
                           width: screenSize(context).width,
                           height: screenSize(context).height * .86,
-                          child: ListView.builder(
-                              itemCount: _sites.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Container(
-                                        height:
-                                            screenSize(context).height / 5.2,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10.0)),
-                                            border: Border.all(
-                                                color: Colors.black38)),
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5.0),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: screenSize(context)
-                                                              .width /
-                                                          80),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      InkWell(
-                                                        onTap: () =>
-                                                            _showDetails(
-                                                                _sites[index],
-                                                                _owner),
-                                                        child: Text(
-                                                          'Site - ${_sites[index].street}',
+                          child: _sites == null || _sites.length == 0
+                              ? Center(
+                                  child: Text('Aucun site'),
+                                )
+                              : ListView.builder(
+                                  itemCount: _sites.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Container(
+                                            height: screenSize(context).height /
+                                                5.2,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10.0)),
+                                                border: Border.all(
+                                                    color: Colors.black38)),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 5.0),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              80),
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          InkWell(
+                                                            onTap: () =>
+                                                                _showDetails(
+                                                                    _sites[
+                                                                        index],
+                                                                    _owner),
+                                                            child: Text(
+                                                              'Site - ${_sites[index].street}',
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          30,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                          Spacer(),
+                                                          InkWell(
+                                                              onTap: () {
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  duration:
+                                                                      Duration(
+                                                                          seconds:
+                                                                              30),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  content:
+                                                                      Container(
+                                                                    height:
+                                                                        145.0,
+                                                                    child:
+                                                                        Column(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Container(
+                                                                          decoration: BoxDecoration(
+                                                                              color: greyColor,
+                                                                              borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                                                                          height:
+                                                                              5.0,
+                                                                          width:
+                                                                              150.0,
+                                                                        ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              15.0,
+                                                                        ),
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                            Navigator.push(context,
+                                                                                MaterialPageRoute(builder: (context) => UserPage(site: _allSitesData[index])));
+                                                                          },
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.symmetric(vertical: 10.0),
+                                                                            child:
+                                                                                Row(
+                                                                              children: <Widget>[
+                                                                                Icon(
+                                                                                  AmazingIcon.repeat_2_line,
+                                                                                  size: 15.0,
+                                                                                  color: gradient1,
+                                                                                ),
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 20.0),
+                                                                                  child: Text(
+                                                                                    'Mon Personnel',
+                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.symmetric(vertical: 10.0),
+                                                                          child:
+                                                                              Row(
+                                                                            children: <Widget>[
+                                                                              Icon(
+                                                                                AmazingIcon.edit_2_line,
+                                                                                size: 15.0,
+                                                                                color: gradient1,
+                                                                              ),
+                                                                              InkWell(
+                                                                                onTap: () {
+                                                                                  _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                                  _updateSite(_sites[index]);
+                                                                                },
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.only(left: 20.0),
+                                                                                  child: Text(
+                                                                                    'Modifier',
+                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                  ),
+                                                                                ),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            _scaffoldKey.currentState.hideCurrentSnackBar();
+                                                                            _deleteSite(index);
+                                                                          },
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.symmetric(vertical: 10.0),
+                                                                            child:
+                                                                                Row(
+                                                                              children: <Widget>[
+                                                                                Icon(
+                                                                                  AmazingIcon.delete_bin_6_line,
+                                                                                  size: 15.0,
+                                                                                  color: redColor,
+                                                                                ),
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 20.0),
+                                                                                  child: Text(
+                                                                                    'Supprimer',
+                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ));
+                                                              },
+                                                              child: Icon(
+                                                                AmazingIcon
+                                                                    .more_2_fill,
+                                                                size: 25.0,
+                                                                color: Colors
+                                                                    .black54,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height:
+                                                          screenSize(context)
+                                                                  .height /
+                                                              40.0,
+                                                    ),
+                                                    Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          AmazingIcon
+                                                              .map_pin_2_line,
+                                                        ),
+                                                        SizedBox(
+                                                          width: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              70,
+                                                        ),
+                                                        Text(
+                                                          '${_sites[index].town}, Cameroun',
                                                           style: TextStyle(
+                                                              color: Colors
+                                                                  .black54,
                                                               fontSize: screenSize(
                                                                           context)
                                                                       .height /
-                                                                  30,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                                  38.0),
                                                         ),
-                                                      ),
-                                                      Spacer(),
-                                                      InkWell(
-                                                          onTap: () {
-                                                            _scaffoldKey
-                                                                .currentState
-                                                                .showSnackBar(
-                                                                    SnackBar(
-                                                              duration:
-                                                                  Duration(
-                                                                      seconds:
-                                                                          30),
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              content:
-                                                                  Container(
-                                                                height: 145.0,
-                                                                child: Column(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Container(
-                                                                      decoration: BoxDecoration(
-                                                                          color:
-                                                                              greyColor,
-                                                                          borderRadius:
-                                                                              BorderRadius.all(Radius.circular(5.0))),
-                                                                      height:
-                                                                          5.0,
-                                                                      width:
-                                                                          150.0,
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          15.0,
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        _scaffoldKey
-                                                                            .currentState
-                                                                            .hideCurrentSnackBar();
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(builder: (context) => UserPage(site: _allSitesData[index])));
-                                                                      },
-                                                                      child:
-                                                                          Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(vertical: 10.0),
-                                                                        child:
-                                                                            Row(
-                                                                          children: <
-                                                                              Widget>[
-                                                                            Icon(
-                                                                              AmazingIcon.repeat_2_line,
-                                                                              size: 15.0,
-                                                                              color: gradient1,
-                                                                            ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 20.0),
-                                                                              child: Text(
-                                                                                'Mon Personnel',
-                                                                                style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                              ),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .symmetric(
-                                                                          vertical:
-                                                                              10.0),
-                                                                      child:
-                                                                          Row(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Icon(
-                                                                            AmazingIcon.edit_2_line,
-                                                                            size:
-                                                                                15.0,
-                                                                            color:
-                                                                                gradient1,
-                                                                          ),
-                                                                          InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                              _updateSite(_sites[index]);
-                                                                            },
-                                                                            child:
-                                                                                Padding(
-                                                                              padding: const EdgeInsets.only(left: 20.0),
-                                                                              child: Text(
-                                                                                'Modifier',
-                                                                                style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        _scaffoldKey
-                                                                            .currentState
-                                                                            .hideCurrentSnackBar();
-                                                                        _deleteSite(
-                                                                            index);
-                                                                      },
-                                                                      child:
-                                                                          Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(vertical: 10.0),
-                                                                        child:
-                                                                            Row(
-                                                                          children: <
-                                                                              Widget>[
-                                                                            Icon(
-                                                                              AmazingIcon.delete_bin_6_line,
-                                                                              size: 15.0,
-                                                                              color: redColor,
-                                                                            ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 20.0),
-                                                                              child: Text(
-                                                                                'Supprimer',
-                                                                                style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                              ),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ));
-                                                          },
-                                                          child: Icon(
-                                                            AmazingIcon
-                                                                .more_2_fill,
-                                                            size: 25.0,
-                                                            color:
-                                                                Colors.black54,
-                                                          ))
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: screenSize(context)
-                                                          .height /
-                                                      40.0,
-                                                ),
-                                                Row(
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      AmazingIcon
-                                                          .map_pin_2_line,
+                                                      ],
                                                     ),
                                                     SizedBox(
-                                                      width: screenSize(context)
-                                                              .width /
-                                                          70,
-                                                    ),
-                                                    Text(
-                                                      '${_sites[index].town}, Cameroun',
-                                                      style: TextStyle(
-                                                          color: Colors.black54,
-                                                          fontSize: screenSize(
-                                                                      context)
+                                                      height:
+                                                          screenSize(context)
                                                                   .height /
-                                                              38.0),
+                                                              40.0,
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: screenSize(
+                                                                      context)
+                                                                  .width /
+                                                              80),
+                                                      child: Text(
+                                                        'Disponible',
+                                                        style: TextStyle(
+                                                            color: gradient1,
+                                                            fontSize: screenSize(
+                                                                        context)
+                                                                    .height /
+                                                                40.0),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
-                                                SizedBox(
-                                                  height: screenSize(context)
-                                                          .height /
-                                                      40.0,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: screenSize(context)
-                                                              .width /
-                                                          80),
-                                                  child: Text(
-                                                    'Disponible',
-                                                    style: TextStyle(
-                                                        color: gradient1,
-                                                        fontSize:
-                                                            screenSize(context)
-                                                                    .height /
-                                                                40.0),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )));
-                              }),
+                                              ),
+                                            )));
+                                  }),
                         );
                       }
                       return Container(

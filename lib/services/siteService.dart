@@ -21,6 +21,24 @@ Future fetchSiteOfCompany(int id) async {
   }
 }
 
+Future fetchEmployeesOfSite(int id) async {
+  try {
+    print(id);
+    final response = await http.get('$endPoint/sites/$id',
+        headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['data'];
+    }
+
+    throw Exception(
+        'Fetch Employees of Site $id exited with code ${response.statusCode}');
+  } catch (ex) {
+    throw Exception('Fetch Employees of Site $id with error $ex');
+  }
+}
+
 Future createSite(params) async {
   print(params.toString());
   try {

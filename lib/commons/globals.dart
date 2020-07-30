@@ -116,6 +116,33 @@ Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
 }
 
+checkNumberValidity(String value, {canBeEmpty = false}) {
+  if (value.isEmpty) {
+    return canBeEmpty ? null : 'Champs obligatoire';
+  }
+  if (value.length != 9) {
+    return 'Numero doit avoir 9 chiffres';
+  }
+  if (value.substring(0, 1) != "6") {
+    return 'Numero commence par 6';
+  }
+  if (!["5", "6", "7", "8", "9"].contains(value.substring(1, 2))) {
+    return "Numero invalide";
+  }
+  return null;
+}
+
+checkEmailValidity(String value, {canBeEmpty = false}) {
+  RegExp _emailValidity = new RegExp(r'[a-zA-Z0-9]{2,}@[a-z]{2,5}.[a-z]{2,3}');
+  if (value.isEmpty) {
+    return canBeEmpty ? null : 'Champs obligatoire';
+  }
+  if (!_emailValidity.hasMatch(value)) {
+    return 'Email incorrect';
+  }
+  return null;
+}
+
 int errorStatusCode, userId;
 Map userRole;
 String userToken;

@@ -13,7 +13,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool _isLoading, _obscureText, _cObscureText;
+  bool _isLoading, _obscureText;
   var _formKey;
   int _currentPage;
   Plan _selectedPlan;
@@ -26,13 +26,13 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _useremailController;
   TextEditingController _userloginController;
   TextEditingController _userpasswordController;
-  TextEditingController _usercPasswordController;
   TextEditingController _snacknameController;
   TextEditingController _snackemailController;
   TextEditingController _snacktownController;
   TextEditingController _snackstreetController;
   TextEditingController _snackphone1Controller;
   TextEditingController _snackphone2Controller;
+  TextEditingController _sitenameController;
   TextEditingController _siteemailController;
   TextEditingController _sitetownController;
   TextEditingController _sitestreetController;
@@ -45,13 +45,13 @@ class _RegisterPageState extends State<RegisterPage> {
   FocusNode _useremailNode;
   FocusNode _userloginNode;
   FocusNode _userpasswordNode;
-  FocusNode _usercPasswordNode;
   FocusNode _snacknameNode;
   FocusNode _snackemailNode;
   FocusNode _snacktownNode;
   FocusNode _snackstreetNode;
   FocusNode _snackphone1Node;
   FocusNode _snackphone2Node;
+  FocusNode _sitenameNode;
   FocusNode _siteemailNode;
   FocusNode _sitetownNode;
   FocusNode _sitestreetNode;
@@ -66,7 +66,6 @@ class _RegisterPageState extends State<RegisterPage> {
     _listOfPlans = [];
     _currentPage = 0;
     _obscureText = true;
-    _cObscureText = true;
     _plans = fetchAllPlans();
 
     _usernameController = new TextEditingController();
@@ -75,13 +74,14 @@ class _RegisterPageState extends State<RegisterPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-    _usercPasswordController = new TextEditingController();
+
     _snacknameController = new TextEditingController();
     _snackemailController = new TextEditingController();
     _snacktownController = new TextEditingController();
     _snackstreetController = new TextEditingController();
     _snackphone1Controller = new TextEditingController();
     _snackphone2Controller = new TextEditingController();
+    _sitenameController = new TextEditingController();
     _siteemailController = new TextEditingController();
     _sitetownController = new TextEditingController();
     _sitestreetController = new TextEditingController();
@@ -94,13 +94,13 @@ class _RegisterPageState extends State<RegisterPage> {
     _useremailNode = new FocusNode();
     _userloginNode = new FocusNode();
     _userpasswordNode = new FocusNode();
-    _usercPasswordNode = new FocusNode();
     _snacknameNode = new FocusNode();
     _snackemailNode = new FocusNode();
     _snacktownNode = new FocusNode();
     _snackstreetNode = new FocusNode();
     _snackphone1Node = new FocusNode();
     _snackphone2Node = new FocusNode();
+    _sitenameNode = new FocusNode();
     _siteemailNode = new FocusNode();
     _sitetownNode = new FocusNode();
     _sitestreetNode = new FocusNode();
@@ -129,8 +129,7 @@ class _RegisterPageState extends State<RegisterPage> {
       _params['companyphone2'] = _snackphone2Controller.text;
     }
 
-    _params['sitename'] =
-        "${_snacknameController.text} ${_sitestreetController.text}";
+    _params['sitename'] = _sitenameController.text;
     _params['siteemail'] = _siteemailController.text;
     _params['sitetown'] = _sitetownController.text;
     _params['sitestreet'] = _sitestreetController.text;
@@ -156,12 +155,6 @@ class _RegisterPageState extends State<RegisterPage> {
   _toggle() {
     setState(() {
       _obscureText = !_obscureText;
-    });
-  }
-
-   _cToggle() {
-    setState(() {
-      _cObscureText = !_cObscureText;
     });
   }
 
@@ -209,8 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.account_circle_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Nom complet',
@@ -253,8 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Adresse',
@@ -293,15 +284,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.number,
                     onFieldSubmitted: (_) =>
                         nextNode(context, _userphoneNode, _useremailNode),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      return null;
-                    },
+                    validator: (value) => checkNumberValidity(value),
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.phone_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Telephone',
@@ -339,15 +324,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     onFieldSubmitted: (_) =>
                         nextNode(context, _useremailNode, _userloginNode),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      return null;
-                    },
+                    validator: (value) => checkEmailValidity(value),
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.at_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Email',
@@ -391,8 +370,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.user_6_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Nom d\'utilisateur',
@@ -427,9 +405,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: _obscureText,
                     controller: _userpasswordController,
                     focusNode: _userpasswordNode,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) => nextNode(
-                        context, _userpasswordNode, _usercPasswordNode),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _userpasswordNode.unfocus(),
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Champs obligatoire';
@@ -440,8 +417,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                     decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
+                        contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.lock_password_line,
                             color: Color(0xff000000), size: 15.0),
                         hintText: 'Mot de passe',
@@ -449,70 +425,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           onPressed: () => _toggle(),
                           icon: Icon(
                               _obscureText
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: Color(0xff000000),
-                              size: 15.0),
-                        ),
-                        hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    obscureText: _cObscureText,
-                    controller: _usercPasswordController,
-                    focusNode: _usercPasswordNode,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) {
-                      _usercPasswordNode.unfocus();
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      if (value.length < 8) {
-                        return 'Au minimum 8 carateres';
-                      }
-                      if (_usercPasswordController.text
-                              .compareTo(_userpasswordController.text) !=
-                          0) {
-                        return 'les mots de passe ne coincident pas';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 50.0),
-                        prefixIcon: Icon(AmazingIcon.lock_password_line,
-                            color: Color(0xff000000), size: 15.0),
-                        hintText: 'Confirmation de mot de passe',
-                        suffixIcon: IconButton(
-                          onPressed: () => _cToggle(),
-                          icon: Icon(
-                              _cObscureText
                                   ? Icons.visibility
                                   : Icons.visibility_off,
                               color: Color(0xff000000),
@@ -565,8 +477,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.community_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Nom du snack',
@@ -604,16 +515,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 keyboardType: TextInputType.emailAddress,
                 onFieldSubmitted: (_) =>
                     nextNode(context, _snackemailNode, _snacktownNode),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-
-                  return null;
-                },
+                validator: (value) => checkEmailValidity(value),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.at_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'email',
@@ -658,8 +562,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Ville',
@@ -704,8 +607,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.community_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Rue',
@@ -743,16 +645,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 keyboardType: TextInputType.number,
                 onFieldSubmitted: (_) =>
                     nextNode(context, _snackphone1Node, _snackphone2Node),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-
-                  return null;
-                },
+                validator: (value) => checkNumberValidity(value),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Telephone No 1',
@@ -791,9 +686,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) {
                   _snackphone2Node.unfocus();
                 },
+                validator: (value) =>
+                    checkNumberValidity(value, canBeEmpty: true),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Telephone No 2',
@@ -829,22 +725,55 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 10.0),
               child: TextFormField(
+                controller: _sitenameController,
+                focusNode: _sitenameNode,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.emailAddress,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _sitenameNode, _siteemailNode),
+                validator: (value) => checkEmailValidity(value),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.at_line,
+                        color: Color(0xff000000), size: 15.0),
+                    hintText: 'Nom',
+                    hintStyle: TextStyle(
+                        color: Color(0xff000000).withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48.0,
+                decoration: textFormFieldBoxDecoration,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
                 controller: _siteemailController,
                 focusNode: _siteemailNode,
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
                 onFieldSubmitted: (_) =>
                     nextNode(context, _siteemailNode, _sitetownNode),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-
-                  return null;
-                },
+                validator: (value) => checkEmailValidity(value),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.at_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Email',
@@ -889,8 +818,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Ville',
@@ -935,8 +863,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Quartier',
@@ -974,16 +901,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 keyboardType: TextInputType.number,
                 onFieldSubmitted: (_) =>
                     nextNode(context, _sitephone1Node, _sitephone2Node),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-
-                  return null;
-                },
+                validator: (value) => checkNumberValidity(value),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Telephone No 1',
@@ -1022,9 +942,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) {
                   _sitephone2Node.unfocus();
                 },
+                validator: (value) =>
+                    checkNumberValidity(value, canBeEmpty: true),
                 decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 50.0),
+                    contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
                         color: Color(0xff000000), size: 15.0),
                     hintText: 'Telephone No 2',
