@@ -30,6 +30,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -45,332 +46,356 @@ class _ShoppingPageState extends State<ShoppingPage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done ||
                         snapshot.hasData) {
-                      print(snapshot.data);
-                      _categories = snapshot.data
-                          .map((cat) => Category.fromJson(cat))
-                          .toList();
-                      _categories.insert(0, Category(id: 0, name: 'Produits'));
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            'Categories',
-                            style: TextStyle(
-                                fontSize: myHeight(context) / 40.0,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(),
-                            height: myHeight(context) / 23.0,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _categories.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                      right: index == _categories.length - 1
-                                          ? 0.0
-                                          : myHeight(context) / 40),
-                                  child: GestureDetector(
-                                    onTap: () => index == 0
-                                        ? Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProductPage()))
-                                        : Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProductPage(
-                                                      category:
-                                                          _categories[index],
-                                                    ))),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: gradient2.withOpacity(.2),
-                                          borderRadius:
-                                              BorderRadius.circular(30.0)),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 30.0, vertical: 5.0),
-                                        child: index == 0
-                                            ? Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    AmazingIcon.archive_line,
-                                                    size: 20.0,
-                                                    color: gradient1,
-                                                  ),
-                                                  SizedBox(
-                                                    width: myHeight(context) /
-                                                        100.0,
-                                                  ),
-                                                  Text(
-                                                    '${_categories[index].name}',
-                                                    style: TextStyle(
-                                                        fontSize: 17.0,
-                                                        color: gradient1,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              )
-                                            : Text(
-                                                '${_categories[index].name}',
-                                                style: TextStyle(
-                                                    fontSize: 17.0,
-                                                    color: gradient1,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
+                      if (snapshot.data != null) {
+                        _categories = snapshot.data
+                            .map((cat) => Category.fromJson(cat))
+                            .toList();
+                        _categories.insert(
+                            0, Category(id: 0, name: 'Produits'));
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Categories',
+                              style: TextStyle(
+                                  fontSize: myHeight(context) / 40.0,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 30.0,
-                          ),
-                          Container(
-                            height: myHeight(context) / 3.5,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: <Widget>[
-                                Container(
-                                  height: 170.0,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: gradient1,
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20.0, vertical: 10),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        RichText(
-                                            text: TextSpan(
-                                                text: '${(allSales ~/ 1000)}',
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        myHeight(context) /
-                                                            20.0),
-                                                children: [
-                                              TextSpan(
-                                                  text: 'K Ventes',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          myHeight(context) /
-                                                              30.0)),
-                                              TextSpan(
-                                                  text:
-                                                      '\n${months[DateTime.now().month - 1]} ${DateTime.now().year}',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          myHeight(context) /
-                                                              45.0,
-                                                      color: Colors.white38))
-                                            ])),
-                                        GestureDetector(
-                                          onTap: () => Navigator.push(
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(),
+                              height: myHeight(context) / 23.0,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _categories.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        right: index == _categories.length - 1
+                                            ? 0.0
+                                            : myHeight(context) / 40),
+                                    child: GestureDetector(
+                                      onTap: () => index == 0
+                                          ? Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      SalePage())),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Voir toutes les ventes',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize:
-                                                      myHeight(context) / 45.0,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width:
-                                                    myHeight(context) / 100.0,
-                                              ),
-                                              Icon(
-                                                AmazingIcon.arrow_right_s_line,
-                                                color: Colors.white,
-                                                size: myHeight(context) / 35.0,
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () => Navigator.push(
+                                                      ProductPage()))
+                                          : Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      ManageSales())),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Gerer les ventes',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize:
-                                                      myHeight(context) / 45.0,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width:
-                                                    myHeight(context) / 100.0,
-                                              ),
-                                              Icon(
-                                                AmazingIcon.arrow_right_s_line,
-                                                color: Colors.white,
-                                                size: myHeight(context) / 35.0,
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 0.0,
-                                  child: Container(
-                                    height: myHeight(context) / 3.5,
-                                    child: Image.asset(
-                                      'svg/blue-man-character.png',
-                                      fit: BoxFit.fitHeight,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 50.0,
-                          ),
-                          Container(
-                            height: myHeight(context) / 3.8,
-                            child: Stack(
-                              alignment: Alignment.bottomCenter,
-                              children: <Widget>[
-                                Container(
-                                  height: 170.0,
-                                  decoration: BoxDecoration(
-                                      color: Colors.black12,
-                                      borderRadius:
-                                          BorderRadius.circular(10.0)),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20.0, vertical: 10),
-                                    child: Container(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Spacer(),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              RichText(
-                                                  text: TextSpan(
-                                                      text:
-                                                          '${((allPurchases ~/ 1000).toString())}',
-                                                      style: TextStyle(
-                                                          color: gradient1,
-                                                          fontSize: myHeight(
-                                                                  context) /
-                                                              20.0),
-                                                      children: [
-                                                    TextSpan(
-                                                        text: 'K Achats',
-                                                        style: TextStyle(
-                                                            fontSize: myHeight(
-                                                                    context) /
-                                                                30.0)),
-                                                    TextSpan(
-                                                        text:
-                                                            '\n${months[DateTime.now().month - 1]} ${DateTime.now().year}',
-                                                        style: TextStyle(
-                                                            fontSize: myHeight(
-                                                                    context) /
-                                                                45.0,
-                                                            color:
-                                                                Colors.black38))
-                                                  ])),
-                                              GestureDetector(
-                                                onTap: () => Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PurchasePage())),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                      ProductPage(
+                                                        category:
+                                                            _categories[index],
+                                                      ))),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: gradient2.withOpacity(.2),
+                                            borderRadius:
+                                                BorderRadius.circular(30.0)),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 30.0, vertical: 5.0),
+                                          child: index == 0
+                                              ? Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: <Widget>[
-                                                    Text(
-                                                      'Voir tous les achats',
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                45.0,
-                                                      ),
+                                                    Icon(
+                                                      AmazingIcon.archive_line,
+                                                      size: 20.0,
+                                                      color: gradient1,
                                                     ),
                                                     SizedBox(
                                                       width: myHeight(context) /
                                                           100.0,
                                                     ),
-                                                    Icon(
-                                                      AmazingIcon
-                                                          .arrow_right_s_line,
-                                                      color: Colors.black,
-                                                      size: myHeight(context) /
-                                                          35.0,
-                                                    )
+                                                    Text(
+                                                      '${_categories[index].name}',
+                                                      style: TextStyle(
+                                                          fontSize: 17.0,
+                                                          color: gradient1,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
                                                   ],
+                                                )
+                                              : Text(
+                                                  '${_categories[index].name}',
+                                                  style: TextStyle(
+                                                      fontSize: 17.0,
+                                                      color: gradient1,
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                                 ),
-                                              ),
-                                            ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Container(
+                              height: myHeight(context) / 3.5,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    height: 170.0,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        color: gradient1,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 10),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          RichText(
+                                              text: TextSpan(
+                                                  text: allSales == null
+                                                      ? '0'
+                                                      : '${(allSales ~/ 1000)}',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          myHeight(context) /
+                                                              20.0),
+                                                  children: [
+                                                TextSpan(
+                                                    text: 'K Ventes',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            myHeight(context) /
+                                                                30.0)),
+                                                TextSpan(
+                                                    text:
+                                                        '\n${months[DateTime.now().month - 1]} ${DateTime.now().year}',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            myHeight(context) /
+                                                                45.0,
+                                                        color: Colors.white38))
+                                              ])),
+                                          GestureDetector(
+                                            onTap: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SalePage())),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Voir toutes les ventes',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            45.0,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width:
+                                                      myHeight(context) / 100.0,
+                                                ),
+                                                Icon(
+                                                  AmazingIcon
+                                                      .arrow_right_s_line,
+                                                  color: Colors.white,
+                                                  size:
+                                                      myHeight(context) / 35.0,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ManageSales())),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Gerer les ventes',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            45.0,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width:
+                                                      myHeight(context) / 100.0,
+                                                ),
+                                                Icon(
+                                                  AmazingIcon
+                                                      .arrow_right_s_line,
+                                                  color: Colors.white,
+                                                  size:
+                                                      myHeight(context) / 35.0,
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  left: 0.0,
-                                  top: 0.0,
-                                  child: Container(
-                                    height: myHeight(context) / 4,
-                                    child: Image.asset(
-                                      'svg/blue-girl-character.png',
-                                      fit: BoxFit.fitHeight,
+                                  Positioned(
+                                    right: 0.0,
+                                    child: Container(
+                                      height: myHeight(context) / 3.5,
+                                      child: Image.asset(
+                                        'img/boy.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 50.0,
+                            ),
+                            Container(
+                              height: myHeight(context) / 3.8,
+                              child: Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: <Widget>[
+                                  Container(
+                                    height: 170.0,
+                                    decoration: BoxDecoration(
+                                        color: textInverseModeColor.withOpacity(.12),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 10),
+                                      child: Container(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Spacer(),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                RichText(
+                                                    text: TextSpan(
+                                                        text: allPurchases ==
+                                                                null
+                                                            ? "0"
+                                                            : '${((allPurchases ~/ 1000).toString())}',
+                                                        style: TextStyle(
+                                                            color: gradient1,
+                                                            fontSize: myHeight(
+                                                                    context) /
+                                                                20.0),
+                                                        children: [
+                                                      TextSpan(
+                                                          text: 'K Achats',
+                                                          style: TextStyle(
+                                                              fontSize: myHeight(
+                                                                      context) /
+                                                                  30.0)),
+                                                      TextSpan(
+                                                          text:
+                                                              '\n${months[DateTime.now().month - 1]} ${DateTime.now().year}',
+                                                          style: TextStyle(
+                                                              fontSize: myHeight(
+                                                                      context) /
+                                                                  45.0,
+                                                              color: Colors
+                                                                  .black38))
+                                                    ])),
+                                                GestureDetector(
+                                                  onTap: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              PurchasePage())),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        'Voir tous les achats',
+                                                        style: TextStyle(
+                                                          color: textInverseModeColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              45.0,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            myHeight(context) /
+                                                                100.0,
+                                                      ),
+                                                      Icon(
+                                                        AmazingIcon
+                                                            .arrow_right_s_line,
+                                                        color: textInverseModeColor,
+                                                        size:
+                                                            myHeight(context) /
+                                                                35.0,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                )
-                              ],
+                                  Positioned(
+                                    left: 0.0,
+                                    top: 0.0,
+                                    child: Container(
+                                      height: myHeight(context) / 4,
+                                      child: Image.asset(
+                                        'img/girl.png',
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
+                          ],
+                        );
+                      } else {
+                        return Container(
+                          height: myHeight(context) * .8,
+                          child: Center(
+                            child: Text(
+                                'Une erreur est survenue. Veuillez reessayer plutard.'),
                           ),
-                        ],
-                      );
+                        );
+                      }
                     }
                     return Container(
                       height: myHeight(context) * .8,

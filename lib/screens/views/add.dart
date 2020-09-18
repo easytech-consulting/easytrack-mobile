@@ -1,3 +1,4 @@
+import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/views/general.dart';
 import 'package:easytrack/styles/style.dart';
@@ -12,12 +13,13 @@ class _AddState extends State<Add> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * .9,
           height: MediaQuery.of(context).size.height * .8,
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: textSameModeColor,
               borderRadius: BorderRadius.circular(10.0),
               boxShadow: [BoxShadow(blurRadius: 100, offset: Offset(0, 0))]),
           child: Padding(
@@ -44,7 +46,7 @@ class _AddState extends State<Add> {
                   children: <Widget>[
                     Container(
                       height: 45.0,
-                      decoration: textFormFieldBoxDecoration,
+                      decoration: buildTextFormFieldContainer(decorationColor),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -52,7 +54,7 @@ class _AddState extends State<Add> {
                         isExpanded: true,
                         underline: Text(''),
                         icon: Icon(AmazingIcon.arrow_down_s_line,
-                            color: Colors.black),
+                            color: textInverseModeColor),
                         items: [],
                         onChanged: (value) {},
                         hint: Text('Selectionner un produit'),
@@ -67,7 +69,7 @@ class _AddState extends State<Add> {
                   height: 90.0,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(color: Colors.black12)),
+                      border: Border.all(color: textInverseModeColor.withOpacity(.12))),
                   child: Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
@@ -127,12 +129,12 @@ class _AddState extends State<Add> {
                               text: TextSpan(
                                   text: 'SOUS TOTAL',
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 11.0),
+                                      color: textInverseModeColor, fontSize: 11.0),
                                   children: [
                                     TextSpan(
                                       text: '  1,600 FCFA',
                                       style: TextStyle(
-                                          color: Colors.black, fontSize: 14.0),
+                                          color: textInverseModeColor, fontSize: 14.0),
                                     ),
                                   ]),
                             ),
@@ -156,7 +158,7 @@ class _AddState extends State<Add> {
                         text: 'REDUCTION',
                         style: TextStyle(
                             fontSize: 13.0,
-                            color: Colors.black,
+                            color: textInverseModeColor,
                             wordSpacing: 3.0),
                         children: [
                       TextSpan(
@@ -213,7 +215,7 @@ class _AddState extends State<Add> {
                       'Enregistrer',
                       style: TextStyle(
                         fontSize: 20.0,
-                        color: Colors.white,
+                        color: textSameModeColor,
                       ),
                     ),
                   ),

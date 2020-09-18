@@ -1,3 +1,4 @@
+import 'package:easytrack/commons/globals.dart';
 import 'package:flutter/material.dart';
 
 class UnknownRoute extends StatefulWidget {
@@ -9,7 +10,10 @@ class _UnknownRouteState extends State<UnknownRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text('Route inconnue mon ami(e)'),),
+      backgroundColor: backgroundColor,
+      body: Center(
+        child: Text('Route inconnue mon ami(e)'),
+      ),
     );
   }
 }

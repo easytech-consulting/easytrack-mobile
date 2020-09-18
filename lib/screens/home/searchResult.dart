@@ -33,7 +33,7 @@ class _SearchResultState extends State<SearchResult> {
     return SafeArea(
       top: true,
       child: Scaffold(
-        backgroundColor: Color(0xffffffff),
+          backgroundColor: backgroundColor,
         body: ListView(
           children: <Widget>[
             Container(
@@ -46,7 +46,7 @@ class _SearchResultState extends State<SearchResult> {
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight)
                       : LinearGradient(
-                          colors: [Color(0xffffffff), Color(0xffffffff)],
+                          colors: [textInverseModeColor, textInverseModeColor],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight)),
               child: Padding(
@@ -69,30 +69,30 @@ class _SearchResultState extends State<SearchResult> {
                           textInputAction: TextInputAction.done,
                           style: TextStyle(
                               color: widget.index == 0
-                                  ? Color(0xffffffff)
-                                  : Color(0xff000000)),
+                                  ? textInverseModeColor
+                                  : textInverseModeColor),
                           decoration: InputDecoration(
                               contentPadding:
                                   const EdgeInsets.symmetric(horizontal: 50.0),
                               prefixIcon: Icon(
                                   /* AmazingIcon.user_icon, */ Icons.search,
                                   color: widget.index == 0
-                                      ? Color(0xffffffff)
-                                      : Color(0xff000000),
+                                      ? textInverseModeColor
+                                      : textInverseModeColor,
                                   size: 20.0),
                               suffixIcon: IconButton(
                                   onPressed: () {},
                                   /* AmazingIcon.user_icon, */ icon: Icon(
                                       Icons.close,
                                       color: widget.index == 0
-                                          ? Color(0xffffffff)
-                                          : Color(0xff000000),
+                                          ? textInverseModeColor
+                                          : textInverseModeColor,
                                       size: 20.0)),
                               hintText: 'Recherche...',
                               hintStyle: TextStyle(
                                   color: widget.index == 0
-                                      ? Color(0xffffffff).withOpacity(.35)
-                                      : Color(0xff000000).withOpacity(.35),
+                                      ? textInverseModeColor.withOpacity(.35)
+                                      : textInverseModeColor.withOpacity(.35),
                                   fontSize: 18.0),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,

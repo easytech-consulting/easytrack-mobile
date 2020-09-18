@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
+import 'package:easytrack/services/contactService.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/style.dart';
@@ -38,23 +39,30 @@ storeToken(String token) async {
   await prefs.setBool('isLogged', true);
 }
 
-storeUserDetails(
-    userData, siteData, userHasSite, companyData, userHasCompany) async {
+storeTokenExpireDate(String date) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  await prefs.setString('expire_date', date);
+}
+
+getTokenExpireDate() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('expire_date');
+}
+
+storeUserDetails(userData, siteData, userHasSite, companyData, userHasCompany,
+    userRole) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String prefsUser = json.encode(userData), roleData = json.encode(userRole);
   await prefs.setString('user', prefsUser);
-  await prefs.setString('roles', roleData);
+  await prefs.setString('role', roleData);
   if (userHasCompany) {
     String prefsCompany = json.encode(companyData);
     await prefs.setString('company', prefsCompany);
   }
   if (userHasSite) {
     String prefsSite = json.encode(siteData);
-    /* 
-    String prefsCompany = json.encode(companyData); */
     await prefs.setString('site', prefsSite);
-    /* 
-    await prefs.setString('company', prefsCompany); */
   }
 }
 
@@ -70,7 +78,7 @@ getUserSite() async {
 
 getUserSnack() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return json.decode(prefs.getString('snack'));
+  return json.decode(prefs.getString('company'));
 }
 
 getUserToken() async {
@@ -80,9 +88,7 @@ getUserToken() async {
 
 getUserRoles() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getStringList('roles') == null
-      ? []
-      : prefs.getStringList('roles');
+  return json.decode(prefs.getString('role'));
 }
 
 nextNode(BuildContext context, FocusNode oldNode, FocusNode newNode) {
@@ -102,14 +108,22 @@ setFirstConnexion() async {
 
 getFirstConnexion() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('firstConnexion') == null
-      ? true
-      : prefs.getBool('firstConnexion');
+  return prefs.getBool('firstConnexion') ?? true;
 }
 
 disconnectUser() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool('isLogged', false);
+}
+
+changeMode(bool isDarkMode) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.setBool('is_dark_mode', isDarkMode);
+}
+
+getThemeMode() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('is_dark_mode') ?? false;
 }
 
 final String endPoint =
@@ -196,52 +210,118 @@ formatDate(DateTime date) {
                               : '${(now.difference(date).inDays ~/ 365)} ans';
 }
 
-generateColor() {
+generateColor(int index) {
   List colors = [
+    Colors.tealAccent.withOpacity(.5),
     Colors.amber.withOpacity(.5),
-    Colors.amberAccent.withOpacity(.5),
     Colors.blue.withOpacity(.5),
-    Colors.blueAccent.withOpacity(.5),
+    Colors.redAccent.withOpacity(.5),
     Colors.blueGrey.withOpacity(.5),
+    Colors.orangeAccent.withOpacity(.5),
     Colors.brown.withOpacity(.5),
     Colors.cyan.withOpacity(.5),
-    Colors.cyanAccent.withOpacity(.5),
     Colors.deepOrange.withOpacity(.5),
-    Colors.deepOrangeAccent.withOpacity(.5),
+    Colors.amberAccent.withOpacity(.5),
     Colors.deepPurple.withOpacity(.5),
     Colors.green.withOpacity(.5),
-    Colors.greenAccent.withOpacity(.5),
     Colors.indigo.withOpacity(.5),
+    Colors.yellowAccent.withOpacity(.5),
+    Colors.deepOrangeAccent.withOpacity(.5),
     Colors.grey.withOpacity(.5),
+    Colors.blueAccent.withOpacity(.5),
     Colors.indigoAccent.withOpacity(.5),
     Colors.lightBlue.withOpacity(.5),
-    Colors.lightBlueAccent.withOpacity(.5),
     Colors.lightGreenAccent.withOpacity(.5),
     Colors.lime.withOpacity(.5),
-    Colors.limeAccent.withOpacity(.5),
     Colors.orange.withOpacity(.5),
-    Colors.orangeAccent.withOpacity(.5),
+    Colors.cyanAccent.withOpacity(.5),
     Colors.pink.withOpacity(.5),
     Colors.purple.withOpacity(.5),
-    Colors.purpleAccent.withOpacity(.5),
+    Colors.limeAccent.withOpacity(.5),
     Colors.red.withOpacity(.5),
-    Colors.redAccent.withOpacity(.5),
     Colors.teal.withOpacity(.5),
-    Colors.tealAccent.withOpacity(.5),
     Colors.yellow.withOpacity(.5),
-    Colors.yellowAccent.withOpacity(.5)
+    Colors.purpleAccent.withOpacity(.5),
+    Colors.greenAccent.withOpacity(.5),
+    Colors.lightBlueAccent.withOpacity(.5),
   ];
 
-  int generatedIndex = Random().nextInt(colors.length);
-  return colors[generatedIndex];
+  return colors[index % colors.length];
+}
+
+capitalize(String data) {
+  List words = data.split(' ');
+  String result = '';
+  int index = 0;
+  for (var word in words) {
+    result += index == words.length - 1
+        ? '${word.substring(0, 1).toUpperCase()}${word.substring(1)}'
+        : '${word.substring(0, 1).toUpperCase()}${word.substring(1)} ';
+  }
+
+  return result;
+}
+
+loadModeColor(ThemeMode themeMode) {
+  if (ThemeMode.dark == themeMode) {
+    textInverseModeColor = Colors.white;
+    textSameModeColor = Colors.black;
+    decorationColor = Colors.white.withOpacity(.07);
+    iconColor = Colors.white;
+    backgroundColor = Color(0xff101d25);
+    outlineBtnColor = Colors.white;
+    raisedBtnColor = Colors.white;
+    flatButtonColor = Colors.white;
+  } else {
+    textInverseModeColor = Colors.black;
+    textSameModeColor = Colors.white;
+    decorationColor = Colors.black.withOpacity(.05);
+    iconColor = Colors.black;
+    backgroundColor = Colors.white;
+    outlineBtnColor = Colors.black;
+    raisedBtnColor = Colors.black;
+    flatButtonColor = Colors.black;
+  }
+}
+
+fetchUserContacts() async {
+  allUserContacts = await fetchContacts();
+}
+
+logUserOnFirebase() async {
+  final QuerySnapshot result = await FirebaseFirestore.instance
+      .collection('users')
+      .where('id', isEqualTo: user.id.toString())
+      .get();
+  final List<DocumentSnapshot> documents = result.docs;
+  if (documents.length == 0) {
+    FirebaseFirestore.instance.collection('users').doc().set({
+      'email': user.email.toString(),
+      'id': user.id.toString(),
+      'name': user.name.toString(),
+      'phone': user.tel.toString(),
+      'photo': user.photo.toString(),
+      'username': user.username.toString()
+    });
+  }
 }
 
 int errorStatusCode, userId;
+List allUserContacts;
 Map userRole;
 String userToken;
 User user;
 Site site;
 Company company;
+ThemeMode appThemeMode;
+Color textInverseModeColor,
+    textSameModeColor,
+    decorationColor,
+    iconColor,
+    backgroundColor,
+    outlineBtnColor,
+    raisedBtnColor,
+    flatButtonColor;
 int allSales,
     allPurchases,
     dailySales,

@@ -18,6 +18,7 @@ class _ManageSalesState extends State<ManageSales> {
   bool _salesAlreadyLoad;
   TextEditingController _searchController = TextEditingController();
   FocusNode _searchNode = FocusNode();
+  List _salesForSearch = [];
 
   Future _companySales;
   Map product, currentSite;
@@ -35,6 +36,45 @@ class _ManageSalesState extends State<ManageSales> {
   GlobalKey<ScaffoldState> _scaffoldKey;
   PageController _pageController;
   String _paymentMode;
+
+  searchMethod(List items, filter) {
+    List result = [];
+    for (var item in items) {
+      if (item['code'].toLowerCase().contains(filter.toLowerCase())) {
+        if (!result.contains(item)) {
+          result.add(item);
+        }
+      }
+      if (filter.contains('S'.toLowerCase())) {
+        if (item['code']
+                .toLowerCase()
+                .contains(filter.substring(5).toLowerCase()) ||
+            item['code']
+                .toLowerCase()
+                .contains(filter.substring(3).toLowerCase())) {
+          if (!result.contains(item)) {
+            result.add(item);
+          }
+        }
+      }
+      if (item['validator']['name']
+              .toLowerCase()
+              .contains(filter.toLowerCase()) ||
+          item['initiator']['name'].toLowerCase() == filter.toLowerCase()) {
+        if (!result.contains(item)) {
+          result.add(item);
+        }
+      } else if (item['products'].firstWhere(
+          (element) => element['name'].toLowerCase() == filter.toLowerCase())) {
+        result.add(item);
+      }
+
+      print(item['validator']['name']
+          .toLowerCase()
+          .contains(filter.toLowerCase()));
+    }
+    return filter == '' ? items : result;
+  }
 
   @override
   void initState() {
@@ -121,7 +161,7 @@ class _ManageSalesState extends State<ManageSales> {
                       children: <Widget>[
                         Image.asset(
                           'img/logos/LogoWhiteWithText.png',
-                          color: Colors.black,
+                          color: textInverseModeColor,
                           height: myHeight(context) / 20.0,
                         ),
                         SizedBox(
@@ -333,7 +373,7 @@ class _ManageSalesState extends State<ManageSales> {
                           onTap: () {
                             Navigator.of(context).pop();
                             launchWhatsApp(
-                                phone: "+237991177985",
+                                phone: "+2376991177985",
                                 message: 'Recu de commande ${_site.name}');
                           },
                           child: Container(
@@ -349,7 +389,7 @@ class _ManageSalesState extends State<ManageSales> {
                               'Envoyer au client',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: textSameModeColor,
                                   fontSize: myHeight(context) / 50.0),
                             ),
                           ),
@@ -364,7 +404,7 @@ class _ManageSalesState extends State<ManageSales> {
                             height: myHeight(context) / 20.0,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
+                              border: Border.all(color: textInverseModeColor),
                               borderRadius: BorderRadius.circular(
                                   myHeight(context) / 20.0),
                             ),
@@ -394,7 +434,7 @@ class _ManageSalesState extends State<ManageSales> {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
       duration: Duration(seconds: 30),
-      backgroundColor: Colors.white,
+      backgroundColor: textSameModeColor,
       content: Container(
         height: status == 2
             ? _salesToShow[currentIndex]['validator'] == null ||
@@ -441,7 +481,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           )
                         ],
@@ -475,7 +515,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           )
                         ],
@@ -511,7 +551,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           )
                         ],
@@ -546,7 +586,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           )
                         ],
@@ -581,7 +621,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           )
                         ],
@@ -643,7 +683,7 @@ class _ManageSalesState extends State<ManageSales> {
                                   fontFamily: 'Ubuntu',
                                   fontSize: 17.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: textInverseModeColor),
                             ),
                           ),
                         )
@@ -673,7 +713,7 @@ class _ManageSalesState extends State<ManageSales> {
                             fontFamily: 'Ubuntu',
                             fontSize: 17.0,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                            color: textInverseModeColor),
                       ),
                     )
                   ],
@@ -684,24 +724,6 @@ class _ManageSalesState extends State<ManageSales> {
         ),
       ),
     ));
-  }
-
-  search(List datas, String filter) {
-    List result = [];
-
-    for (var data in datas) {
-      if (data['code'].toLowerCase() == filter.toLowerCase() ||
-          data['validator']['name'].toLowerCase() == filter.toLowerCase() ||
-          data['initiator']['name'].toLowerCase() == filter.toLowerCase() ||
-          data['status'].toLowerCase() == filter.toLowerCase()) {
-        result.add(data);
-      } else if (data['products'].firstWhere(
-          (element) => element['name'].toLowerCase() == filter.toLowerCase())) {
-        result.add(data);
-      }
-
-      return result;
-    }
   }
 
   checkSiteProduct(sites, siteId) {
@@ -793,7 +815,8 @@ class _ManageSalesState extends State<ManageSales> {
                                 children: <Widget>[
                                   Container(
                                     height: myHeight(context) / 15.0,
-                                    decoration: textFormFieldBoxDecoration,
+                                    decoration: buildTextFormFieldContainer(
+                                        decorationColor),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -802,7 +825,7 @@ class _ManageSalesState extends State<ManageSales> {
                                       isExpanded: true,
                                       underline: Text(''),
                                       icon: Icon(AmazingIcon.arrow_down_s_line,
-                                          color: Colors.black),
+                                          color: textInverseModeColor),
                                       items: allProducts
                                           .map((product) => DropdownMenuItem(
                                                 child: Text(product['name']),
@@ -855,7 +878,9 @@ class _ManageSalesState extends State<ManageSales> {
                                                               10.0),
                                                       border: Border.all(
                                                           color:
-                                                              Colors.black12)),
+                                                              textInverseModeColor
+                                                                  .withOpacity(
+                                                                      .12))),
                                                   child: Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
@@ -908,7 +933,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                               height: 35.0,
                                                               child:
                                                                   VerticalDivider(
-                                                                thickness: 2.0,
+                                                                thickness: 1.0,
                                                               ),
                                                             ),
                                                             Container(
@@ -1099,7 +1124,7 @@ class _ManageSalesState extends State<ManageSales> {
                                     'Mettre a jour',
                                     style: TextStyle(
                                       fontSize: 20.0,
-                                      color: Colors.white,
+                                      color: textSameModeColor,
                                     ),
                                   ),
                                 ),
@@ -1208,7 +1233,8 @@ class _ManageSalesState extends State<ManageSales> {
                                         Container(
                                           height: myHeight(context) / 15.0,
                                           decoration:
-                                              textFormFieldBoxDecoration,
+                                              buildTextFormFieldContainer(
+                                                  decorationColor),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -1219,7 +1245,7 @@ class _ManageSalesState extends State<ManageSales> {
                                             underline: Text(''),
                                             icon: Icon(
                                                 AmazingIcon.arrow_down_s_line,
-                                                color: Colors.black),
+                                                color: textInverseModeColor),
                                             items: sites
                                                 .map((site) => DropdownMenuItem<
                                                         Map<String, dynamic>>(
@@ -1251,7 +1277,8 @@ class _ManageSalesState extends State<ManageSales> {
                                 children: <Widget>[
                                   Container(
                                     height: myHeight(context) / 15.0,
-                                    decoration: textFormFieldBoxDecoration,
+                                    decoration: buildTextFormFieldContainer(
+                                        decorationColor),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -1260,7 +1287,7 @@ class _ManageSalesState extends State<ManageSales> {
                                       isExpanded: true,
                                       underline: Text(''),
                                       icon: Icon(AmazingIcon.arrow_down_s_line,
-                                          color: Colors.black),
+                                          color: textInverseModeColor),
                                       items: user.isAdmin == 1
                                           ? sites
                                               .map((site) => DropdownMenuItem<
@@ -1328,7 +1355,9 @@ class _ManageSalesState extends State<ManageSales> {
                                                               10.0),
                                                       border: Border.all(
                                                           color:
-                                                              Colors.black12)),
+                                                              textInverseModeColor
+                                                                  .withOpacity(
+                                                                      .12))),
                                                   child: Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
@@ -1381,7 +1410,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                               height: 35.0,
                                                               child:
                                                                   VerticalDivider(
-                                                                thickness: 2.0,
+                                                                thickness: 1.0,
                                                               ),
                                                             ),
                                                             Container(
@@ -1547,7 +1576,8 @@ class _ManageSalesState extends State<ManageSales> {
                                     height: myHeight(context) / 40.0,
                                     child: DropdownButton(
                                       underline: Text(''),
-                                      icon: Icon(AmazingIcon.arrow_drop_down_line,
+                                      icon: Icon(
+                                          AmazingIcon.arrow_drop_down_line,
                                           size: myHeight(context) / 50),
                                       items: [
                                         DropdownMenuItem(
@@ -1559,7 +1589,7 @@ class _ManageSalesState extends State<ManageSales> {
                                             value: 'cash'),
                                         DropdownMenuItem(
                                             child: Text('OM',
-                                            textAlign: TextAlign.center,
+                                                textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     fontSize:
                                                         myHeight(context) /
@@ -1624,7 +1654,7 @@ class _ManageSalesState extends State<ManageSales> {
                                     'Enregistrer',
                                     style: TextStyle(
                                       fontSize: 20.0,
-                                      color: Colors.white,
+                                      color: textSameModeColor,
                                     ),
                                   ),
                                 ),
@@ -1785,6 +1815,7 @@ class _ManageSalesState extends State<ManageSales> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         key: _scaffoldKey,
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(
@@ -1862,20 +1893,10 @@ class _ManageSalesState extends State<ManageSales> {
               Column(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
+                    padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Icon(
-                              AmazingIcon.arrow_left_line,
-                              size: myHeight(context) / 20.0,
-                            ),
-                          ),
-                        ),
                         Expanded(
                           child: Stack(
                             children: <Widget>[
@@ -1884,7 +1905,8 @@ class _ManageSalesState extends State<ManageSales> {
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Container(
                                   height: 46.0,
-                                  decoration: textFormFieldBoxDecoration,
+                                  decoration: buildTextFormFieldContainer(
+                                      decorationColor),
                                 ),
                               ),
                               Padding(
@@ -1894,37 +1916,45 @@ class _ManageSalesState extends State<ManageSales> {
                                   height: 46.0,
                                   child: TextFormField(
                                     textInputAction: TextInputAction.done,
-                                    style: TextStyle(color: Colors.black87),
+                                    style: TextStyle(
+                                        color: textInverseModeColor
+                                            .withOpacity(.87)),
                                     controller: _searchController,
                                     focusNode: _searchNode,
                                     onChanged: (value) {
-                                      print(value);
-                                      _salesToShow =
-                                          search(_salesToShow, value);
                                       setState(() {
-                                        _salesToShow =
-                                            search(_salesToShow, value);
+                                        _sales = searchMethod(
+                                            _salesForSearch, value);
+                                        loadDesireSales(_sales);
                                       });
                                     },
-                                    onEditingComplete: () {
-                                      _salesToShow = search(
-                                          _salesToShow, _searchController.text);
-                                      _searchNode.unfocus();
+                                    onFieldSubmitted: (value) {
                                       setState(() {
+                                        _sales = searchMethod(
+                                            _salesForSearch, value);
+                                        loadDesireSales(_sales);
                                         _searchController.text = '';
                                       });
                                     },
                                     decoration: InputDecoration(
                                         contentPadding:
                                             const EdgeInsets.only(left: 50.0),
-                                        suffixIcon: Icon(AmazingIcon.close_fill,
-                                            color: Colors.black),
+                                        suffixIcon: GestureDetector(
+                                          onTap: () {
+                                            _searchController.text = '';
+                                            _searchNode.unfocus();
+                                            _sales = _salesForSearch;
+                                            loadDesireSales(_sales);
+                                          },
+                                          child: Icon(AmazingIcon.close_fill,
+                                              color: textInverseModeColor),
+                                        ),
                                         hintText: 'Recherche...',
                                         prefixIcon: Icon(
                                             AmazingIcon.search_2_line,
-                                            color: Colors.black),
+                                            color: textInverseModeColor),
                                         hintStyle: TextStyle(
-                                            color: Color(0xff000000)
+                                            color: textInverseModeColor
                                                 .withOpacity(.35),
                                             fontSize: 18.0),
                                         border: OutlineInputBorder(
@@ -1934,6 +1964,16 @@ class _ManageSalesState extends State<ManageSales> {
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Icon(
+                              AmazingIcon.arrow_down_s_line,
+                              size: myHeight(context) / 20.0,
+                            ),
                           ),
                         ),
                       ],
@@ -1950,10 +1990,13 @@ class _ManageSalesState extends State<ManageSales> {
                           if (snapshot.connectionState ==
                                   ConnectionState.done &&
                               snapshot.hasData) {
-                            allSalesData = snapshot.data;
-                            _sales = _checkAllSales(allSalesData);
-                            if (!_salesAlreadyLoad) {
-                              loadDesireSales(_sales);
+                            if (_sales == null) {
+                              allSalesData = snapshot.data;
+                              _sales = _checkAllSales(allSalesData);
+                              _salesForSearch = _sales;
+                              if (!_salesAlreadyLoad) {
+                                loadDesireSales(_sales);
+                              }
                             }
                             return PageView(
                               controller: _pageController,
@@ -2026,7 +2069,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                     ),
                                                     SizedBox(
                                                       width: myHeight(context) /
-                                                          100.0,
+                                                          50.0,
                                                     ),
                                                     GestureDetector(
                                                         onTap: () =>
@@ -2088,8 +2131,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                           duration:
                                                                               Duration(seconds: 4),
                                                                           decoration: BoxDecoration(
-                                                                              color: Colors.white,
-                                                                              border: Border.all(color: Colors.black12),
+                                                                              color: textSameModeColor,
+                                                                              border: Border.all(color: textInverseModeColor.withOpacity(.12)),
                                                                               borderRadius: BorderRadius.circular(10.0)),
                                                                           child:
                                                                               Padding(
@@ -2104,7 +2147,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   children: <Widget>[
                                                                                     Text(
                                                                                       'S0-${_salesToShow[index]['code']}',
-                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 26.0),
+                                                                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 26.0),
                                                                                     ),
                                                                                     Spacer(),
                                                                                     userRole['slug'] == 'storekeeper'
@@ -2118,7 +2161,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   ],
                                                                                 ),
                                                                                 Padding(
-                                                                                  padding: EdgeInsets.only(right: myWidth(context) / 10),
+                                                                                  padding: EdgeInsets.only(top: myHeight(context) / 100.0),
                                                                                   child: Column(
                                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                                     children: <Widget>[
@@ -2130,13 +2173,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             itemBuilder: (context, ind) {
                                                                                               return Text(
                                                                                                 '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']} ',
-                                                                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 40.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 40.0),
                                                                                               );
                                                                                             }),
                                                                                       ),
                                                                                     ],
                                                                                   ),
                                                                                 ),
+                                                                                Spacer(),
                                                                                 Row(
                                                                                   children: <Widget>[
                                                                                     Container(
@@ -2144,7 +2188,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Stack(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                            decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                             child: Padding(
                                                                                               padding: const EdgeInsets.all(8.0),
                                                                                               child: Text(
@@ -2159,12 +2203,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                                 )
                                                                                               : Container(
                                                                                                   transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                  decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                                   child: Padding(
-                                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                                    padding: const EdgeInsets.all(10.0),
                                                                                                     child: Text(
                                                                                                       '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                                     ),
                                                                                                   ),
                                                                                                 ),
@@ -2176,7 +2220,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Column(
                                                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                                                         children: <Widget>[
-                                                                                          Text('Total'),
+                                                                                          Text('Total', style: TextStyle(color: textInverseModeColor.withOpacity(.45))),
                                                                                           Text(
                                                                                             '${calculTotal(_salesToShow[index]['products'])} FCFA',
                                                                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
@@ -2212,7 +2256,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             Container(
                                                                                               width: 30.0,
                                                                                               height: 30.0,
-                                                                                              decoration: BoxDecoration(color: selectedItem ? Colors.white : Colors.transparent, border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(10.0)),
+                                                                                              decoration: BoxDecoration(color: selectedItem ? textSameModeColor : Colors.transparent, border: Border.all(color: textSameModeColor), borderRadius: BorderRadius.circular(10.0)),
                                                                                               child: Icon(
                                                                                                 Icons.check,
                                                                                                 color: selectedItem ? Colors.blueGrey : Colors.transparent,
@@ -2223,7 +2267,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             ),
                                                                                             Text(
                                                                                               'Selectionner',
-                                                                                              style: TextStyle(color: Colors.white, fontSize: 17.0),
+                                                                                              style: TextStyle(color: textSameModeColor, fontSize: 17.0),
                                                                                             ),
                                                                                           ],
                                                                                         ),
@@ -2305,7 +2349,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                     ),
                                                     SizedBox(
                                                       width: myHeight(context) /
-                                                          100.0,
+                                                          50.0,
                                                     ),
                                                     GestureDetector(
                                                         onTap: () =>
@@ -2367,8 +2411,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                           duration:
                                                                               Duration(seconds: 4),
                                                                           decoration: BoxDecoration(
-                                                                              color: Colors.white,
-                                                                              border: Border.all(color: Colors.black12),
+                                                                              color: textSameModeColor,
+                                                                              border: Border.all(color: textInverseModeColor.withOpacity(.12)),
                                                                               borderRadius: BorderRadius.circular(10.0)),
                                                                           child:
                                                                               Padding(
@@ -2383,7 +2427,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   children: <Widget>[
                                                                                     Text(
                                                                                       'S0-${_salesToShow[index]['code']}',
-                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 26.0),
+                                                                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 26.0),
                                                                                     ),
                                                                                     Spacer(),
                                                                                     userRole['slug'] == 'storekeeper'
@@ -2397,7 +2441,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   ],
                                                                                 ),
                                                                                 Padding(
-                                                                                  padding: EdgeInsets.only(right: myWidth(context) / 10),
+                                                                                  padding: EdgeInsets.only(top: myHeight(context) / 100.0),
                                                                                   child: Column(
                                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                                     children: <Widget>[
@@ -2409,13 +2453,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             itemBuilder: (context, ind) {
                                                                                               return Text(
                                                                                                 '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']} ',
-                                                                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 40.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 40.0),
                                                                                               );
                                                                                             }),
                                                                                       ),
                                                                                     ],
                                                                                   ),
                                                                                 ),
+                                                                                Spacer(),
                                                                                 Row(
                                                                                   children: <Widget>[
                                                                                     Container(
@@ -2423,12 +2468,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Stack(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                            decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                             child: Padding(
-                                                                                              padding: const EdgeInsets.all(8.0),
+                                                                                              padding: const EdgeInsets.all(10.0),
                                                                                               child: Text(
                                                                                                 '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                               ),
                                                                                             ),
                                                                                           ),
@@ -2438,12 +2483,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                                 )
                                                                                               : Container(
                                                                                                   transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                  decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                                   child: Padding(
-                                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                                    padding: const EdgeInsets.all(10.0),
                                                                                                     child: Text(
                                                                                                       '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                                     ),
                                                                                                   ),
                                                                                                 ),
@@ -2455,7 +2500,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Column(
                                                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                                                         children: <Widget>[
-                                                                                          Text('Total'),
+                                                                                          Text('Total', style: TextStyle(color: textInverseModeColor.withOpacity(.45))),
                                                                                           Text(
                                                                                             '${calculTotal(_salesToShow[index]['products'])} FCFA',
                                                                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
@@ -2491,7 +2536,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             Container(
                                                                                               width: 30.0,
                                                                                               height: 30.0,
-                                                                                              decoration: BoxDecoration(color: selectedItem ? Colors.white : Colors.transparent, border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(10.0)),
+                                                                                              decoration: BoxDecoration(color: selectedItem ? textSameModeColor : Colors.transparent, border: Border.all(color: textSameModeColor), borderRadius: BorderRadius.circular(10.0)),
                                                                                               child: Icon(
                                                                                                 Icons.check,
                                                                                                 color: selectedItem ? Colors.blueGrey : Colors.transparent,
@@ -2502,7 +2547,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             ),
                                                                                             Text(
                                                                                               'Selectionner',
-                                                                                              style: TextStyle(color: Colors.white, fontSize: 17.0),
+                                                                                              style: TextStyle(color: textSameModeColor, fontSize: 17.0),
                                                                                             ),
                                                                                           ],
                                                                                         ),
@@ -2611,8 +2656,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                           duration:
                                                                               Duration(seconds: 4),
                                                                           decoration: BoxDecoration(
-                                                                              color: Colors.white,
-                                                                              border: Border.all(color: Colors.black12),
+                                                                              color: textSameModeColor,
+                                                                              border: Border.all(color: textInverseModeColor.withOpacity(.12)),
                                                                               borderRadius: BorderRadius.circular(10.0)),
                                                                           child:
                                                                               Padding(
@@ -2627,7 +2672,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   children: <Widget>[
                                                                                     Text(
                                                                                       'S0-${_salesToShow[index]['code']}',
-                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 26.0),
+                                                                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 26.0),
                                                                                     ),
                                                                                     Spacer(),
                                                                                     userRole['slug'] == 'storekeeper'
@@ -2641,7 +2686,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   ],
                                                                                 ),
                                                                                 Padding(
-                                                                                  padding: EdgeInsets.only(right: myWidth(context) / 10),
+                                                                                  padding: EdgeInsets.only(top: myHeight(context) / 100.0),
                                                                                   child: Column(
                                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                                     children: <Widget>[
@@ -2653,13 +2698,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             itemBuilder: (context, ind) {
                                                                                               return Text(
                                                                                                 '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']} ',
-                                                                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 40.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 40.0),
                                                                                               );
                                                                                             }),
                                                                                       ),
                                                                                     ],
                                                                                   ),
                                                                                 ),
+                                                                                Spacer(),
                                                                                 Row(
                                                                                   children: <Widget>[
                                                                                     Container(
@@ -2667,12 +2713,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Stack(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                            decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                             child: Padding(
-                                                                                              padding: const EdgeInsets.all(8.0),
+                                                                                              padding: const EdgeInsets.all(10.0),
                                                                                               child: Text(
                                                                                                 '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                               ),
                                                                                             ),
                                                                                           ),
@@ -2682,12 +2728,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                                 )
                                                                                               : Container(
                                                                                                   transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                  decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                                   child: Padding(
-                                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                                    padding: const EdgeInsets.all(10.0),
                                                                                                     child: Text(
                                                                                                       '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                                     ),
                                                                                                   ),
                                                                                                 ),
@@ -2696,18 +2742,17 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                     ),
                                                                                     Spacer(),
                                                                                     Container(
-                                                                                        /* child:
-                                                                                      Column(
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: <Widget>[
-                                                                                      Text('Total'),
-                                                                                      Text(
-                                                                                        '${calculTotal(_productsOnSales[index])} FCFA',
-                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                                                                                      )
-                                                                                    ],
-                                                                                  ), */
-                                                                                        )
+                                                                                      child: Column(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: <Widget>[
+                                                                                          Text('Total', style: TextStyle(color: textInverseModeColor.withOpacity(.45))),
+                                                                                          Text(
+                                                                                            '${calculTotal(_salesToShow[index]['products'])} FCFA',
+                                                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    )
                                                                                   ],
                                                                                 )
                                                                               ],
@@ -2736,7 +2781,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             Container(
                                                                                               width: 30.0,
                                                                                               height: 30.0,
-                                                                                              decoration: BoxDecoration(color: selectedItem ? Colors.white : Colors.transparent, border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(10.0)),
+                                                                                              decoration: BoxDecoration(color: selectedItem ? textSameModeColor : Colors.transparent, border: Border.all(color: textSameModeColor), borderRadius: BorderRadius.circular(10.0)),
                                                                                               child: Icon(
                                                                                                 Icons.check,
                                                                                                 color: selectedItem ? Colors.blueGrey : Colors.transparent,
@@ -2747,7 +2792,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             ),
                                                                                             Text(
                                                                                               'Selectionner',
-                                                                                              style: TextStyle(color: Colors.white, fontSize: 17.0),
+                                                                                              style: TextStyle(color: textSameModeColor, fontSize: 17.0),
                                                                                             ),
                                                                                           ],
                                                                                         ),
@@ -2856,8 +2901,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                           duration:
                                                                               Duration(seconds: 4),
                                                                           decoration: BoxDecoration(
-                                                                              color: Colors.white,
-                                                                              border: Border.all(color: Colors.black12),
+                                                                              color: textSameModeColor,
+                                                                              border: Border.all(color: textInverseModeColor.withOpacity(.12)),
                                                                               borderRadius: BorderRadius.circular(10.0)),
                                                                           child:
                                                                               Padding(
@@ -2872,7 +2917,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   children: <Widget>[
                                                                                     Text(
                                                                                       'S0-${_salesToShow[index]['code']}',
-                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 26.0),
+                                                                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 26.0),
                                                                                     ),
                                                                                     Spacer(),
                                                                                     userRole['slug'] == 'storekeeper'
@@ -2886,7 +2931,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   ],
                                                                                 ),
                                                                                 Padding(
-                                                                                  padding: EdgeInsets.only(right: myWidth(context) / 10),
+                                                                                  padding: EdgeInsets.only(top: myHeight(context) / 100.0),
                                                                                   child: Column(
                                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                                     children: <Widget>[
@@ -2898,13 +2943,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             itemBuilder: (context, ind) {
                                                                                               return Text(
                                                                                                 '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']} ',
-                                                                                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: myHeight(context) / 40.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 40.0),
                                                                                               );
                                                                                             }),
                                                                                       ),
                                                                                     ],
                                                                                   ),
                                                                                 ),
+                                                                                Spacer(),
                                                                                 Row(
                                                                                   children: <Widget>[
                                                                                     Container(
@@ -2912,12 +2958,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Stack(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                            decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                             child: Padding(
-                                                                                              padding: const EdgeInsets.all(8.0),
+                                                                                              padding: const EdgeInsets.all(10.0),
                                                                                               child: Text(
                                                                                                 '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                               ),
                                                                                             ),
                                                                                           ),
@@ -2927,12 +2973,12 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                                 )
                                                                                               : Container(
                                                                                                   transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                  decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                                   child: Padding(
-                                                                                                    padding: const EdgeInsets.all(8.0),
+                                                                                                    padding: const EdgeInsets.all(10.0),
                                                                                                     child: Text(
                                                                                                       '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, color: textInverseModeColor.withOpacity(.45), fontSize: myHeight(context) / 50.0),
                                                                                                     ),
                                                                                                   ),
                                                                                                 ),
@@ -2941,18 +2987,17 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                     ),
                                                                                     Spacer(),
                                                                                     Container(
-                                                                                        /*  child:
-                                                                                      Column(
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: <Widget>[
-                                                                                      Text('Total'),
-                                                                                      Text(
-                                                                                        '${calculTotal(_productsOnSales[index])} FCFA',
-                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                                                                                      )
-                                                                                    ],
-                                                                                  ), */
-                                                                                        )
+                                                                                      child: Column(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: <Widget>[
+                                                                                          Text('Total', style: TextStyle(color: textInverseModeColor.withOpacity(.45))),
+                                                                                          Text(
+                                                                                            '${calculTotal(_salesToShow[index]['products'])} FCFA',
+                                                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    )
                                                                                   ],
                                                                                 )
                                                                               ],
@@ -2981,7 +3026,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             Container(
                                                                                               width: 30.0,
                                                                                               height: 30.0,
-                                                                                              decoration: BoxDecoration(color: selectedItem ? Colors.white : Colors.transparent, border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(10.0)),
+                                                                                              decoration: BoxDecoration(color: selectedItem ? textSameModeColor : Colors.transparent, border: Border.all(color: textSameModeColor), borderRadius: BorderRadius.circular(10.0)),
                                                                                               child: Icon(
                                                                                                 Icons.check,
                                                                                                 color: selectedItem ? Colors.blueGrey : Colors.transparent,
@@ -2992,7 +3037,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             ),
                                                                                             Text(
                                                                                               'Selectionner',
-                                                                                              style: TextStyle(color: Colors.white, fontSize: 17.0),
+                                                                                              style: TextStyle(color: textSameModeColor, fontSize: 17.0),
                                                                                             ),
                                                                                           ],
                                                                                         ),
@@ -3034,7 +3079,7 @@ class _ManageSalesState extends State<ManageSales> {
                   ? Container(
                       height: myHeight(context),
                       width: myWidth(context),
-                      color: Colors.white.withOpacity(.9),
+                      color: textSameModeColor.withOpacity(.9),
                       child: Center(
                         child: CircularProgressIndicator(
                           valueColor: new AlwaysStoppedAnimation(gradient1),

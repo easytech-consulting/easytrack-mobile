@@ -13,6 +13,7 @@ class _GeneralState extends State<General> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -38,7 +39,7 @@ class _GeneralState extends State<General> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                            color: Colors.black12, shape: BoxShape.circle),
+                            color: textInverseModeColor.withOpacity(.12), shape: BoxShape.circle),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
@@ -84,7 +85,7 @@ class _GeneralState extends State<General> {
                                       text: '\nJuillet 2020',
                                       style: TextStyle(
                                           fontSize: 18.0,
-                                          color: Colors.white38))
+                                          color: textSameModeColor.withOpacity(.38)))
                                 ])),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +93,7 @@ class _GeneralState extends State<General> {
                                 Text(
                                   'Voir toutes les ventes',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: textSameModeColor,
                                     fontSize: 17.0,
                                   ),
                                 ),
@@ -101,7 +102,7 @@ class _GeneralState extends State<General> {
                                 ),
                                 Icon(
                                   AmazingIcon.arrow_right_s_line,
-                                  color: Colors.white,
+                                  color: textSameModeColor,
                                 )
                               ],
                             ),
@@ -111,7 +112,7 @@ class _GeneralState extends State<General> {
                                 Text(
                                   'Gerer les ventes',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: textSameModeColor,
                                     fontSize: 17.0,
                                   ),
                                 ),
@@ -120,7 +121,7 @@ class _GeneralState extends State<General> {
                                 ),
                                 Icon(
                                   AmazingIcon.arrow_right_s_line,
-                                  color: Colors.white,
+                                  color: textSameModeColor,
                                 )
                               ],
                             ),
@@ -148,7 +149,7 @@ class _GeneralState extends State<General> {
                     Container(
                       height: 170.0,
                       decoration: BoxDecoration(
-                          color: Colors.black12,
+                          color: textInverseModeColor.withOpacity(.12),
                           borderRadius: BorderRadius.circular(10.0)),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
@@ -175,7 +176,7 @@ class _GeneralState extends State<General> {
                                             text: '\nJuillet 2020',
                                             style: TextStyle(
                                                 fontSize: 18.0,
-                                                color: Colors.black38))
+                                                color: textInverseModeColor.withOpacity(.38)))
                                       ])),
                                   Row(
                                     crossAxisAlignment:
@@ -316,15 +317,15 @@ class _GeneralState extends State<General> {
                       decoration: BoxDecoration(boxShadow: [
                         BoxShadow(
                             blurRadius: 12.0,
-                            color: Colors.white,
+                            color: textSameModeColor,
                             offset: Offset(-10.0, 0)),
                         BoxShadow(
                             blurRadius: 30.0,
-                            color: Colors.white,
+                            color: textSameModeColor,
                             offset: Offset(-20.0, 0)),
                         BoxShadow(
                             blurRadius: 100.0,
-                            color: Colors.white,
+                            color: textSameModeColor,
                             offset: Offset(-50.0, 0))
                       ]),
                       child: GestureDetector(
@@ -344,7 +345,7 @@ class _GeneralState extends State<General> {
                 height: 300.0,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.black12,
+                    color: textInverseModeColor.withOpacity(.12),
                     borderRadius: BorderRadius.circular(20.0)),
                 child: Padding(
                   padding:
@@ -386,14 +387,14 @@ class _GeneralState extends State<General> {
                                   Text(
                                     'Gerer les produits',
                                     style: TextStyle(
-                                        color: Colors.white,
+                                        color: textSameModeColor,
                                         fontSize:
                                             screenSize(context).height / 47),
                                   ),
                                   Spacer(),
                                   Icon(
                                     AmazingIcon.arrow_drop_right_line,
-                                    color: Colors.white,
+                                    color: textSameModeColor,
                                     size: screenSize(context).height / 25,
                                   )
                                 ],

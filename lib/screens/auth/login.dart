@@ -60,8 +60,10 @@ class _LoginPageState extends State<LoginPage> {
 
       await login(params).then((success) async {
         if (success) {
-          await fetchUserDetails(userId).then((user) {
+          await fetchUserDetails(userId).then((user) async {
             if (user != null) {
+              await fetchUserContacts();
+              await logUserOnFirebase();
               user.isAdmin == 3
                   ? Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => AdminPage()))
@@ -84,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
+              backgroundColor: backgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
@@ -100,26 +103,26 @@ class _LoginPageState extends State<LoginPage> {
                             Text(
                               'Erreur d\'authentification',
                               style: TextStyle(
-                                  color: Color(0xff000000),
+                                  color: textInverseModeColor,
                                   fontSize: myWidth(context) / 22),
                             ),
                             SizedBox(height: myHeight(context) / 80),
                             Text(
                               'Desole, nous n\'avons pas pu vous',
                               style: TextStyle(
-                                  color: Color(0xff000000).withOpacity(.5),
+                                  color: textInverseModeColor.withOpacity(.5),
                                   fontSize: myWidth(context) / 25),
                             ),
                             Text(
                               'identifier. Votre nom d\'utilisateur',
                               style: TextStyle(
-                                  color: Color(0xff000000).withOpacity(.5),
+                                  color: textInverseModeColor.withOpacity(.5),
                                   fontSize: myWidth(context) / 25),
                             ),
                             Text(
                               'ou mot de passe est incorrecte.',
                               style: TextStyle(
-                                  color: Color(0xff000000).withOpacity(.5),
+                                  color: textInverseModeColor.withOpacity(.5),
                                   fontSize: myWidth(context) / 25),
                             ),
                             SizedBox(
@@ -133,12 +136,15 @@ class _LoginPageState extends State<LoginPage> {
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(30.0))),
                                     borderSide:
-                                        BorderSide(color: Color(0xff000000)),
+                                        BorderSide(color: textInverseModeColor),
                                     onPressed: () => Navigator.pop(context),
                                     child: Container(
                                         alignment: Alignment.center,
                                         height: 40.0,
-                                        child: Text('Fermer')),
+                                        child: Text('Fermer',
+                                            style: TextStyle(
+                                              color: textInverseModeColor,
+                                            ))),
                                   ),
                                 ),
                               ],
@@ -157,26 +163,29 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Erreur d\'authentification',
                                   style: TextStyle(
-                                      color: Color(0xff000000),
+                                      color: textInverseModeColor,
                                       fontSize: myWidth(context) / 22),
                                 ),
                                 SizedBox(height: myHeight(context) / 80),
                                 Text(
                                   'Desole, nous n\'avons pas pu vous',
                                   style: TextStyle(
-                                      color: Color(0xff000000).withOpacity(.5),
+                                      color:
+                                          textInverseModeColor.withOpacity(.5),
                                       fontSize: myWidth(context) / 25),
                                 ),
                                 Text(
                                   'identifier. Votre nom d\'utilisateur',
                                   style: TextStyle(
-                                      color: Color(0xff000000).withOpacity(.5),
+                                      color:
+                                          textInverseModeColor.withOpacity(.5),
                                       fontSize: myWidth(context) / 25),
                                 ),
                                 Text(
                                   'n\'existe pas dans notre base.',
                                   style: TextStyle(
-                                      color: Color(0xff000000).withOpacity(.5),
+                                      color:
+                                          textInverseModeColor.withOpacity(.5),
                                       fontSize: myWidth(context) / 25),
                                 ),
                                 SizedBox(
@@ -190,12 +199,15 @@ class _LoginPageState extends State<LoginPage> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(30.0))),
                                         borderSide: BorderSide(
-                                            color: Color(0xff000000)),
+                                            color: textInverseModeColor),
                                         onPressed: () => Navigator.pop(context),
                                         child: Container(
                                             alignment: Alignment.center,
                                             height: 40.0,
-                                            child: Text('Fermer')),
+                                            child: Text('Fermer',
+                                                style: TextStyle(
+                                                  color: textInverseModeColor,
+                                                ))),
                                       ),
                                     ),
                                   ],
@@ -214,29 +226,29 @@ class _LoginPageState extends State<LoginPage> {
                                     Text(
                                       'Erreur de serveur',
                                       style: TextStyle(
-                                          color: Color(0xff000000),
+                                          color: textInverseModeColor,
                                           fontSize: myWidth(context) / 22),
                                     ),
                                     SizedBox(height: myHeight(context) / 80),
                                     Text(
                                       'Desole, nous n\'avons pas pu vous',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     Text(
                                       'identifier car Notre serveur est',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     Text(
                                       'indisponible pour l\'instant',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     SizedBox(
@@ -250,13 +262,16 @@ class _LoginPageState extends State<LoginPage> {
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(30.0))),
                                             borderSide: BorderSide(
-                                                color: Color(0xff000000)),
+                                                color: textInverseModeColor),
                                             onPressed: () =>
                                                 Navigator.pop(context),
                                             child: Container(
                                                 alignment: Alignment.center,
                                                 height: 40.0,
-                                                child: Text('Fermer')),
+                                                child: Text('Fermer',
+                                                    style: TextStyle(
+                                                        color:
+                                                            textInverseModeColor))),
                                           ),
                                         ),
                                       ],
@@ -274,29 +289,29 @@ class _LoginPageState extends State<LoginPage> {
                                     Text(
                                       'Erreur de connectivite',
                                       style: TextStyle(
-                                          color: Color(0xff000000),
+                                          color: textInverseModeColor,
                                           fontSize: myWidth(context) / 22),
                                     ),
                                     SizedBox(height: myHeight(context) / 80),
                                     Text(
                                       'Desole, nous n\'avons pas pu vous',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     Text(
                                       'identifier. Verifier votre acces',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     Text(
                                       'internet.',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.5),
+                                          color: textInverseModeColor
+                                              .withOpacity(.5),
                                           fontSize: myWidth(context) / 25),
                                     ),
                                     SizedBox(
@@ -310,13 +325,17 @@ class _LoginPageState extends State<LoginPage> {
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(30.0))),
                                             borderSide: BorderSide(
-                                                color: Color(0xff000000)),
+                                                color: textInverseModeColor),
                                             onPressed: () =>
                                                 Navigator.pop(context),
                                             child: Container(
                                                 alignment: Alignment.center,
                                                 height: 40.0,
-                                                child: Text('Fermer')),
+                                                child: Text('Fermer',
+                                                    style: TextStyle(
+                                                      color:
+                                                          textInverseModeColor,
+                                                    ))),
                                           ),
                                         ),
                                       ],
@@ -345,26 +364,26 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Erreur d\'authentification',
                         style: TextStyle(
-                            color: Color(0xff000000),
+                            color: textInverseModeColor,
                             fontSize: myWidth(context) / 22),
                       ),
                       SizedBox(height: myHeight(context) / 80),
                       Text(
                         'Desole, nous n\'avons pas pu vous',
                         style: TextStyle(
-                            color: Color(0xff000000).withOpacity(.5),
+                            color: textInverseModeColor.withOpacity(.5),
                             fontSize: myWidth(context) / 25),
                       ),
                       Text(
                         'recuperer toutes vos informations',
                         style: TextStyle(
-                            color: Color(0xff000000).withOpacity(.5),
+                            color: textInverseModeColor.withOpacity(.5),
                             fontSize: myWidth(context) / 25),
                       ),
                       Text(
                         'veuillez reessayer plus tard.',
                         style: TextStyle(
-                            color: Color(0xff000000).withOpacity(.5),
+                            color: textInverseModeColor.withOpacity(.5),
                             fontSize: myWidth(context) / 25),
                       ),
                       SizedBox(
@@ -377,12 +396,16 @@ class _LoginPageState extends State<LoginPage> {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0))),
-                              borderSide: BorderSide(color: Color(0xff000000)),
+                              borderSide:
+                                  BorderSide(color: textInverseModeColor),
                               onPressed: () => Navigator.pop(context),
                               child: Container(
                                   alignment: Alignment.center,
                                   height: 40.0,
-                                  child: Text('Fermer')),
+                                  child: Text('Fermer',
+                                      style: TextStyle(
+                                        color: textInverseModeColor,
+                                      ))),
                             ),
                           ),
                         ],
@@ -397,6 +420,7 @@ class _LoginPageState extends State<LoginPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: Stack(
           children: <Widget>[
             Padding(
@@ -414,27 +438,31 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             height: myHeight(context) / 15.0,
                           ),
-                          Image.asset(
-                            'img/Logo.png',
-                            width: myHeight(context) / 13,
+                          Hero(
+                            tag: 'logo',
+                            child: Image.asset(
+                              'img/Logo.png',
+                              width: myHeight(context) / 13,
+                            ),
                           ),
                           SizedBox(
                             height: myHeight(context) / 30.0,
                           ),
                           Text('Connexion',
-                              style:
-                                  TextStyle(fontSize: myHeight(context) / 20)),
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontSize: myHeight(context) / 20)),
                           SizedBox(height: myHeight(context) / 80.0),
                           Text(
                             'Authentifiez-vous pour acceder',
                             style: TextStyle(
-                                color: Color(0xff000000).withOpacity(.7),
+                                color: textInverseModeColor.withOpacity(.7),
                                 fontSize: myHeight(context) / 39),
                           ),
                           Text(
                             'a la plate-forme',
                             style: TextStyle(
-                                color: Color(0xff000000).withOpacity(.7),
+                                color: textInverseModeColor.withOpacity(.7),
                                 fontSize: myHeight(context) / 39),
                           ),
                           SizedBox(
@@ -445,9 +473,9 @@ class _LoginPageState extends State<LoginPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Container(
-                                  height: 48.0,
-                                  decoration: textFormFieldBoxDecoration,
-                                ),
+                                    height: 48.0,
+                                    decoration: buildTextFormFieldContainer(
+                                        decorationColor)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
@@ -463,15 +491,17 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                     return null;
                                   },
+                                  style: TextStyle(color: textInverseModeColor),
                                   decoration: InputDecoration(
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(AmazingIcon.user_6_line,
-                                          color: Color(0xff000000), size: 15.0),
+                                          color: textInverseModeColor,
+                                          size: 15.0),
                                       hintText: 'Nom d\'utilisateur',
                                       hintStyle: TextStyle(
-                                          color: Color(0xff000000)
+                                          color: textInverseModeColor
                                               .withOpacity(.35),
                                           fontSize: 18.0),
                                       focusedBorder: OutlineInputBorder(
@@ -493,7 +523,8 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.only(left: 8.5),
                                 child: Container(
                                     height: 48.0,
-                                    decoration: textFormFieldBoxDecoration),
+                                    decoration: buildTextFormFieldContainer(
+                                        decorationColor)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
@@ -511,18 +542,19 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                     return null;
                                   },
+                                  style: TextStyle(color: textInverseModeColor),
                                   decoration: InputDecoration(
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               horizontal: 50.0),
                                       prefixIcon: Icon(
                                           AmazingIcon.lock_password_line,
-                                          color: Color(0xff000000),
+                                          color: textInverseModeColor,
                                           size: 15.0),
                                       hintText: 'Mot de passe',
-                                      fillColor: Colors.black,
+                                      fillColor: textInverseModeColor,
                                       hintStyle: TextStyle(
-                                          color: Color(0xff000000)
+                                          color: textInverseModeColor
                                               .withOpacity(.35),
                                           fontSize: 18.0),
                                       focusedBorder: OutlineInputBorder(
@@ -534,7 +566,7 @@ class _LoginPageState extends State<LoginPage> {
                                             _obscureText
                                                 ? Icons.visibility
                                                 : Icons.visibility_off,
-                                            color: Color(0xff000000),
+                                            color: textInverseModeColor,
                                             size: 15.0),
                                       ),
                                       border: OutlineInputBorder(
@@ -565,7 +597,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: Text(
                                       'Se connecter',
                                       style: TextStyle(
-                                          color: Color(0xffffffff),
+                                          color: textSameModeColor,
                                           fontSize: 18),
                                     ),
                                   ),
@@ -585,15 +617,30 @@ class _LoginPageState extends State<LoginPage> {
                                     child: Container(
                                         child: Text('Inscription',
                                             style: TextStyle(
+                                                color: textInverseModeColor,
                                                 fontSize:
                                                     myHeight(context) / 43))),
                                   ),
                                   Spacer(),
                                   InkWell(
-                                    onTap: () => Navigator.pushNamed(
+                                    onTap: () {
+                                      setState(() {
+                                        appThemeMode =
+                                            appThemeMode == ThemeMode.dark
+                                                ? ThemeMode.light
+                                                : ThemeMode.dark;
+                                        loadModeColor(appThemeMode);
+                                      });
+                                      changeMode(appThemeMode == ThemeMode.dark
+                                          ? true
+                                          : false);
+                                    },
+                                    /* onTap: () => Navigator.pushNamed(
                                         context, '/recover'),
+                                     */
                                     child: Text('Mot de passe oublie',
                                         style: TextStyle(
+                                            color: textInverseModeColor,
                                             fontSize: myHeight(context) / 43)),
                                   )
                                 ],
@@ -609,7 +656,7 @@ class _LoginPageState extends State<LoginPage> {
                 ? Container(
                     width: myWidth(context),
                     height: myHeight(context),
-                    color: Color(0xffffffff).withOpacity(.89),
+                    color: textSameModeColor.withOpacity(.89),
                     child: Center(
                       child: CircularProgressIndicator(
                         valueColor:

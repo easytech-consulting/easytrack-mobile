@@ -1,6 +1,6 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
-import 'package:easytrack/screens/chat/all.dart';
+import 'package:easytrack/screens/chat/current_discussion.dart';
 import 'package:easytrack/screens/home/calendar.dart';
 import 'package:easytrack/screens/home/shopping.dart';
 import 'package:easytrack/screens/home/stats.dart';
@@ -8,6 +8,8 @@ import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
+  final int index;
+  MainPage({this.index});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -18,28 +20,83 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = 0;
+    _currentIndex = widget.index == null ? 0 : widget.index;
     _pageController = new PageController(initialPage: _currentIndex);
   }
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
-          context: context,
-          builder: (context) => new AlertDialog(
-            title: new Text('Confirmation'),
-            content: new Text('Confirmer la sortie ?'),
-            actions: <Widget>[
-              new FlatButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: new Text('Non'),
-              ),
-              new FlatButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: new Text('Oui', style: TextStyle(color: Colors.red),),
-              ),
-            ],
-          ),
-        )) ??
+            context: context,
+            builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                content: Container(
+                    height: myHeight(context) / 2.5,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        errorAlertIcon(context),
+                        SizedBox(
+                          height: myHeight(context) / 40,
+                        ),
+                        Text(
+                          'Quitter l\'application',
+                          style: TextStyle(
+                              color: Color(0xff000000),
+                              fontSize: myWidth(context) / 22),
+                        ),
+                        SizedBox(height: myHeight(context) / 80),
+                        Text(
+                          'Vous allez sortir de l\'application',
+                          style: TextStyle(
+                              color: Color(0xff000000).withOpacity(.5),
+                              fontSize: myWidth(context) / 25),
+                        ),
+                        SizedBox(
+                          height: myHeight(context) / 40,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: FlatButton(
+                                color: gradient1,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                onPressed: () => Navigator.pop(context),
+                                child: Container(
+                                    alignment: Alignment.center,
+                                    height: 40.0,
+                                    child: Text(
+                                      'Continuer',
+                                      style:
+                                          TextStyle(color: textSameModeColor),
+                                    )),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: OutlineButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                borderSide:
+                                    BorderSide(color: Color(0xff000000)),
+                                onPressed: () => Navigator.pop(context),
+                                child: Container(
+                                    alignment: Alignment.center,
+                                    height: 40.0,
+                                    child: Text('Fermer')),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ))))) ??
         false;
   }
 
@@ -89,10 +146,11 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return WillPopScope(
-      onWillPop:  _onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.white,
+            backgroundColor: textSameModeColor,
             showSelectedLabels: false,
             type: BottomNavigationBarType.fixed,
             showUnselectedLabels: false,
@@ -134,5 +192,5 @@ List<Widget> _items = <Widget>[
   StatsPage(),
   ShoppingPage(),
   CalendarPage(),
-  DiscussionPage()
+  CurrentDiscussion()
 ];

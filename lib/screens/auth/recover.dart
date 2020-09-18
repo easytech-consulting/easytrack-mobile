@@ -300,6 +300,7 @@ class _RecoverPageState extends State<RecoverPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: Stack(
           children: <Widget>[
             Padding(
@@ -357,7 +358,8 @@ class _RecoverPageState extends State<RecoverPage> {
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Container(
                                     height: 48.0,
-                                    decoration: textFormFieldBoxDecoration),
+                                    decoration: buildTextFormFieldContainer(
+                                        decorationColor)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),

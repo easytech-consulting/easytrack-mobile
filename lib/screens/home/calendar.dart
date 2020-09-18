@@ -9,92 +9,96 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
       child: Scaffold(
+          backgroundColor: backgroundColor,
           body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            height: screenSize(context).height / 20,
-          ),
-          Text('A G E N D A',
-              style: TextStyle(
-                  color: Colors.black38,
-                  fontSize: screenSize(context).height / 44,
-                  fontWeight: FontWeight.bold)),
-          SizedBox(
-            height: screenSize(context).height / 60,
-          ),
-          Text(
-            'Equipe de serveur',
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: screenSize(context).height / 35),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 13.0),
-            child: Container(
-              height: screenSize(context).height / 2,
-              child: Stack(
-                children: <Widget>[
-                  SfCalendar(
-                    cellBorderColor: Colors.black,
-                    firstDayOfWeek: 7,
-                    minDate: DateTime.now().subtract(Duration(days: 7)),
-                    headerHeight: screenSize(context).height / 10,
-                    headerStyle: CalendarHeaderStyle(
-                        textStyle: TextStyle(
-                            fontFamily: 'Ubuntu',
-                            color: Colors.black,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold)),
-                    view: CalendarView.month,
-                    dataSource: MeetingDataSource(_getDataSource()),
-                    monthViewSettings: MonthViewSettings(
-                        appointmentDisplayMode:
-                            MonthAppointmentDisplayMode.appointment),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: screenSize(context).height / 45),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                                width: screenSize(context).height / 15,
-                                height: screenSize(context).height / 18,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black)),
-                                child: Icon(
-                                  Icons.arrow_back_ios,
-                                  size: screenSize(context).height / 50,
-                                ))),
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                                width: screenSize(context).height / 15,
-                                height: screenSize(context).height / 18,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black)),
-                                child: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: screenSize(context).height / 50,
-                                ))),
-                      ],
-                    ),
-                  )
-                ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: screenSize(context).height / 20,
               ),
-            ),
-          ),
-        ],
-      )),
+              Text('A G E N D A',
+                  style: TextStyle(
+                      color: textInverseModeColor.withOpacity(.38),
+                      fontSize: screenSize(context).height / 44,
+                      fontWeight: FontWeight.bold)),
+              SizedBox(
+                height: screenSize(context).height / 60,
+              ),
+              Text(
+                'Equipe de serveur',
+                style: TextStyle(
+                    color: textInverseModeColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenSize(context).height / 35),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 13.0),
+                child: Container(
+                  height: screenSize(context).height / 2,
+                  child: Stack(
+                    children: <Widget>[
+                      SfCalendar(
+                        cellBorderColor: textInverseModeColor,
+                        firstDayOfWeek: 7,
+                        minDate: DateTime.now().subtract(Duration(days: 7)),
+                        headerHeight: screenSize(context).height / 10,
+                        headerStyle: CalendarHeaderStyle(
+                            textStyle: TextStyle(
+                                fontFamily: 'Ubuntu',
+                                color: textInverseModeColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold)),
+                        view: CalendarView.month,
+                        dataSource: MeetingDataSource(_getDataSource()),
+                        monthViewSettings: MonthViewSettings(
+                            appointmentDisplayMode:
+                                MonthAppointmentDisplayMode.appointment),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: screenSize(context).height / 45),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Align(
+                                alignment: Alignment.topRight,
+                                child: Container(
+                                    width: screenSize(context).height / 15,
+                                    height: screenSize(context).height / 18,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: textInverseModeColor)),
+                                    child: Icon(
+                                      Icons.arrow_back_ios,
+                                      size: screenSize(context).height / 50,
+                                    ))),
+                            Align(
+                                alignment: Alignment.topRight,
+                                child: Container(
+                                    width: screenSize(context).height / 15,
+                                    height: screenSize(context).height / 18,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: textInverseModeColor)),
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: screenSize(context).height / 50,
+                                    ))),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )),
     );
   }
 }

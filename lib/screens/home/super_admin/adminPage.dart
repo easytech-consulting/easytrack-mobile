@@ -28,42 +28,44 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: backgroundColor,
         body: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40.0),
-      child: Stack(
-        children: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Stack(
             children: <Widget>[
-              SafeArea(
-                  top: true,
-                  child:
-                      Center(child: Text('Tableau de bord mobile easytech'))),
-              OutlineButton(
-                onPressed: () => _logoutUser(),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0)),
-                child: Text('Retour',
-                    style: TextStyle(
-                      color: Colors.red,
-                    )),
-              )
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  SafeArea(
+                      top: true,
+                      child: Center(
+                          child: Text('Tableau de bord mobile easytech'))),
+                  OutlineButton(
+                    onPressed: () => _logoutUser(),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0)),
+                    child: Text('Retour',
+                        style: TextStyle(
+                          color: Colors.red,
+                        )),
+                  )
+                ],
+              ),
+              _isLoading
+                  ? Container(
+                      width: screenSize(context).width,
+                      height: screenSize(context).height,
+                      color: textSameModeColor.withOpacity(.89),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              new AlwaysStoppedAnimation<Color>(gradient1),
+                        ),
+                      ))
+                  : Container(),
             ],
           ),
-          _isLoading
-              ? Container(
-                  width: screenSize(context).width,
-                  height: screenSize(context).height,
-                  color: Color(0xffffffff).withOpacity(.89),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: new AlwaysStoppedAnimation<Color>(gradient1),
-                    ),
-                  ))
-              : Container(),
-        ],
-      ),
-    ));
+        ));
   }
 }

@@ -16,6 +16,7 @@ class _WelcomPageState extends State<WelcomPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: ListView(
@@ -23,9 +24,12 @@ class _WelcomPageState extends State<WelcomPage> {
               SizedBox(height: myHeight(context) / 4.3),
               Container(
                 height: myHeight(context) / 5.0,
-                child: Image.asset(
-                  'img/Logo.png',
-                  fit: BoxFit.fitHeight,
+                child: Hero(
+                  tag: 'logo',
+                  child: Image.asset(
+                    'img/Logo.png',
+                    fit: BoxFit.fitHeight,
+                  ),
                 ),
               ),
               SizedBox(
@@ -34,7 +38,9 @@ class _WelcomPageState extends State<WelcomPage> {
               Center(
                 child: Text(
                   'easytrack',
-                  style: TextStyle(fontSize: myHeight(context) / 20),
+                  style: TextStyle(
+                      color: textInverseModeColor,
+                      fontSize: myHeight(context) / 20),
                 ),
               ),
               SizedBox(
@@ -44,7 +50,7 @@ class _WelcomPageState extends State<WelcomPage> {
                 child: Text(
                   'La meilleure plateforme pour',
                   style: TextStyle(
-                      color: Color(0xff000000).withOpacity(.7),
+                      color: textInverseModeColor.withOpacity(.7),
                       fontSize: myHeight(context) / 39),
                 ),
               ),
@@ -52,7 +58,7 @@ class _WelcomPageState extends State<WelcomPage> {
                 child: Text(
                   'votre gestion de stock',
                   style: TextStyle(
-                      color: Color(0xff000000).withOpacity(.7),
+                      color: textInverseModeColor.withOpacity(.7),
                       fontSize: myHeight(context) / 39),
                 ),
               ),
@@ -60,7 +66,10 @@ class _WelcomPageState extends State<WelcomPage> {
                 height: myHeight(context) / 11,
               ),
               InkWell(
-                onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                onTap: () async {
+                  await setFirstConnexion();
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
                 child: Container(
                   height: myHeight(context) / 13,
                   decoration: BoxDecoration(
@@ -77,13 +86,13 @@ class _WelcomPageState extends State<WelcomPage> {
                         Text(
                           'Demarrer',
                           style: TextStyle(
-                              color: Colors.white,
+                              color: textSameModeColor,
                               fontSize: myHeight(context) / 47),
                         ),
                         Spacer(),
                         Icon(
                           AmazingIcon.arrow_drop_right_line,
-                          color: Colors.white,
+                          color: textSameModeColor,
                           size: myHeight(context) / 25,
                         )
                       ],
@@ -98,7 +107,7 @@ class _WelcomPageState extends State<WelcomPage> {
                     child: Text(
                       'voir notre politique de confidentialite',
                       style: TextStyle(
-                          color: Color(0xff000000).withOpacity(.7),
+                          color: textInverseModeColor.withOpacity(.7),
                           fontSize: myHeight(context) / 50),
                     ),
                   )),
@@ -107,7 +116,9 @@ class _WelcomPageState extends State<WelcomPage> {
                 height: myHeight(context) / 30,
                 child: Center(
                     child: Text('Version 1.0.0',
-                        style: TextStyle(fontSize: myHeight(context) / 70))),
+                        style: TextStyle(
+                            color: textInverseModeColor,
+                            fontSize: myHeight(context) / 70))),
               )
             ],
           ),

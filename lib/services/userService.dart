@@ -24,15 +24,14 @@ Future<User> fetchUserDetails(int id) async {
       userRole = data['role'];
       if (data['employee'] != null) {
         _linkToSite = true;
-        site = Site.fromJson(data['employee']['site']);/* 
-        company = Company.fromJson(data['employee']['site']['companies'][0]); */
+        site = Site.fromJson(data['employee']['site']);
       }
       if (data['companies'] != null) {
         _linkToCompany = true;
         company = Company.fromJson(data['companies'][0]);
       }
       print('$data\n $site, $_linkToSite, $company, $_linkToCompany}');
-      storeUserDetails(data, site, _linkToSite, company, _linkToCompany);
+      storeUserDetails(data, site, _linkToSite, company, _linkToCompany, userRole);
       return user;
     }
 

@@ -37,6 +37,7 @@ class _ProductPage2State extends State<ProductPage2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Column(
@@ -56,7 +57,7 @@ class _ProductPage2State extends State<ProductPage2> {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Container(
                               height: 48.0,
-                              decoration: textFormFieldBoxDecoration,
+                              decoration: buildTextFormFieldContainer(decorationColor),
                             ),
                           ),
                           Padding(
@@ -66,7 +67,7 @@ class _ProductPage2State extends State<ProductPage2> {
                               height: 48.0,
                               child: TextFormField(
                                 textInputAction: TextInputAction.done,
-                                style: TextStyle(color: Color(0xffffffff)),
+                                style: TextStyle(color: textSameModeColor),
                                 decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 50.0),
@@ -77,7 +78,7 @@ class _ProductPage2State extends State<ProductPage2> {
                                     prefixIcon: Icon(AmazingIcon.search_2_line),
                                     hintStyle: TextStyle(
                                         color:
-                                            Color(0xff000000).withOpacity(.35),
+                                            textInverseModeColor.withOpacity(.35),
                                         fontSize: 18.0),
                                     border: OutlineInputBorder(
                                       borderSide: BorderSide.none,
@@ -153,8 +154,8 @@ class _ProductPage2State extends State<ProductPage2> {
                       curve: Curves.bounceInOut,
                       duration: Duration(seconds: 4),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.black12),
+                          color: textSameModeColor,
+                          border: Border.all(color: textInverseModeColor.withOpacity(.12)),
                           borderRadius: BorderRadius.circular(10.0)),
                       child: Padding(
                         padding: EdgeInsets.all(10.0),
@@ -281,10 +282,10 @@ class _ProductPage2State extends State<ProductPage2> {
                                           height: 30.0,
                                           decoration: BoxDecoration(
                                               color: selectedItem
-                                                  ? Colors.white
+                                                  ? textSameModeColor
                                                   : Colors.transparent,
                                               border: Border.all(
-                                                  color: Colors.white),
+                                                  color: textSameModeColor),
                                               borderRadius:
                                                   BorderRadius.circular(10.0)),
                                           child: Icon(
@@ -300,7 +301,7 @@ class _ProductPage2State extends State<ProductPage2> {
                                         Text(
                                           'Selectionner',
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color: textSameModeColor,
                                               fontSize: 17.0),
                                         ),
                                       ],
@@ -337,7 +338,7 @@ class _ProductPage2State extends State<ProductPage2> {
                   Icon(
                     Icons.brightness_1,
                     size: 12.0,
-                    color: Colors.black26,
+                    color: textInverseModeColor.withOpacity(.26),
                   ),
                   SizedBox(
                     width: 10.0,
@@ -345,7 +346,7 @@ class _ProductPage2State extends State<ProductPage2> {
                   Icon(
                     Icons.brightness_1,
                     size: 12.0,
-                    color: Colors.black26,
+                    color: textInverseModeColor.withOpacity(.26),
                   )
                 ],
               ),

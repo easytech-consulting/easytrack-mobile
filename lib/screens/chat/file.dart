@@ -25,7 +25,7 @@ class _FilePageState extends State<FilePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Icon(
-                    AmazingIcon.repeat_2_line,
+                    AmazingIcon.chat_delete_line,
                     color: Color(0xff267FC9),
                     size: myHeight(context) / 40.0,
                   ),
@@ -46,7 +46,7 @@ class _FilePageState extends State<FilePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Icon(
-                    AmazingIcon.archive_line,
+                    AmazingIcon.chat_off_line,
                     color: Color(0xff267FC9),
                     size: myHeight(context) / 40.0,
                   ),
@@ -81,10 +81,11 @@ class _FilePageState extends State<FilePage> {
               ),
             ),
           ],
-          icon: Icon(Icons.more_vert, color: Colors.black),
+          icon: Icon(Icons.more_vert, color: textInverseModeColor),
         );
 
     return Scaffold(
+        backgroundColor: backgroundColor,
         appBar: PreferredSize(
             child: SafeArea(
               child: Container(
@@ -108,7 +109,7 @@ class _FilePageState extends State<FilePage> {
                                   controller: _controller,
                                   textInputAction: TextInputAction.done,
                                   style: TextStyle(
-                                      color: Color(0xff000000),
+                                      color: textInverseModeColor,
                                       fontWeight: FontWeight.w700),
                                   decoration: InputDecoration(
                                       contentPadding: const EdgeInsets.only(
@@ -123,7 +124,7 @@ class _FilePageState extends State<FilePage> {
                                                 });
                                               },
                                               icon: Icon(Icons.arrow_back,
-                                                  color: Colors.black,
+                                                  color: textInverseModeColor,
                                                   size: myHeight(context) /
                                                       30.0)),
                                           Padding(
@@ -132,7 +133,7 @@ class _FilePageState extends State<FilePage> {
                                                     myHeight(context) / 50.0),
                                             child: Icon(
                                                 AmazingIcon.search_2_line,
-                                                color: Color(0xff000000),
+                                                color: textInverseModeColor,
                                                 size: myHeight(context) / 37.0),
                                           ),
                                         ],
@@ -144,11 +145,11 @@ class _FilePageState extends State<FilePage> {
                                             });
                                           },
                                           icon: Icon(AmazingIcon.close_fill,
-                                              color: Color(0xff000000),
+                                              color: textInverseModeColor,
                                               size: myHeight(context) / 37.0)),
                                       hintText: 'Recherche...',
                                       hintStyle: TextStyle(
-                                          color: Color(0xff000000)
+                                          color: textInverseModeColor
                                               .withOpacity(.35),
                                           fontSize: 18.0),
                                       border: OutlineInputBorder(
@@ -206,7 +207,7 @@ class _FilePageState extends State<FilePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.insert_drive_file,
+                          AmazingIcon.file_2_line,
                           size: myHeight(context) / 20.0,
                         ),
                         SizedBox(
@@ -230,7 +231,7 @@ class _FilePageState extends State<FilePage> {
                                 text: TextSpan(
                                     text: datas[index].hour,
                                     style: TextStyle(
-                                        color: Colors.black54,
+                                        color: textInverseModeColor.withOpacity(.54),
                                         fontSize: myHeight(context) / 60),
                                     children: [
                                   TextSpan(

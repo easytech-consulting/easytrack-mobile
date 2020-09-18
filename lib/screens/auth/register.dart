@@ -184,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Container(
                     height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
+                    decoration: buildTextFormFieldContainer(decorationColor),
                   ),
                 ),
                 Padding(
@@ -201,13 +201,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       }
                       return null;
                     },
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.account_circle_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Nom complet',
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -227,7 +230,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.5),
                   child: Container(
-                      height: 48.0, decoration: textFormFieldBoxDecoration),
+                      height: 48.0,
+                      decoration: buildTextFormFieldContainer(decorationColor)),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
@@ -244,14 +248,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       }
                       return null;
                     },
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Adresse',
-                        fillColor: Colors.black,
+                        fillColor: textSameModeColor,
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -272,7 +279,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Container(
                     height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
+                    decoration: buildTextFormFieldContainer(decorationColor),
                   ),
                 ),
                 Padding(
@@ -285,13 +292,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     onFieldSubmitted: (_) =>
                         nextNode(context, _userphoneNode, _useremailNode),
                     validator: (value) => checkNumberValidity(value),
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.phone_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Telephone',
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -312,7 +322,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Container(
                     height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
+                    decoration: buildTextFormFieldContainer(decorationColor),
                   ),
                 ),
                 Padding(
@@ -325,13 +335,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     onFieldSubmitted: (_) =>
                         nextNode(context, _useremailNode, _userloginNode),
                     validator: (value) => checkEmailValidity(value),
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.at_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Email',
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -352,7 +365,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Container(
                     height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
+                    decoration: buildTextFormFieldContainer(decorationColor),
                   ),
                 ),
                 Padding(
@@ -369,13 +382,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       }
                       return null;
                     },
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.user_6_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Nom d\'utilisateur',
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -396,7 +412,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Container(
                     height: 48.0,
-                    decoration: textFormFieldBoxDecoration,
+                    decoration: buildTextFormFieldContainer(decorationColor),
                   ),
                 ),
                 Padding(
@@ -416,10 +432,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       }
                       return null;
                     },
+                    style: TextStyle(
+                      color: textInverseModeColor,
+                    ),
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(left: 50.0),
                         prefixIcon: Icon(AmazingIcon.lock_password_line,
-                            color: Color(0xff000000), size: 15.0),
+                            color: textInverseModeColor, size: 15.0),
                         hintText: 'Mot de passe',
                         suffixIcon: IconButton(
                           onPressed: () => _toggle(),
@@ -427,11 +446,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               _obscureText
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Color(0xff000000),
+                              color: textInverseModeColor,
                               size: 15.0),
                         ),
                         hintStyle: TextStyle(
-                            color: Color(0xff000000).withOpacity(.35),
+                            color: textInverseModeColor.withOpacity(.35),
                             fontSize: 18.0),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -458,7 +477,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -476,13 +495,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.community_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Nom du snack',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -503,7 +525,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -516,13 +538,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) =>
                     nextNode(context, _snackemailNode, _snacktownNode),
                 validator: (value) => checkEmailValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.at_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'email',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -543,7 +568,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -561,13 +586,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Ville',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -588,7 +616,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -606,13 +634,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.community_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Rue',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -633,7 +664,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -646,13 +677,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) =>
                     nextNode(context, _snackphone1Node, _snackphone2Node),
                 validator: (value) => checkNumberValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Telephone No 1',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -673,7 +707,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -688,13 +722,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
                 validator: (value) =>
                     checkNumberValidity(value, canBeEmpty: true),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Telephone No 2',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -719,7 +756,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -734,13 +771,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 validator: (value) {
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.at_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Nom',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -761,7 +801,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -774,13 +814,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) =>
                     nextNode(context, _siteemailNode, _sitetownNode),
                 validator: (value) => checkEmailValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.at_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Email',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -801,7 +844,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -819,13 +862,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Ville',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -846,7 +892,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -864,13 +910,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   return null;
                 },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Quartier',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -891,7 +940,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -904,13 +953,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 onFieldSubmitted: (_) =>
                     nextNode(context, _sitephone1Node, _sitephone2Node),
                 validator: (value) => checkNumberValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Telephone No 1',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -931,7 +983,7 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
                 height: 48.0,
-                decoration: textFormFieldBoxDecoration,
+                decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
             Padding(
@@ -946,13 +998,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
                 validator: (value) =>
                     checkNumberValidity(value, canBeEmpty: true),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 50.0),
                     prefixIcon: Icon(AmazingIcon.phone_line,
-                        color: Color(0xff000000), size: 15.0),
+                        color: textInverseModeColor, size: 15.0),
                     hintText: 'Telephone No 2',
                     hintStyle: TextStyle(
-                        color: Color(0xff000000).withOpacity(.35),
+                        color: textInverseModeColor.withOpacity(.35),
                         fontSize: 18.0),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -982,13 +1037,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: <Widget>[
                   Text(
                     'Pack',
-                    style: TextStyle(fontSize: screenSize(context).height / 43),
+                    style: TextStyle(
+                        color: textInverseModeColor,
+                        fontSize: screenSize(context).height / 43),
                   ),
                   SizedBox(
                     height: 8.0,
                   ),
                   Text(_selectedPlan.title,
                       style: TextStyle(
+                          color: textInverseModeColor,
                           fontWeight: FontWeight.bold,
                           fontSize: screenSize(context).height / 35)),
                 ],
@@ -999,13 +1057,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: <Widget>[
                   Text(
                     'Duree',
-                    style: TextStyle(fontSize: screenSize(context).height / 43),
+                    style: TextStyle(
+                        color: textInverseModeColor,
+                        fontSize: screenSize(context).height / 43),
                   ),
                   SizedBox(
                     height: 8.0,
                   ),
                   Text("${_selectedPlan.duration.toString()} Mois",
                       style: TextStyle(
+                          color: textInverseModeColor,
                           fontWeight: FontWeight.bold,
                           fontSize: screenSize(context).height / 35)),
                 ],
@@ -1018,13 +1079,16 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         Text(
           'Montant',
-          style: TextStyle(fontSize: screenSize(context).height / 43),
+          style: TextStyle(
+              color: textInverseModeColor,
+              fontSize: screenSize(context).height / 43),
         ),
         SizedBox(
           height: 8.0,
         ),
         Text("${_selectedPlan.price.toString()} FCFA",
             style: TextStyle(
+                color: textInverseModeColor,
                 fontWeight: FontWeight.bold,
                 fontSize: screenSize(context).height / 35)),
         SizedBox(
@@ -1035,15 +1099,17 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: Container(
-                  height: 48.0, decoration: textFormFieldBoxDecoration),
+                  height: 48.0,
+                  decoration: buildTextFormFieldContainer(decorationColor)),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 10.0, top: 5.0),
               child: DropdownButton<Plan>(
+                dropdownColor: backgroundColor,
                 underline: Text(''),
                 icon: Icon(
                   AmazingIcon.arrow_down_s_line,
-                  color: Color(0xff000000).withOpacity(.4),
+                  color: textInverseModeColor.withOpacity(.4),
                 ),
                 isExpanded: true,
                 value: _selectedPlan,
@@ -1058,13 +1124,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     value: plan,
                     child: Row(
                       children: <Widget>[
-                        Icon(AmazingIcon.community_line),
+                        Icon(
+                          AmazingIcon.community_line,
+                          color: textInverseModeColor,
+                        ),
                         SizedBox(
                           width: 10.0,
                         ),
                         Text(
                           plan.title,
-                          style: TextStyle(),
+                          style: TextStyle(
+                            color: textInverseModeColor,
+                          ),
                         ),
                       ],
                     ),
@@ -1086,13 +1157,16 @@ class _RegisterPageState extends State<RegisterPage> {
         children: <Widget>[
           Text(
             'Nom',
-            style: TextStyle(fontSize: screenSize(context).height / 43),
+            style: TextStyle(
+                color: textInverseModeColor,
+                fontSize: screenSize(context).height / 43),
           ),
           SizedBox(
             height: 8.0,
           ),
           Text(_usernameController.text,
               style: TextStyle(
+                  color: textInverseModeColor,
                   fontWeight: FontWeight.bold,
                   fontSize: screenSize(context).height / 35)),
           SizedBox(
@@ -1100,13 +1174,16 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           Text(
             'Nom d\'utilisateur',
-            style: TextStyle(fontSize: screenSize(context).height / 43),
+            style: TextStyle(
+                color: textInverseModeColor,
+                fontSize: screenSize(context).height / 43),
           ),
           SizedBox(
             height: 8.0,
           ),
           Text(_userloginController.text,
               style: TextStyle(
+                  color: textInverseModeColor,
                   fontWeight: FontWeight.bold,
                   fontSize: screenSize(context).height / 35)),
           SizedBox(
@@ -1114,13 +1191,16 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           Text(
             'Snack',
-            style: TextStyle(fontSize: screenSize(context).height / 43),
+            style: TextStyle(
+                color: textInverseModeColor,
+                fontSize: screenSize(context).height / 43),
           ),
           SizedBox(
             height: 8.0,
           ),
           Text(_snacknameController.text,
               style: TextStyle(
+                  color: textInverseModeColor,
                   fontWeight: FontWeight.bold,
                   fontSize: screenSize(context).height / 35)),
           SizedBox(
@@ -1128,13 +1208,16 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           Text(
             'Site',
-            style: TextStyle(fontSize: screenSize(context).height / 43),
+            style: TextStyle(
+                color: textInverseModeColor,
+                fontSize: screenSize(context).height / 43),
           ),
           SizedBox(
             height: 8.0,
           ),
           Text('${_sitetownController.text}, ${_sitestreetController.text}',
               style: TextStyle(
+                  color: textInverseModeColor,
                   fontWeight: FontWeight.bold,
                   fontSize: screenSize(context).height / 35)),
           SizedBox(
@@ -1142,13 +1225,16 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           Text(
             'Licence',
-            style: TextStyle(fontSize: screenSize(context).height / 43),
+            style: TextStyle(
+                color: textInverseModeColor,
+                fontSize: screenSize(context).height / 43),
           ),
           SizedBox(
             height: 8.0,
           ),
           Text(_selectedPlan.title,
               style: TextStyle(
+                  color: textInverseModeColor,
                   fontWeight: FontWeight.bold,
                   fontSize: screenSize(context).height / 35)),
         ],
@@ -1160,6 +1246,7 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
+              backgroundColor: backgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
@@ -1203,12 +1290,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(30.0))),
                                     borderSide:
-                                        BorderSide(color: Color(0xff000000)),
+                                        BorderSide(color: textInverseModeColor),
                                     onPressed: () => Navigator.pop(context),
                                     child: Container(
-                                        alignment: Alignment.center,
-                                        height: 40.0,
-                                        child: Text('Fermer')),
+                                      alignment: Alignment.center,
+                                      height: 40.0,
+                                      child: Text('Fermer',
+                                          style: TextStyle(
+                                              color: textInverseModeColor)),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -1254,12 +1344,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(30.0))),
                                         borderSide: BorderSide(
-                                            color: Color(0xff000000)),
+                                            color: textInverseModeColor),
                                         onPressed: () => Navigator.pop(context),
                                         child: Container(
                                             alignment: Alignment.center,
                                             height: 40.0,
-                                            child: Text('Fermer')),
+                                            child: Text('Fermer',
+                                                style: TextStyle(
+                                                    color:
+                                                        textInverseModeColor))),
                                       ),
                                     ),
                                   ],
@@ -1304,12 +1397,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(30.0))),
                                         borderSide: BorderSide(
-                                            color: Color(0xff000000)),
+                                            color: textInverseModeColor),
                                         onPressed: () => Navigator.pop(context),
                                         child: Container(
                                             alignment: Alignment.center,
                                             height: 40.0,
-                                            child: Text('Fermer')),
+                                            child: Text('Fermer',
+                                                style: TextStyle(
+                                                    color:
+                                                        textInverseModeColor))),
                                       ),
                                     ),
                                   ],
@@ -1323,6 +1419,7 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
+            backgroundColor: backgroundColor,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(30.0))),
             content: Container(
@@ -1347,11 +1444,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Text(
                       'Inscription',
-                      style: subLogoTitleStyle,
+                      style: TextStyle(
+                          color: textInverseModeColor, fontSize: 33.0),
                     ),
                     Text(
                       'Reussie',
-                      style: subLogoTitleStyle,
+                      style: TextStyle(
+                          color: textInverseModeColor, fontSize: 33.0),
                     ),
                     SizedBox(
                       height: 20.0,
@@ -1374,7 +1473,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               child: Text(
                                 'Se connecter',
                                 style: TextStyle(
-                                    color: Color(0xffffffff), fontSize: 18),
+                                    color: textSameModeColor, fontSize: 18),
                               ),
                             ),
                           )),
@@ -1388,6 +1487,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: Stack(
           children: <Widget>[
             Padding(
@@ -1423,6 +1523,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   children: <Widget>[
                                     Text('Inscription',
                                         style: TextStyle(
+                                            color: textInverseModeColor,
                                             fontSize:
                                                 screenSize(context).height /
                                                     20)),
@@ -1438,8 +1539,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   ? 'Ajouter un site a'
                                                   : 'Selectionner la licence',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.7),
+                                          color: textInverseModeColor
+                                              .withOpacity(.7),
                                           fontSize:
                                               screenSize(context).height / 39),
                                     ),
@@ -1452,8 +1553,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   ? 'votre snack'
                                                   : 'pour votre snack',
                                       style: TextStyle(
-                                          color:
-                                              Color(0xff000000).withOpacity(.7),
+                                          color: textInverseModeColor
+                                              .withOpacity(.7),
                                           fontSize:
                                               screenSize(context).height / 39),
                                     ),
@@ -1464,6 +1565,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   child: Text(
                                     'Recapitulatif',
                                     style: TextStyle(
+                                        color: textInverseModeColor,
                                         fontSize:
                                             screenSize(context).height / 21),
                                   ),
@@ -1508,7 +1610,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             ? 'continuer'
                                             : 'Terminer',
                                         style: TextStyle(
-                                            color: Color(0xffffffff),
+                                            color: textSameModeColor,
                                             fontSize: 18),
                                       ),
                                     ),
@@ -1526,7 +1628,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         height: 45.0,
                                         decoration: BoxDecoration(
                                           border: Border.all(
-                                              color: Color(0xff000000)),
+                                              color: textInverseModeColor),
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(30.0)),
                                         ),
@@ -1537,7 +1639,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             child: Text(
                                               'Retour',
                                               style: TextStyle(
-                                                  color: Color(0xff000000),
+                                                  color: textInverseModeColor,
                                                   fontSize: 18),
                                             ),
                                           ),
@@ -1554,7 +1656,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ? Container(
                     width: screenSize(context).width,
                     height: screenSize(context).height,
-                    color: Color(0xffffffff).withOpacity(.89),
+                    color: textSameModeColor.withOpacity(.89),
                     child: Center(
                       child: CircularProgressIndicator(
                         valueColor:

@@ -1,3 +1,4 @@
+import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:flutter/material.dart';
 
@@ -14,13 +15,14 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
     return SafeArea(
       top: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         bottomNavigationBar: Container(
           height: 30.0,
           child: Center(
               child: Text(
             'Version 1.0.0',
             style: TextStyle(
-                color: Color(0xff000000).withOpacity(.4), fontSize: 14),
+                color: textInverseModeColor.withOpacity(.4), fontSize: 14),
           )),
         ),
         body: Padding(
@@ -72,13 +74,13 @@ class _ResponsePasswordResetState extends State<ResponsePasswordReset> {
                           Text(
                             'Connectez-vous',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 18.0),
+                                TextStyle(color: textInverseModeColor, fontSize: 18.0),
                           ),
                           Spacer(),
                           Icon(
                             AmazingIcon.arrow_drop_right_line,
                             size: 20.0,
-                            color: Colors.white,
+                            color: textInverseModeColor,
                           )
                         ],
                       ),

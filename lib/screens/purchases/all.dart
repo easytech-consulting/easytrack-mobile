@@ -60,7 +60,7 @@ class _PurchasePageState extends State<PurchasePage> {
                       children: <Widget>[
                         Image.asset(
                           'img/logos/LogoWhiteWithText.png',
-                          color: Colors.black,
+                          color: textInverseModeColor,
                           height: myHeight(context) / 20.0,
                         ),
                         SizedBox(
@@ -184,7 +184,7 @@ class _PurchasePageState extends State<PurchasePage> {
                             'Enregistrer',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: textSameModeColor,
                                 fontSize: myHeight(context) / 50.0),
                           ),
                         ),
@@ -198,7 +198,7 @@ class _PurchasePageState extends State<PurchasePage> {
                             height: myHeight(context) / 20.0,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
+                              border: Border.all(color: textInverseModeColor),
                               borderRadius: BorderRadius.circular(
                                   myHeight(context) / 20.0),
                             ),
@@ -317,248 +317,255 @@ class _PurchasePageState extends State<PurchasePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: true,
-      child: Scaffold(
-          body: Scaffold(
-        key: _scaffoldKey,
-        body: Stack(
-          children: <Widget>[
-            ListView(
-              children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    child: Stack(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Container(
-                            height: myHeight(context) / 17.0,
-                            decoration: textFormFieldBoxDecoration,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: Hero(
-                            tag: 'search',
+        top: true,
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          key: _scaffoldKey,
+          body: Stack(
+            children: <Widget>[
+              ListView(
+                children: <Widget>[
+                  Padding(
+                      padding:
+                          const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                      child: Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
                               height: myHeight(context) / 17.0,
-                              child: TextFormField(
-                                onFieldSubmitted: (_) {},
-                                controller: _controller,
-                                textInputAction: TextInputAction.done,
-                                style: TextStyle(color: Color(0xffffffff)),
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 10.0, left: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.search_2_line,
-                                        color: Color(0xff000000), size: 20.0),
-                                    suffixIcon: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(AmazingIcon.close_fill,
-                                            color: Color(0xff000000),
-                                            size: 20.0)),
-                                    hintText: 'Recherche...',
-                                    hintStyle: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color:
-                                            Color(0xff000000).withOpacity(.35),
-                                        fontSize: 18.0),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Hero(
+                              tag: 'search',
+                              child: Container(
+                                height: myHeight(context) / 17.0,
+                                child: TextFormField(
+                                  onFieldSubmitted: (_) {},
+                                  controller: _controller,
+                                  textInputAction: TextInputAction.done,
+                                  style: TextStyle(color: textSameModeColor),
+                                  decoration: InputDecoration(
+                                      contentPadding: const EdgeInsets.only(
+                                          top: 10.0, left: 50.0),
+                                      prefixIcon: Icon(
+                                          AmazingIcon.search_2_line,
+                                          color: textInverseModeColor,
+                                          size: 20.0),
+                                      suffixIcon: IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(AmazingIcon.close_fill,
+                                              color: textInverseModeColor,
+                                              size: 20.0)),
+                                      hintText: 'Recherche...',
+                                      hintStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: textInverseModeColor
+                                              .withOpacity(.35),
+                                          fontSize: 18.0),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                      )),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    )),
-                SizedBox(
-                  height: myHeight(context) / 50.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Row(
-                    children: <Widget>[
-                      InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: Icon(Icons.arrow_back)),
-                      SizedBox(
-                        width: myHeight(context) / 40.0,
-                      ),
-                      Text(
-                        'Mes achats',
-                        style: TextStyle(
-                            fontSize: myHeight(context) / 25.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Spacer(),
-                      InkWell(
-                          onTap: () => _filterData(),
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10.0),
-                            child: Icon(
-                              AmazingIcon.list_settings_fill,
-                              size: myHeight(context) / 25.0,
-                            ),
-                          ))
-                    ],
+                        ],
+                      )),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
                   ),
-                ),
-                SizedBox(
-                  height: myHeight(context) / 40.0,
-                ),
-                Container(
-                  width: myWidth(context),
-                  height: myHeight(context) * .78,
-                  child: FutureBuilder(
-                      future: _companyPurchases,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
-                          allPurchasesData = snapshot.data;
-                          _purchases = _checkAllPurchases(allPurchasesData)
-                              .map((sale) => Purchase.fromJson(sale))
-                              .toList();
-                          return _purchases == null || _purchases.length == 0
-                              ? Center(
-                                  child: Text('Aucun produit'),
-                                )
-                              : ListView.builder(
-                                  itemCount: _purchases.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () => showBill(
-                                          _suppliers[index],
-                                          _sites[index],
-                                          _purchases[index],
-                                          _initiators[index],
-                                          validator: _validators[index]),
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Container(
-                                              height: myHeight(context) / 5.2,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10.0)),
-                                                  border: Border.all(
-                                                      color: Colors.black38)),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 5.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Row(
+                      children: <Widget>[
+                        InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: Icon(Icons.arrow_back)),
+                        SizedBox(
+                          width: myHeight(context) / 40.0,
+                        ),
+                        Text(
+                          'Mes achats',
+                          style: TextStyle(
+                              fontSize: myHeight(context) / 25.0,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        InkWell(
+                            onTap: () => _filterData(),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10.0),
+                              child: Icon(
+                                AmazingIcon.list_settings_fill,
+                                size: myHeight(context) / 25.0,
+                              ),
+                            ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 40.0,
+                  ),
+                  Container(
+                    width: myWidth(context),
+                    height: myHeight(context) * .78,
+                    child: FutureBuilder(
+                        future: _companyPurchases,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            allPurchasesData = snapshot.data;
+                            _purchases = _checkAllPurchases(allPurchasesData)
+                                .map((sale) => Purchase.fromJson(sale))
+                                .toList();
+                            return _purchases == null || _purchases.length == 0
+                                ? Center(
+                                    child: Text('Aucun produit'),
+                                  )
+                                : ListView.builder(
+                                    itemCount: _purchases.length,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () => showBill(
+                                            _suppliers[index],
+                                            _sites[index],
+                                            _purchases[index],
+                                            _initiators[index],
+                                            validator: _validators[index]),
+                                        child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Container(
+                                                height: myHeight(context) / 5.2,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    border: Border.all(
+                                                        color: textInverseModeColor.withOpacity(.38))),
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: EdgeInsets.only(
-                                                            left: screenSize(
-                                                                        context)
-                                                                    .width /
-                                                                80),
-                                                        child: InkWell(
-                                                          child: Text(
-                                                            'P0 - ${_purchases[index].code}',
-                                                            style: TextStyle(
-                                                                fontSize: screenSize(
-                                                                            context)
-                                                                        .height /
-                                                                    30,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 5.0),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding: EdgeInsets.only(
+                                                              left: screenSize(
+                                                                          context)
+                                                                      .width /
+                                                                  80),
+                                                          child: InkWell(
+                                                            child: Text(
+                                                              'P0 - ${_purchases[index].code}',
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          30,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        _suppliers[index]
-                                                            .name
-                                                            .toUpperCase(),
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: screenSize(
-                                                                        context)
-                                                                    .height /
-                                                                38.0),
-                                                      ),
-                                                      Row(
-                                                        children: <Widget>[
-                                                          Text(
-                                                            _purchases[index]
-                                                                    .alreadyDelivered
-                                                                ? 'Paye'
-                                                                : 'Non paye',
-                                                            style: TextStyle(
-                                                                color: _purchases[
-                                                                            index]
-                                                                        .alreadyDelivered
-                                                                    ? Colors
-                                                                        .green
-                                                                    : Colors
-                                                                        .red,
-                                                                fontSize: screenSize(
-                                                                            context)
-                                                                        .height /
-                                                                    38.0),
-                                                          ),
-                                                          Spacer(),
-                                                          Text(
-                                                            'Il y\'a ${formatDate(DateTime.parse(_purchases[index].createdAt))}',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black54,
-                                                                fontSize: screenSize(
-                                                                            context)
-                                                                        .height /
-                                                                    50.0),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
+                                                        Text(
+                                                          _suppliers[index]
+                                                              .name
+                                                              .toUpperCase(),
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black54,
+                                                              fontSize: screenSize(
+                                                                          context)
+                                                                      .height /
+                                                                  38.0),
+                                                        ),
+                                                        Row(
+                                                          children: <Widget>[
+                                                            Text(
+                                                              _purchases[index]
+                                                                      .alreadyDelivered
+                                                                  ? 'Paye'
+                                                                  : 'Non paye',
+                                                              style: TextStyle(
+                                                                  color: _purchases[
+                                                                              index]
+                                                                          .alreadyDelivered
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors
+                                                                          .red,
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          38.0),
+                                                            ),
+                                                            Spacer(),
+                                                            Text(
+                                                              'Il y\'a ${formatDate(DateTime.parse(_purchases[index].createdAt))}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          50.0),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ))),
-                                    );
-                                  });
-                        }
-                        return Container(
-                          height: myHeight(context) * .86,
-                          color: Colors.transparent,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              valueColor: new AlwaysStoppedAnimation(gradient1),
+                                                ))),
+                                      );
+                                    });
+                          }
+                          return Container(
+                            height: myHeight(context) * .86,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    new AlwaysStoppedAnimation(gradient1),
+                              ),
                             ),
-                          ),
-                        );
-                      }),
-                ),
-              ],
-            ),
-            _isLoading
-                ? Container(
-                    height: myHeight(context),
-                    color: Colors.white.withOpacity(.9),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor: new AlwaysStoppedAnimation(gradient1),
+                          );
+                        }),
+                  ),
+                ],
+              ),
+              _isLoading
+                  ? Container(
+                      height: myHeight(context),
+                      color: textSameModeColor.withOpacity(.9),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: new AlwaysStoppedAnimation(gradient1),
+                        ),
                       ),
-                    ),
-                  )
-                : Container(
-                    height: 0.0,
-                  )
-          ],
-        ),
-      )),
-    );
+                    )
+                  : Container(
+                      height: 0.0,
+                    )
+            ],
+          ),
+        ));
   }
 }

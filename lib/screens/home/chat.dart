@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easytrack/commons/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
@@ -58,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         child: Text(
           messages[index],
-          style: TextStyle(color: Colors.white, fontSize: 15.0),
+          style: TextStyle(color: textSameModeColor, fontSize: 15.0),
         ),
       ),
     );
@@ -137,6 +138,7 @@ class _ChatPageState extends State<ChatPage> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[

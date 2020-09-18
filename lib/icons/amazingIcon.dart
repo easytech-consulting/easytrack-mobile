@@ -54,4 +54,16 @@ class AmazingIcon {
   static const IconData repeat_2_line = IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData edit_2_line = IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData archive_line = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData attachment_line = IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chat_delete_line = IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chat_off_line = IconData(0xe823, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData file_2_line = IconData(0xe824, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData folder_line = IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData send_plane_fill = IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData archive_line_1 = IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData logout_box_line = IconData(0xe828, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData money_dollar_circle_line = IconData(0xe829, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData notification_4_line = IconData(0xe82a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData building_2_line = IconData(0xe82b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData settings_line = IconData(0xe82c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

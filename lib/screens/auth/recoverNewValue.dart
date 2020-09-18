@@ -92,6 +92,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
       top: true,
       bottom: true,
       child: Scaffold(
+        backgroundColor: backgroundColor,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Form(
@@ -136,7 +137,8 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                             children: <Widget>[
                               Container(
                                 height: 48.0,
-                                decoration: textFormFieldBoxDecoration,
+                                decoration: buildTextFormFieldContainer(
+                                    decorationColor),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
@@ -185,7 +187,8 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                             children: <Widget>[
                               Container(
                                 height: 48.0,
-                                decoration: textFormFieldBoxDecoration,
+                                decoration: buildTextFormFieldContainer(
+                                    decorationColor),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10.0),
