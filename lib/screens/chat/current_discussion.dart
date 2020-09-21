@@ -25,8 +25,6 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
     super.initState();
     _controller = new TextEditingController();
     _node = FocusNode();
-    registerNotification();
-    configLocalNotification();
     loadData();
   }
 
@@ -47,81 +45,7 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
     return filter == '' ? items : result;
   }
 
-  checkUser({String id}) async {
-    QueryDocumentSnapshot result;
-    result = await FirebaseFirestore.instance
-        .collection('users')
-        .where('id', isEqualTo: id)
-        .get()
-        .then((value) => value.docs.first);
-
-    return result;
-  }
-
-  void registerNotification() async {
-    QueryDocumentSnapshot currentUser = await checkUser(id: user.id.toString());
-
-    FirebaseMessaging _messaging = FirebaseMessaging();
-    _messaging.requestNotificationPermissions();
-
-    _messaging.configure(onMessage: (Map<String, dynamic> message) {
-      print('onMessage: $message');
-      Platform.isAndroid
-          ? showNotification(message['notification'])
-          : showNotification(message['aps']['alert']);
-      return;
-    }, onResume: (Map<String, dynamic> message) {
-      print('onResume: $message');
-      return;
-    }, onLaunch: (Map<String, dynamic> message) {
-      print('onLaunch: $message');
-      return;
-    });
-
-    _messaging.getToken().then((token) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.id)
-          .update({'pushToken': token});
-    }).catchError((err) {
-      throw Exception('Exception occured when register message $err');
-    });
-  }
-
-  void showNotification(message) async {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      Platform.isAndroid
-          ? 'com.dfa.flutterchatdemo'
-          : 'com.duytq.flutterchatdemo',
-      'Flutter chat demo',
-      'your channel description',
-      playSound: true,
-      enableVibration: true,
-      importance: Importance.Max,
-      priority: Priority.High,
-    );
-    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
-        message['body'].toString(), platformChannelSpecifics,
-        payload: json.encode(message));
-  }
-
-  void configLocalNotification() {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        new AndroidInitializationSettings('app_icon');
-    var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

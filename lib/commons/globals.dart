@@ -293,16 +293,18 @@ logUserOnFirebase() async {
       .collection('users')
       .where('id', isEqualTo: user.id.toString())
       .get();
-  final List<DocumentSnapshot> documents = result.docs;
-  if (documents.length == 0) {
-    FirebaseFirestore.instance.collection('users').doc().set({
-      'email': user.email.toString(),
-      'id': user.id.toString(),
-      'name': user.name.toString(),
-      'phone': user.tel.toString(),
-      'photo': user.photo.toString(),
-      'username': user.username.toString()
-    });
+  if (result != null) {
+    final List<DocumentSnapshot> documents = result.docs;
+    if (documents.length == 0) {
+      FirebaseFirestore.instance.collection('users').doc().set({
+        'email': user.email.toString(),
+        'id': user.id.toString(),
+        'name': user.name.toString(),
+        'phone': user.tel.toString(),
+        'photo': user.photo.toString(),
+        'username': user.username.toString()
+      });
+    }
   }
 }
 
