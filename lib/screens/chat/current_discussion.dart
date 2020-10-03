@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/show.dart';
 import 'package:easytrack/styles/style.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class CurrentDiscussion extends StatefulWidget {

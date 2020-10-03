@@ -23,6 +23,7 @@ class _StatsPageState extends State<StatsPage> {
   bool searchMode;
   bool _isLoading;
   Future stats;
+  OverlayEntry _overlayEntry;
 
   bool showAll = true;
   Future _futureSales;
@@ -47,9 +48,330 @@ class _StatsPageState extends State<StatsPage> {
     _futureSales = fetchSales();
   }
 
+  _show() {
+    setState(() {
+      this._overlayEntry = this._createOverlayEntry();
+      Overlay.of(context).insert(this._overlayEntry);
+    });
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+        builder: (context) => Positioned(
+            bottom: 0.0,
+            height: myHeight(context),
+            width: myWidth(context),
+            child: Material(
+              color: Colors.black38,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: myHeight(context) * .8,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(myHeight(context) / 70.0))),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: myWidth(context) / 13),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onVerticalDragStart: (details) =>
+                                  this._overlayEntry.remove(),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Container(
+                                    width: myWidth(context) / 5,
+                                    height: myHeight(context) / 150.0,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.withOpacity(.3),
+                                        borderRadius: BorderRadius.circular(
+                                            myHeight(context) / 100.0))),
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Color(0xff267FC9),
+                                      shape: BoxShape.circle),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(
+                                        myHeight(context) / 50.0),
+                                    child: Text(
+                                      '${user.name.substring(0, 2).toUpperCase()}',
+                                      style: TextStyle(
+                                          color: textSameModeColor,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: myHeight(context) / 50.0),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 20.0,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${capitalize(user.name)}',
+                                      style: TextStyle(
+                                          color: textInverseModeColor,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: myHeight(context) / 40.0),
+                                    ),
+                                    Text(
+                                      '${capitalize(company.name.toLowerCase())} (${capitalize(userRole["name"])})',
+                                      style: TextStyle(
+                                          color: textInverseModeColor
+                                              .withOpacity(.38),
+                                          fontSize: myHeight(context) / 60.0),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 20.0,
+                            ),
+                            Row(
+                              children: [
+                                Stack(
+                                  fit: StackFit.loose,
+                                  children: [
+                                    Icon(
+                                      AmazingIcon.notification_4_line,
+                                      color: textInverseModeColor,
+                                      size: myHeight(context) / 35.0,
+                                    ),
+                                    Positioned(
+                                      top: 0.0,
+                                      right: 0.0,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle),
+                                        width: myHeight(context) / 100.0,
+                                        height: myHeight(context) / 100.0,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Notifications',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                this._overlayEntry.remove();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SitePage()));
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    AmazingIcon.building_2_line,
+                                    color: textInverseModeColor,
+                                    size: myHeight(context) / 35.0,
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Mes sites',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.bar_chart_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Rapports',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.settings_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Configurations',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.money_dollar_circle_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Abonnement',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 20.0,
+                            ),
+                            Text(
+                              'MENU',
+                              style: TextStyle(
+                                  color: textInverseModeColor.withOpacity(.45),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 35.0,
+                            ),
+                            Text(
+                              'Politique de confidentialite',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'Termes et conditions',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'A Propos',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'Aide',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: myHeight(context) / 60.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _scaffoldKey.currentState
+                                      .hideCurrentSnackBar();
+                                  _logoutUser();
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      AmazingIcon.logout_box_line,
+                                      color: textInverseModeColor,
+                                      size: myHeight(context) / 30.0,
+                                    ),
+                                    SizedBox(
+                                      width: myWidth(context) / 10.0,
+                                    ),
+                                    Text(
+                                      'Deconnexion',
+                                      style: TextStyle(
+                                          color: textInverseModeColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: myHeight(context) / 40.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            )));
+  }
+
   _showAdminSnackBar() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      backgroundColor: textSameModeColor,
+      duration: Duration(minutes: 30),
+      backgroundColor: backgroundColor,
       shape: RoundedRectangleBorder(
           side: BorderSide(color: textInverseModeColor.withOpacity(.05)),
           borderRadius: BorderRadius.vertical(
@@ -154,7 +476,7 @@ class _StatsPageState extends State<StatsPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  _scaffoldKey.currentState.hideCurrentSnackBar();
+                  this._overlayEntry.remove();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => SitePage()));
                 },
@@ -299,7 +621,7 @@ class _StatsPageState extends State<StatsPage> {
                 padding: EdgeInsets.only(bottom: myHeight(context) / 60.0),
                 child: GestureDetector(
                   onTap: () {
-                    _scaffoldKey.currentState.hideCurrentSnackBar();
+                    this._overlayEntry.remove();
                     _logoutUser();
                   },
                   child: Row(
@@ -330,6 +652,7 @@ class _StatsPageState extends State<StatsPage> {
 
   _showUserSnackBar() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
+      duration: Duration(minutes: 30),
       backgroundColor: textSameModeColor,
       shape: RoundedRectangleBorder(
           side: BorderSide(color: textInverseModeColor.withOpacity(.05)),
@@ -549,7 +872,7 @@ class _StatsPageState extends State<StatsPage> {
               Spacer(),
               GestureDetector(
                 onTap: () {
-                  _scaffoldKey.currentState.hideCurrentSnackBar();
+                  this._overlayEntry.remove();
                   _logoutUser();
                 },
                 child: Row(
@@ -1052,7 +1375,8 @@ class _StatsPageState extends State<StatsPage> {
                                                   child: InkWell(
                                                       onTap: () {},
                                                       child: Container(
-                                                          height: myHeight(context) /
+                                                          height: myHeight(
+                                                                  context) /
                                                               5.8,
                                                           margin: EdgeInsets
                                                               .symmetric(
@@ -1063,7 +1387,8 @@ class _StatsPageState extends State<StatsPage> {
                                                           decoration: BoxDecoration(
                                                               borderRadius: BorderRadius.horizontal(
                                                                   right: Radius.circular(
-                                                                      myHeight(context) /
+                                                                      myHeight(
+                                                                              context) /
                                                                           110.0)),
                                                               border: Border.all(
                                                                   color: Colors
@@ -1720,7 +2045,12 @@ class _StatsPageState extends State<StatsPage> {
                                           width: 10.0,
                                         ),
                                         GestureDetector(
-                                          onTap: () => _showAdminSnackBar(),
+                                          onTap: () {
+                                            setState(() {
+                                              showBottom = false;
+                                            });
+                                            _show();
+                                          },
                                           child: Container(
                                             width: myWidth(context) / 7.5,
                                             height: myWidth(context) / 7.5,
@@ -1856,7 +2186,7 @@ class _StatsPageState extends State<StatsPage> {
                                                   child: Container(
                                                       height:
                                                           myHeight(context) /
-                                                              5.8,
+                                                              6.4,
                                                       margin:
                                                           EdgeInsets.symmetric(
                                                         vertical:
@@ -2027,38 +2357,31 @@ class _StatsPageState extends State<StatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return allSales == null ||
-            allPurchases == null ||
-            allIncomes == null ||
-            dailySales == null ||
-            dailyPurchases == null ||
-            dailyIncomes == null
-        ? FutureBuilder(
-            future: stats,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                _loadStats(snapshot.data);
-                return buildContent();
-              }
-              return Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: otherHeader(context),
+    return FutureBuilder(
+        future: stats,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            _loadStats(snapshot.data);
+            return buildContent();
+          }
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: otherHeader(context),
+              ),
+              Container(
+                height: myHeight(context) * .8,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(gradient1),
                   ),
-                  Container(
-                    height: myHeight(context) * .8,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(gradient1),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            })
-        : buildContent();
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
 
@@ -2084,7 +2407,7 @@ class _StatsCardsState extends State<StatCards> {
     _key.currentState.showSnackBar(SnackBar(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
-      duration: Duration(seconds: 30),
+      duration: Duration(minutes: 30),
       backgroundColor: textSameModeColor,
       content: Container(
         height: myHeight(widget.parentContext) / 6,
@@ -2259,10 +2582,10 @@ class _StatsCardsState extends State<StatCards> {
                   children: <Widget>[
                     Text(
                       widget.index == 1
-                          ? _priceCard1.toString()
+                          ? formatPrice(_priceCard1)
                           : widget.index == 2
-                              ? _priceCard2.toString()
-                              : _priceCard3.toString(),
+                              ? formatPrice(_priceCard2)
+                              : formatPrice(_priceCard3),
                       style: TextStyle(
                           color: textInverseModeColor,
                           fontSize: myHeight(context) / 20.0),

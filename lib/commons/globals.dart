@@ -204,7 +204,7 @@ formatDate(DateTime date) {
                   : now.difference(date).inDays <= 7
                       ? '${now.difference(date).inDays} jrs'
                       : now.difference(date).inDays ~/ 7 <= 4
-                          ? '${(now.difference(date).inDays ~/ 7)} smns'
+                          ? '${(now.difference(date).inDays ~/ 7)} sem'
                           : now.difference(date).inDays ~/ 30 < 12
                               ? '${(now.difference(date).inDays ~/ 30)} mois'
                               : '${(now.difference(date).inDays ~/ 365)} ans';
@@ -308,7 +308,21 @@ logUserOnFirebase() async {
   }
 }
 
+formatPrice(int price) {
+  String result;
+  if(price > 1000) {
+    result = '${price ~/ 1000}k';
+  }
+
+  if(price > 1000000) {
+    result = '${price ~/ 1000000}m';
+  }
+
+  return result.toString();
+}
+
 int errorStatusCode, userId;
+bool showBottom;
 List allUserContacts;
 Map userRole;
 String userToken;

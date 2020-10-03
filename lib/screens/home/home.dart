@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
   final int index;
-  MainPage({this.index});
+  final Widget element;
+  MainPage({this.index, this.element});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -17,6 +18,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   PageController _pageController;
   int _currentIndex;
+  bool bottom = true;
   @override
   void initState() {
     super.initState();
@@ -64,7 +66,7 @@ class _MainPageState extends State<MainPage> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(30.0))),
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () => true,
                                 child: Container(
                                     alignment: Alignment.center,
                                     height: 40.0,
@@ -86,7 +88,7 @@ class _MainPageState extends State<MainPage> {
                                         Radius.circular(30.0))),
                                 borderSide:
                                     BorderSide(color: Color(0xff000000)),
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () => false,
                                 child: Container(
                                     alignment: Alignment.center,
                                     height: 40.0,
@@ -100,6 +102,7 @@ class _MainPageState extends State<MainPage> {
         false;
   }
 
+  
   @override
   Widget build(BuildContext context) {
     List<BottomNavigationBarItem> _bottomItems = [
@@ -170,18 +173,20 @@ class _MainPageState extends State<MainPage> {
             },
             currentIndex: _currentIndex,
             items: _bottomItems),
-        body: PageView(
-          controller: _pageController,
-          pageSnapping: true,
-          onPageChanged: (index) {
-            if (index < _items.length) {
-              setState(() {
-                _currentIndex = index;
-              });
-            }
-          },
-          scrollDirection: Axis.horizontal,
-          children: _items,
+        body: Scaffold(
+          body: PageView(
+            controller: _pageController,
+            pageSnapping: true,
+            onPageChanged: (index) {
+              if (index < _items.length) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              }
+            },
+            scrollDirection: Axis.horizontal,
+            children: _items,
+          ),
         ),
       ),
     );

@@ -167,14 +167,14 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                               text: TextSpan(
                                                   text: allSales == null
                                                       ? '0'
-                                                      : '${(allSales ~/ 1000)}',
+                                                      : '${formatPrice(allSales)}',
                                                   style: TextStyle(
                                                       fontSize:
                                                           myHeight(context) /
                                                               20.0),
                                                   children: [
                                                 TextSpan(
-                                                    text: 'K Ventes',
+                                                    text: ' Ventes',
                                                     style: TextStyle(
                                                         fontSize:
                                                             myHeight(context) /
@@ -303,7 +303,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                         text: allPurchases ==
                                                                 null
                                                             ? "0"
-                                                            : '${((allPurchases ~/ 1000).toString())}',
+                                                            : '${formatPrice(allPurchases)}',
                                                         style: TextStyle(
                                                             color: gradient1,
                                                             fontSize: myHeight(
@@ -311,7 +311,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                                 20.0),
                                                         children: [
                                                       TextSpan(
-                                                          text: 'K Achats',
+                                                          text: ' Achats',
                                                           style: TextStyle(
                                                               fontSize: myHeight(
                                                                       context) /

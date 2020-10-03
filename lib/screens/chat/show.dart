@@ -36,6 +36,7 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
     configLocalNotification();
     _node = FocusNode();
     _searchMode = false;
+    _fieldChattingWithField();
     _controller = TextEditingController();
     _scrollController = ScrollController();
   }
@@ -50,7 +51,7 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
     }
   }
 
-   checkUser({String id}) async {
+  checkUser({String id}) async {
     QueryDocumentSnapshot result;
     result = await FirebaseFirestore.instance
         .collection('users')
@@ -59,6 +60,15 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
         .then((value) => value.docs.first);
 
     return result;
+  }
+
+  _fieldChattingWithField() async {
+    QueryDocumentSnapshot currentUser = await checkUser(id: user.id.toString());
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.id)
+        .update({'chattingWith': _peer['id']});
   }
 
   void registerNotification() async {
@@ -82,6 +92,7 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
     });
 
     _messaging.getToken().then((token) {
+      print(token);
       FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.id)
@@ -99,8 +110,8 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
       Platform.isAndroid
           ? 'com.dfa.flutterchatdemo'
           : 'com.duytq.flutterchatdemo',
-      'Flutter chat demo',
-      'your channel description',
+      'Easytrack chat module',
+      'Discussion between users of same site and/or snack',
       playSound: true,
       enableVibration: true,
       importance: Importance.Max,
@@ -124,7 +135,6 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
-
 
   buildMessage(QueryDocumentSnapshot messageQuery, int index, datas) {
     Map message = messageQuery.data();

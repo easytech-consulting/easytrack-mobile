@@ -97,17 +97,19 @@ class _SitePageState extends State<SitePage> {
 
   _showDetails(Site _site) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
-        content: Container(
-          height: myHeight(context) * .76,
-          width: myWidth(context) * .82,
-          child: Padding(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
             padding: EdgeInsets.symmetric(
-                vertical: myHeight(context) / 60,
-                horizontal: myHeight(context) / 100),
+                vertical: myHeight(context) / 30,
+                horizontal: myHeight(context) / 25),
+            height: myHeight(context) * .8,
+            width: myWidth(context) * .9,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -116,7 +118,7 @@ class _SitePageState extends State<SitePage> {
                     Container(
                       width: myWidth(context) / 2,
                       child: Text(
-                        'Site - ${_site.street}',
+                        '${_site.street}',
                         style: TextStyle(
                             fontSize: myHeight(context) / 30,
                             fontWeight: FontWeight.bold),
@@ -152,10 +154,21 @@ class _SitePageState extends State<SitePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: myWidth(context) / 80),
-                  child: Text(
-                    'Disponible',
-                    style: TextStyle(
-                        color: gradient1, fontSize: myHeight(context) / 40.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        AmazingIcon.phone_line,
+                      ),
+                      SizedBox(
+                        width: myWidth(context) / 50,
+                      ),
+                      Text(
+                        _site.tel2 == null ? '${_site.tel1}' : '${_site.tel2}',
+                        style: TextStyle(
+                            color: textInverseModeColor.withOpacity(.54),
+                            fontSize: myHeight(context) / 38.0),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -168,27 +181,6 @@ class _SitePageState extends State<SitePage> {
                 SizedBox(
                   height: myHeight(context) / 40.0,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Nom',
-                      style: TextStyle(
-                          color: textInverseModeColor.withOpacity(.54),
-                          fontSize: myHeight(context) / 38.0),
-                    ),
-                    SizedBox(
-                      width: myWidth(context) / 50,
-                    ),
-                    Text(
-                      '${_site.name}',
-                      style: TextStyle(
-                          fontSize: myHeight(context) / 33,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -210,6 +202,27 @@ class _SitePageState extends State<SitePage> {
                   ],
                 ),
                 Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Nom',
+                      style: TextStyle(
+                          color: textInverseModeColor.withOpacity(.54),
+                          fontSize: myHeight(context) / 38.0),
+                    ),
+                    SizedBox(
+                      width: myHeight(context) / 10,
+                    ),
+                    Text(
+                      '${_site.name}',
+                      style: TextStyle(
+                          fontSize: myHeight(context) / 33,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Spacer(),
                 InkWell(
                   onTap: () =>
                       launchCall(_site.tel2 == null ? _site.tel1 : _site.tel2),
@@ -223,7 +236,7 @@ class _SitePageState extends State<SitePage> {
                             fontSize: myHeight(context) / 38.0),
                       ),
                       SizedBox(
-                        width: myWidth(context) / 50,
+                        width: 30,
                       ),
                       Text(
                         _site.tel2 == null ? '${_site.tel1}' : '${_site.tel2}',
@@ -287,9 +300,7 @@ class _SitePageState extends State<SitePage> {
               ],
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   _attemptSave() async {
@@ -385,7 +396,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Nom',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -427,7 +439,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Email',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -474,7 +487,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Ville',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -521,7 +535,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Rue',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -563,7 +578,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Telephone No 1',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -607,7 +623,8 @@ class _SitePageState extends State<SitePage> {
                                     color: textInverseModeColor, size: 15.0),
                                 hintText: 'Telephone No 2',
                                 hintStyle: TextStyle(
-                                    color: textInverseModeColor.withOpacity(.35),
+                                    color:
+                                        textInverseModeColor.withOpacity(.35),
                                     fontSize: 18.0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide.none,
@@ -1017,7 +1034,8 @@ class _SitePageState extends State<SitePage> {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0))),
-                              borderSide: BorderSide(color: textInverseModeColor),
+                              borderSide:
+                                  BorderSide(color: textInverseModeColor),
                               onPressed: () => Navigator.pop(context),
                               child: Container(
                                   alignment: Alignment.center,
