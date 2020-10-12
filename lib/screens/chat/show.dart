@@ -148,15 +148,15 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
       child: Row(
         mainAxisAlignment:
             message['idTo'] == user.id.toString() || message['idTo'] == user.id
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.start,
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.end,
         children: [
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: message['idTo'] == user.id.toString() ||
                     message['idTo'] == user.id
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.end,
             children: [
               Container(
                 decoration: BoxDecoration(
@@ -165,16 +165,16 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                       topRight: Radius.circular(myHeight(context) / 100.0),
                       bottomRight: message['idTo'] == user.id.toString() ||
                               message['idTo'] == user.id
-                          ? Radius.circular(0.0)
-                          : Radius.circular(myHeight(context) / 100.0),
+                          ? Radius.circular(myHeight(context) / 100.0)
+                          : Radius.circular(0.0),
                       bottomLeft: message['idTo'] != user.id.toString() ||
                               message['idTo'] != user.id
-                          ? Radius.circular(0.0)
-                          : Radius.circular(myHeight(context) / 100.0)),
+                          ? Radius.circular(myHeight(context) / 100.0)
+                          : Radius.circular(0.0)),
                   color: message['idTo'] != user.id.toString() &&
                           message['idTo'] != user.id
-                      ? Color(0xff267FC9)
-                      : Color(0xff3E4859),
+                      ? Color(0xff3E4859)
+                      : Color(0xff267FC9),
                 ),
                 width: myWidth(context) / 1.7,
                 child: Padding(
@@ -368,125 +368,59 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _searchMode
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: Hero(
-                            tag: 'search',
-                            child: Container(
-                              height: myHeight(context) / 17.0,
-                              child: TextFormField(
-                                onFieldSubmitted: (_) {
-                                  setState(() {
-                                    _searchMode = false;
-                                  });
-                                },
-                                controller: _controller,
-                                textInputAction: TextInputAction.done,
-                                style: TextStyle(
-                                    color: textInverseModeColor,
-                                    fontWeight: FontWeight.w700),
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 10.0, left: 50.0),
-                                    prefixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                _searchMode = false;
-                                              });
-                                            },
-                                            icon: Icon(Icons.arrow_back,
-                                                color: textInverseModeColor,
-                                                size:
-                                                    myHeight(context) / 30.0)),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              right: myHeight(context) / 50.0),
-                                          child: Icon(AmazingIcon.search_2_line,
-                                              color: textInverseModeColor,
-                                              size: myHeight(context) / 37.0),
-                                        ),
-                                      ],
-                                    ),
-                                    suffixIcon: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _searchMode = false;
-                                          });
-                                        },
-                                        icon: Icon(AmazingIcon.close_fill,
-                                            color: textInverseModeColor,
-                                            size: myHeight(context) / 37.0)),
-                                    hintText: 'Recherche...',
-                                    hintStyle: TextStyle(
-                                        color: textInverseModeColor
-                                            .withOpacity(.35),
-                                        fontSize: 18.0),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      Container(
+                        width: myHeight(context) / 25.0,
+                        height: myHeight(context) / 25.0,
+                        alignment: Alignment.center,
+                        child: _peer['photo'] == null ||
+                                _peer['photo'] == 'null' ||
+                                _peer['photo'] == ''
+                            ? Padding(
+                                padding:
+                                    EdgeInsets.all(myHeight(context) / 200),
+                                child: Text(
+                                  _peer['name'].substring(0, 2).toUpperCase(),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: textSameModeColor,
+                                      fontSize: myHeight(context) / 60),
+                                ),
+                              )
+                            : SizedBox(
+                                height: 0.0,
                               ),
-                            ),
-                          ),
-                        )
-                      : Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.arrow_back),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            Container(
-                              width: myHeight(context) / 25.0,
-                              height: myHeight(context) / 25.0,
-                              alignment: Alignment.center,
-                              child: _peer['photo'] == null ||
-                                      _peer['photo'] == 'null' ||
-                                      _peer['photo'] == ''
-                                  ? Padding(
-                                      padding: EdgeInsets.all(
-                                          myHeight(context) / 200),
-                                      child: Text(
-                                        _peer['name']
-                                            .substring(0, 2)
-                                            .toUpperCase(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: textSameModeColor,
-                                            fontSize: myHeight(context) / 60),
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: 0.0,
-                                    ),
-                              decoration: _peer['photo'] == null ||
-                                      _peer['photo'] == 'null' ||
-                                      _peer['photo'] == ''
-                                  ? BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xff3E4859))
-                                  : BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              'img/persons/${_peer['photo']}'),
-                                          fit: BoxFit.cover)),
-                            ),
-                            SizedBox(
-                              width: myHeight(context) / 50.0,
-                            ),
-                            Text(
-                              _peer['name'],
-                              style: TextStyle(
-                                  fontSize: myHeight(context) / 40.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Spacer(),
-                            _offsetPopup()
-                          ],
-                        ),
+                        decoration: _peer['photo'] == null ||
+                                _peer['photo'] == 'null' ||
+                                _peer['photo'] == ''
+                            ? BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0xff3E4859))
+                            : BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        'img/persons/${_peer['photo']}'),
+                                    fit: BoxFit.cover)),
+                      ),
+                      SizedBox(
+                        width: myHeight(context) / 50.0,
+                      ),
+                      Text(
+                        _peer['name'],
+                        style: TextStyle(
+                            fontSize: myHeight(context) / 40.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      _offsetPopup()
+                    ],
+                  ),
                   Container(
                     padding: EdgeInsets.symmetric(
                         horizontal: myWidth(context) / 20.0),
@@ -520,8 +454,6 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                   return Container(
                     height: myHeight(context) * .77,
                     child: ListView.builder(
-                        controller: _scrollController,
-                        reverse: false,
                         itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
                           return buildMessage(snapshot.data.docs[index], index,

@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/show.dart';
 import 'package:easytrack/styles/style.dart';
@@ -40,10 +41,209 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
     return filter == '' ? items : result;
   }
 
- 
+  generateBackgroundColor(int index) {
+    List colors = [
+      Color(0xFFC9DFF2),
+      Color(0xFFC8EBF0),
+      Color(0xFFC9F6FB),
+      Color(0xFFD7EDC7),
+      Color(0xFFCBD2F7),
+      Color(0xFFE6C6F7)
+    ];
+
+    return colors[index % colors.length];
+  }
+
+  generateTextColor(int index) {
+    List colors = [
+      Color(0xFF2680C9),
+      Color(0xFF26B0C3),
+      Color(0xFF23B0C3),
+      Color(0xFF61B820),
+      Color(0xFF324CDE),
+      Color(0xFF9A1CDD)
+    ];
+
+    return colors[index % colors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        top: true,
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                header2(context, 'Chat', () {}),
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: dataToShow.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ShowDiscussion(
+                                      user: dataToShow[index]))),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    bottom:
+                                        BorderSide(color: Colors.black12))),
+                            height: myHeight(context) / 8,
+                            padding: EdgeInsets.symmetric(
+                              vertical: myHeight(context) / 30.0,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Container(
+                                  width: myHeight(context) / 15.0,
+                                  height: myHeight(context) / 15.0,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    dataToShow[index]['name']
+                                        .substring(0, 2)
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                        color: generateTextColor(index),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: myHeight(context) / 55),
+                                  ),
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: generateBackgroundColor(index)),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: myHeight(context) / 50.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: myWidth(context) / 2,
+                                        child: Text(
+                                          dataToShow[index]['name'],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontSize:
+                                                  myHeight(context) / 45.0,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Container(
+                                          width: myWidth(context) / 2,
+                                          child: Text(
+                                            'Demarrer la conversation',
+                                            overflow: TextOverflow.ellipsis,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Spacer(),
+                                Text('10:30')
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+}
+
+/* GestureDetector(
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ShowDiscussion(
+                                              user: dataToShow[index]))),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: myHeight(context) / 100.0,
+                                        horizontal: 20.0),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: myHeight(context) / 15.0,
+                                          height: myHeight(context) / 15.0,
+                                          alignment: Alignment.center,
+                                          child: dataToShow[index]['photo'] ==
+                                                  null
+                                              ? Text(
+                                                  dataToShow[index]['name']
+                                                      .substring(0, 2)
+                                                      .toUpperCase(),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize:
+                                                          myHeight(context) /
+                                                              45),
+                                                )
+                                              : SizedBox(
+                                                  height: 0.0,
+                                                ),
+                                          decoration: dataToShow[index]
+                                                      ['photo'] ==
+                                                  null
+                                              ? BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: generateColor(index))
+                                              : BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          'img/persons/${dataToShow[index]['photo']}'),
+                                                      fit: BoxFit.cover)),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  myHeight(context) / 50.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                dataToShow[index]['name'],
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            45.0,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    myHeight(context) / 150.0,
+                                              ),
+                                              Container(
+                                                  child: Text(
+                                                      'Demarrer la conversation')),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                 */
+
+/* Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
           child: Container(
@@ -53,80 +253,7 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
                   CustomScrollView(
                     slivers: [
                       SliverAppBar(
-                        title: _searchMode
-                            ? Stack(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Container(
-                                      height: myHeight(context) / 17.0,
-                                      decoration: buildTextFormFieldContainer(
-                                          decorationColor),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10.0),
-                                    child: Hero(
-                                      tag: 'search',
-                                      child: Container(
-                                        height: myHeight(context) / 17.0,
-                                        child: TextFormField(
-                                          controller: _controller,
-                                          focusNode: _node,
-                                          textInputAction: TextInputAction.done,
-                                          style: TextStyle(
-                                              color: textInverseModeColor),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dataToShow =
-                                                  searchMethod(allData, value);
-                                            });
-                                          },
-                                          onFieldSubmitted: (value) {
-                                            setState(() {
-                                              dataToShow =
-                                                  searchMethod(allData, value);
-                                              _controller.text = '';
-                                            });
-                                          },
-                                          decoration: InputDecoration(
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      top: 10.0, left: 50.0),
-                                              prefixIcon: Icon(
-                                                  AmazingIcon.search_2_line,
-                                                  color: textInverseModeColor,
-                                                  size: 20.0),
-                                              suffixIcon: IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _searchMode = false;
-                                                    });
-                                                    _node.unfocus();
-                                                    _controller.text = '';
-                                                    /*_sales =
-                                                            _salesForSearch; */
-                                                  },
-                                                  icon: Icon(
-                                                      AmazingIcon.close_fill,
-                                                      color: Color(0xff000000),
-                                                      size: 20.0)),
-                                              hintText: 'Recherche...',
-                                              hintStyle: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: textInverseModeColor
-                                                      .withOpacity(.35),
-                                                  fontSize: 18.0),
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide.none,
-                                              )),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Padding(
+                        title: Padding(
                                 padding: const EdgeInsets.only(
                                     top: 20.0, bottom: 10.0),
                                 child: Row(
@@ -217,91 +344,9 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
                         ),
                         expandedHeight: myHeight(context) / 5.5,
                       ),
-                      dataToShow == null || dataToShow.length == 0
-                          ? SliverAppBar(
-                              automaticallyImplyLeading: false,
-                            )
-                          : SliverList(
+                      SliverList(
                               delegate: SliverChildBuilderDelegate(
-                                (context, index) => GestureDetector(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ShowDiscussion(
-                                              user: dataToShow[index]))),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: myHeight(context) / 100.0,
-                                        horizontal: 20.0),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: myHeight(context) / 15.0,
-                                          height: myHeight(context) / 15.0,
-                                          alignment: Alignment.center,
-                                          child: dataToShow[index]['photo'] ==
-                                                  null
-                                              ? Text(
-                                                  dataToShow[index]['name']
-                                                      .substring(0, 2)
-                                                      .toUpperCase(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize:
-                                                          myHeight(context) /
-                                                              45),
-                                                )
-                                              : SizedBox(
-                                                  height: 0.0,
-                                                ),
-                                          decoration: dataToShow[index]
-                                                      ['photo'] ==
-                                                  null
-                                              ? BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: generateColor(index))
-                                              : BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          'img/persons/${dataToShow[index]['photo']}'),
-                                                      fit: BoxFit.cover)),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  myHeight(context) / 50.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                dataToShow[index]['name'],
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        myHeight(context) /
-                                                            45.0,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 150.0,
-                                              ),
-                                              Container(
-                                                  child: Text(
-                                                      'Demarrer la conversation')),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                childCount: dataToShow.length,
+                                (context, index) => childCount: dataToShow.length,
                               ),
                             )
                     ],
@@ -316,6 +361,4 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
                         )
                 ],
               ))),
-    );
-  }
-}
+    ); */

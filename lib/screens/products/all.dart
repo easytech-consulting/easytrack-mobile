@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/category.dart';
 import 'package:easytrack/models/product.dart';
@@ -120,6 +121,199 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+        top: true,
+        child: Scaffold(
+            backgroundColor: backgroundColor,
+            key: _scaffoldKey,
+            body: Stack(
+              children: [
+                FutureBuilder(
+                  future: _companyProducts,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      _products = _fieldValues(snapshot.data);
+                      return CustomScrollView(
+                        slivers: [
+                          sliverHeader(context, 'Gestion', widget.category == null ? 'Produits' : widget.category.name,
+                              canAdd: false, onClick: () {}),
+                          _products == null || _products.length == 0
+                              ? SliverList(
+                                  delegate: SliverChildListDelegate.fixed([
+                                    Container(
+                                      height: myHeight(context) / 1.5,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Aucun produit',
+                                        style: TextStyle(
+                                            fontSize: myHeight(context) / 50.0),
+                                      ),
+                                    )
+                                  ]),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: index == 0
+                                                ? myHeight(context) / 50.0
+                                                : myHeight(context) / 100.0,
+                                            horizontal:
+                                                myHeight(context) / 40.0),
+                                        child: Container(
+                                            height: myHeight(context) / 6.5,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(
+                                                        myHeight(context) /
+                                                            70.0)),
+                                                border: Border.all(
+                                                    color: Colors.black12)),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(
+                                                  myHeight(context) / 60.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: <Widget>[
+                                                  Row(
+                                                    children: <Widget>[
+                                                      Container(
+                                                        width:
+                                                            myWidth(context) /
+                                                                1.4,
+                                                        child: Text(
+                                                          '${_products[index].name}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                              fontSize: screenSize(
+                                                                          context)
+                                                                      .height /
+                                                                  35,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600),
+                                                        ),
+                                                      ),
+                                                      Spacer(),
+                                                      Icon(
+                                                        AmazingIcon.more_2_fill,
+                                                        size: 25.0,
+                                                        color: Colors.black,
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    width:
+                                                        myWidth(context) / 1.3,
+                                                    child: Text(
+                                                      '${_products[index].qty} EN STOCK',
+                                                      style: TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: screenSize(
+                                                                      context)
+                                                                  .height /
+                                                              42.0),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width:
+                                                        myWidth(context) / 1.3,
+                                                    child: Text(
+                                                      '${_products[index].price} XAF  A LA VENTE',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: screenSize(
+                                                                      context)
+                                                                  .height /
+                                                              42.0),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )));
+                                  }, childCount: _products.length),
+                                )
+                        ],
+                      );
+                    }
+                    return CustomScrollView(
+                      slivers: [
+                        sliverHeader(context, 'Gestion',  widget.category == null ? 'Produits' : widget.category.name,
+                            canAdd: true, onClick: () {}),
+                        SliverList(
+                          delegate:
+                              SliverChildBuilderDelegate((context, index) {
+                            return Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: index == 0
+                                        ? myHeight(context) / 50.0
+                                        : myHeight(context) / 100.0,
+                                    horizontal: myHeight(context) / 40.0),
+                                child: Container(
+                                    height: myHeight(context) / 6.5,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                myHeight(context) / 70.0)),
+                                        border:
+                                            Border.all(color: Colors.black12)),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          myHeight(context) / 60.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            height: myHeight(context) / 30.0,
+                                            width: myWidth(context) / 2,
+                                          ),
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            width: myWidth(context) / 1.5,
+                                            height: myHeight(context) / 30.0,
+                                          ),
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            width: myWidth(context) / 3.5,
+                                            height: myHeight(context) / 30.0,
+                                          ),
+                                        ],
+                                      ),
+                                    )));
+                          }),
+                        )
+                      ],
+                    );
+                  },
+                ),
+                _isLoading
+                    ? Container(
+                        width: myWidth(context),
+                        height: myHeight(context),
+                        color: textSameModeColor.withOpacity(.89),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                new AlwaysStoppedAnimation<Color>(gradient1),
+                          ),
+                        ))
+                    : Container(),
+              ],
+            )));
+    /* SafeArea(
         top: true,
         child: Scaffold(
           backgroundColor: backgroundColor,
@@ -342,5 +536,6 @@ class _ProductPageState extends State<ProductPage> {
             ],
           ),
         ));
+   */
   }
 }

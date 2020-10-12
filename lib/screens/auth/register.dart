@@ -1025,10 +1025,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _lastPage() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Padding(
           padding:
-              EdgeInsets.symmetric(horizontal: screenSize(context).height / 10),
+              EdgeInsets.symmetric(horizontal: screenSize(context).height / 20),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -1044,16 +1045,21 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(
                     height: 8.0,
                   ),
-                  Text(_selectedPlan.title,
-                      style: TextStyle(
-                          color: textInverseModeColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: screenSize(context).height / 35)),
+                  Container(
+                    width: myWidth(context) / 3,
+                    child: Text(_selectedPlan.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: textInverseModeColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenSize(context).height / 35)),
+                  ),
                 ],
               ),
               Spacer(),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
                     'Duree',
@@ -1064,7 +1070,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(
                     height: 8.0,
                   ),
-                  Text("${_selectedPlan.duration.toString()} Mois",
+                  Text("${_selectedPlan.duration.toString()} Jours",
                       style: TextStyle(
                           color: textInverseModeColor,
                           fontWeight: FontWeight.bold,

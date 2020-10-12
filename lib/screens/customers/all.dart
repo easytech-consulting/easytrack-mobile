@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/customer.dart';
 import 'package:easytrack/styles/style.dart';
@@ -6,8 +7,8 @@ import 'package:flutter/material.dart';
 
 class CustomerPage extends StatefulWidget {
   final data;
-
-  const CustomerPage({Key key, this.data}) : super(key: key);
+  final sitename;
+  const CustomerPage({Key key, this.data, this.sitename}) : super(key: key);
   @override
   _CustomerPageState createState() => _CustomerPageState();
 }
@@ -16,12 +17,14 @@ class _CustomerPageState extends State<CustomerPage> {
   List _customers;
   bool _isLoading;
   GlobalKey<ScaffoldState> _scaffoldKey;
+  String name;
 
   @override
   void initState() {
     super.initState();
     _scaffoldKey = GlobalKey();
     _isLoading = false;
+    name = widget.sitename;
     _customers =
         widget.data.map((customer) => Customer.fromJson(customer)).toList();
   }
@@ -31,199 +34,161 @@ class _CustomerPageState extends State<CustomerPage> {
     return SafeArea(
         top: true,
         child: Scaffold(
-          backgroundColor: backgroundColor,
-          key: _scaffoldKey,
-          body: Stack(
-            children: <Widget>[
-              ListView(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'img/logos/LogoWithText.png',
-                          width: myHeight(context) / 5.2,
-                        ),
-                        Spacer(),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: myHeight(context) / 50.0),
-                          child: Icon(
-                            AmazingIcon.search_2_line,
-                            size: myHeight(context) / 30.0,
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: textInverseModeColor.withOpacity(.12), shape: BoxShape.circle),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              '${user.name.substring(0, 2).toUpperCase()}',
-                              style:
-                                  TextStyle(fontSize: myHeight(context) / 45.0),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      children: <Widget>[
-                        InkWell(
-                            onTap: () => Navigator.pop(context),
-                            child: Icon(Icons.arrow_back)),
-                        SizedBox(
-                          width: myHeight(context) / 40.0,
-                        ),
-                        Text(
-                          'Clienteles',
-                          style: TextStyle(
-                              fontSize: myHeight(context) / 25.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Spacer(),
-                        InkWell(
-                            onTap: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              child: Icon(
-                                AmazingIcon.list_settings_fill,
-                                size: myHeight(context) / 25.0,
-                              ),
-                            ))
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 40.0,
-                  ),
-                  Container(
-                      width: myWidth(context),
-                      height: myHeight(context) * .78,
-                      child: _customers == null || _customers.length == 0
-                          ? Center(
-                              child: Text('Aucun client'),
-                            )
-                          : ListView.builder(
-                              itemCount: _customers.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Container(
-                                        height: myHeight(context) / 5.2,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10.0)),
-                                            border: Border.all(
-                                                color: textInverseModeColor.withOpacity(.38))),
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5.0),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+            backgroundColor: backgroundColor,
+            key: _scaffoldKey,
+            body: Stack(
+              children: [
+                CustomScrollView(
+                  slivers: [
+                    sliverHeader(context, 'Site $name', 'Clients',
+                        canAdd: false, onClick: null),
+                    _customers == null || _customers.length == 0
+                        ? SliverList(
+                            delegate: SliverChildListDelegate.fixed([
+                              Container(
+                                height: myHeight(context) / 1.5,
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Aucun fournisseur',
+                                  style: TextStyle(
+                                      fontSize: myHeight(context) / 50.0),
+                                ),
+                              )
+                            ]),
+                          )
+                        : SliverList(
+                            delegate:
+                                SliverChildBuilderDelegate((context, index) {
+                              return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: index == 0
+                                          ? myHeight(context) / 50.0
+                                          : myHeight(context) / 100.0,
+                                      horizontal: myHeight(context) / 40.0),
+                                  child: Container(
+                                      height: myHeight(context) / 6.5,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                  myHeight(context) / 70.0)),
+                                          border: Border.all(
+                                              color: Colors.black12)),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(
+                                            myHeight(context) / 60.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Row(
                                               children: <Widget>[
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: screenSize(context)
-                                                              .width /
-                                                          80),
-                                                  child: InkWell(
+                                                InkWell(
+                                                  /* onTap: () => _showDetails(
+                                                    _customers[index],
+                                                  ), */
+                                                  child: Container(
+                                                    width:
+                                                        myWidth(context) / 1.4,
                                                     child: Text(
-                                                      '${_customers[index].name.length > 30 ? _customers[index].name.substring(0, 30) : _customers[index].name}',
+                                                      '${capitalize(_customers[index].name)}',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       style: TextStyle(
                                                           fontSize: screenSize(
                                                                       context)
                                                                   .height /
-                                                              30,
+                                                              35,
                                                           fontWeight:
-                                                              FontWeight.bold),
+                                                              FontWeight.w600),
                                                     ),
                                                   ),
                                                 ),
-                                                SizedBox(
-                                                  height: screenSize(context)
-                                                          .height /
-                                                      40.0,
-                                                ),
-                                                Row(
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      AmazingIcon
-                                                          .map_pin_2_line,
-                                                    ),
-                                                    SizedBox(
-                                                      width: screenSize(context)
-                                                              .width /
-                                                          70,
-                                                    ),
-                                                    Text(
-                                                      '${_customers[index].street}, ${_customers[index].town}',
-                                                      style: TextStyle(
-                                                          color: textInverseModeColor.withOpacity(.54),
-                                                          fontSize: screenSize(
-                                                                      context)
-                                                                  .height /
-                                                              38.0),
-                                                    ),
-                                                  ],
+                                                Spacer(),
+                                                InkWell(
+                                                    /*  onTap: () => _showBu(index),
+                                                    */
+                                                    child: Icon(
+                                                  AmazingIcon.more_2_fill,
+                                                  size: 25.0,
+                                                  color: Colors.black,
+                                                ))
+                                              ],
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Icon(
+                                                  AmazingIcon.map_pin_2_line,
+                                                  color: Colors.black54,
+                                                  size:
+                                                      myHeight(context) / 40.0,
                                                 ),
                                                 SizedBox(
-                                                  height: screenSize(context)
-                                                          .height /
-                                                      40.0,
+                                                  width: screenSize(context)
+                                                          .width /
+                                                      40,
                                                 ),
-                                                Row(
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      AmazingIcon.phone_line,
-                                                    ),
-                                                    SizedBox(
-                                                      width: screenSize(context)
-                                                              .width /
-                                                          70,
-                                                    ),
-                                                    Text(
-                                                      '+237 699177985',
-                                                      style: TextStyle(
-                                                          color: textInverseModeColor.withOpacity(.54),
-                                                          fontSize: screenSize(
-                                                                      context)
+                                                Text(
+                                                  '${_customers[index].town}, ${_customers[index].street}',
+                                                  style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize:
+                                                          screenSize(context)
                                                                   .height /
-                                                              38.0),
-                                                    ),
-                                                  ],
+                                                              42.0),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        )));
-                              })),
-                ],
-              ),
-              _isLoading
-                  ? Container(
-                      height: myHeight(context),
-                      color: textSameModeColor.withOpacity(.9),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation(gradient1),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      height: 0.0,
-                    )
-            ],
-          ),
-        ));
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Icon(
+                                                  AmazingIcon.phone_line,
+                                                  color: Colors.black54,
+                                                  size:
+                                                      myHeight(context) / 40.0,
+                                                ),
+                                                SizedBox(
+                                                  width: screenSize(context)
+                                                          .width /
+                                                      40,
+                                                ),
+                                                Text(
+                                                  '699177985',
+                                                  style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize:
+                                                          screenSize(context)
+                                                                  .height /
+                                                              42.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )));
+                            }, childCount: _customers.length),
+                          )
+                  ],
+                ),
+                _isLoading
+                    ? Container(
+                        width: myWidth(context),
+                        height: myHeight(context),
+                        color: textSameModeColor.withOpacity(.89),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                new AlwaysStoppedAnimation<Color>(gradient1),
+                          ),
+                        ))
+                    : Container(),
+              ],
+            )));
   }
 }

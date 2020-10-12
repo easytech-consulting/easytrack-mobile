@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/role.dart';
 import 'package:easytrack/models/site.dart';
@@ -31,7 +32,6 @@ class _UserPageState extends State<UserPage> {
   List _users = [], _userRole = [];
   Site _site;
   Future _futureEmployees;
-  bool _searchMode;
   GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _usernameController;
   TextEditingController _useraddressController;
@@ -47,16 +47,163 @@ class _UserPageState extends State<UserPage> {
   FocusNode _userloginNode;
   FocusNode _userpasswordNode;
 
+  OverlayEntry _overlay;
+
+  _show(index, user) {
+    setState(() {
+      this._overlay = this._createOverlayEntry(index, user);
+      Overlay.of(context).insert(this._overlay);
+    });
+  }
+
+  _createOverlayEntry(index, user) {
+    return OverlayEntry(
+        builder: (context) => Positioned(
+            bottom: 0.0,
+            height: myHeight(context),
+            width: myWidth(context),
+            child: Material(
+              color: Colors.black38,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => this._overlay.remove(),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 10),
+                    height: myHeight(context) * .23,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(myHeight(context) / 70.0))),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: myWidth(context) / 13),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            decoration: BoxDecoration(
+                                color: greyColor,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0))),
+                            height: 7.0,
+                            width: 50.0,
+                          ),
+                          SizedBox(
+                            height: 15.0,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              this._overlay.remove();
+                              _updateUser(user);
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(
+                                    AmazingIcon.repeat_2_line,
+                                    size: 15.0,
+                                    color: gradient1,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Text(
+                                      'Modifier',
+                                      style: TextStyle(
+                                          fontFamily: 'Ubuntu',
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: textInverseModeColor),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(
+                                  AmazingIcon.repeat_2_line,
+                                  size: 15.0,
+                                  color: gradient1,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    this._overlay.remove();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Text(
+                                      'Dupliquer',
+                                      style: TextStyle(
+                                          fontFamily: 'Ubuntu',
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: textInverseModeColor),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              this._overlay.remove();
+                              _deleteSite(index);
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(
+                                    AmazingIcon.delete_bin_6_line,
+                                    size: 15.0,
+                                    color: redColor,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Text(
+                                      'Supprimer',
+                                      style: TextStyle(
+                                          fontFamily: 'Ubuntu',
+                                          fontSize: 17.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: textInverseModeColor),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )));
+  }
+
   @override
   void initState() {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _futureRoles = fetchRoles();
     _controller = new TextEditingController();
-    _searchMode = false;
     _isLoading = false;
     _scaffoldKey = GlobalKey();
     _site = Site.fromJson(widget.site);
+    _futureEmployees = fetchEmployeesOfSite(_site.id);
     if (widget.site != null && widget.site['employees'].isNotEmpty) {
       _users = widget.site['employees']
           .map((e) => User.fromJson(e['user']))
@@ -311,307 +458,307 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-  _updateUser(User _user) {
+  _updateUser(User user) {
     _usernameController = new TextEditingController();
     _useraddressController = new TextEditingController();
     _userphoneController = new TextEditingController();
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-
     showDialog(
-      context: context,
-      builder: (context) => ListView(
-        children: <Widget>[
-          AlertDialog(
-              shape: RoundedRectangleBorder(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: myHeight(context) / 30,
+                  horizontal: myHeight(context) / 25),
+              height: myHeight(context) * .7,
+              width: myWidth(context) * .9,
+              decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
-              content:
-                  StatefulBuilder(builder: (context, StateSetter setState) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: myHeight(context) / 60,
-                      horizontal: myHeight(context) / 100),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              'Nouvel employe',
+              child: StatefulBuilder(builder: (context, setState) {
+                return Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            width: myWidth(context) / 2,
+                            child: Text(
+                              'Mise a jour',
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: myHeight(context) / 30,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () => Navigator.pop(context),
-                                child: Icon(AmazingIcon.close_line))
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
+                          ),
+                          Spacer(),
+                          InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: Icon(AmazingIcon.close_line))
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.5),
+                            child: Container(
                                 height: 48.0,
                                 decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                controller: _usernameController,
-                                focusNode: _usernameNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _usernameNode, _useraddressNode),
-                                validator: (value) {
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(
-                                        AmazingIcon.account_circle_line,
-                                        color: textInverseModeColor,
-                                        size: 15.0),
-                                    hintText: '${_user.name}',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.5),
-                              child: Container(
-                                  height: 48.0,
-                                  decoration: buildTextFormFieldContainer(
-                                      decorationColor)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                obscureText: false,
-                                controller: _useraddressController,
-                                focusNode: _useraddressNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _useraddressNode, _userphoneNode),
-                                validator: (value) {
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: '${_user.address}',
-                                    fillColor: textInverseModeColor,
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                controller: _userphoneController,
-                                focusNode: _userphoneNode,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _userphoneNode, _useremailNode),
-                                validator: (value) => checkNumberValidity(value,
-                                    canBeEmpty: true),
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.phone_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: '${_user.tel}',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                controller: _useremailController,
-                                focusNode: _useremailNode,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.emailAddress,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _useremailNode, _userloginNode),
-                                validator: (value) =>
-                                    checkEmailValidity(value, canBeEmpty: true),
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.at_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: '${_user.email}',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: TextFormField(
-                                controller: _userloginController,
-                                focusNode: _userloginNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _userloginNode, _userpasswordNode),
-                                validator: (value) {
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.user_6_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: '${_user.username}',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            if (_formKey.currentState.validate()) {
-                              _attemptUpdate(_user);
-                            }
-                          },
-                          child: Container(
-                              height: 48.0,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30.0)),
-                                gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [gradient1, gradient2]),
-                              ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Center(
-                                  child: Text(
-                                    'Sauvegarder',
-                                    style: TextStyle(
-                                        color: textInverseModeColor, fontSize: 18),
+                                    decorationColor)),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              obscureText: false,
+                              controller: _usernameController,
+                              focusNode: _usernameNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _usernameNode, _useraddressNode),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(
+                                      AmazingIcon.account_circle_line,
+                                      color: textInverseModeColor,
+                                      size: 15.0),
+                                  hintText: user.name,
+                                  fillColor: textInverseModeColor,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
                                   ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.5),
+                            child: Container(
+                                height: 48.0,
+                                decoration: buildTextFormFieldContainer(
+                                    decorationColor)),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              obscureText: false,
+                              controller: _useraddressController,
+                              focusNode: _useraddressNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _useraddressNode, _userphoneNode),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.map_pin_2_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: user.address,
+                                  fillColor: textInverseModeColor,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _userphoneController,
+                              focusNode: _userphoneNode,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _userphoneNode, _useremailNode),
+                              validator: (value) =>
+                                  checkNumberValidity(value, canBeEmpty: true),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.phone_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: user.tel,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _useremailController,
+                              focusNode: _useremailNode,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.emailAddress,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _useremailNode, _userloginNode),
+                              validator: (value) =>
+                                  checkEmailValidity(value, canBeEmpty: true),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.at_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: user.email,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _userloginController,
+                              focusNode: _userloginNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _userloginNode, _userpasswordNode),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.user_6_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: user.username,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          if (_formKey.currentState.validate()) {
+                            this._attemptSave();
+                          }
+                        },
+                        child: Container(
+                            height: myHeight(context) / 17.0,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [gradient1, gradient2]),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Center(
+                                child: Text(
+                                  'Enregistrer',
+                                  style: TextStyle(
+                                      color: textSameModeColor,
+                                      fontSize: myHeight(context) / 40.0),
                                 ),
-                              )),
-                        )
-                      ],
-                    ),
+                              ),
+                            )),
+                      )
+                    ],
                   ),
                 );
               })),
-        ],
-      ),
-    );
+        ));
   }
 
   _createUser() {
@@ -621,447 +768,438 @@ class _UserPageState extends State<UserPage> {
     _useremailController = new TextEditingController();
     _userloginController = new TextEditingController();
     _userpasswordController = new TextEditingController();
-
     showDialog(
-      context: context,
-      builder: (context) => ListView(
-        children: <Widget>[
-          AlertDialog(
-              shape: RoundedRectangleBorder(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: myHeight(context) / 30,
+                  horizontal: myHeight(context) / 25),
+              height: myHeight(context) * .82,
+              width: myWidth(context) * .9,
+              decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
-              content:
-                  StatefulBuilder(builder: (context, StateSetter setState) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: myHeight(context) / 60,
-                      horizontal: myHeight(context) / 100),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              'Nouvel employe',
+              child: StatefulBuilder(builder: (context, setState) {
+                return Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            width: myWidth(context) / 2,
+                            child: Text(
+                              'Nouvel employee',
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: myHeight(context) / 30,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () => Navigator.pop(context),
-                                child: Icon(AmazingIcon.close_line))
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
+                          ),
+                          Spacer(),
+                          InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: Icon(AmazingIcon.close_line))
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.5),
+                            child: Container(
                                 height: 48.0,
                                 decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
+                                    decorationColor)),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              obscureText: false,
+                              controller: _usernameController,
+                              focusNode: _usernameNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _usernameNode, _useraddressNode),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(
+                                      AmazingIcon.account_circle_line,
+                                      color: textInverseModeColor,
+                                      size: 15.0),
+                                  hintText: 'Nom complet',
+                                  fillColor: textInverseModeColor,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                controller: _usernameController,
-                                focusNode: _usernameNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _usernameNode, _useraddressNode),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(
-                                        AmazingIcon.account_circle_line,
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.5),
+                            child: Container(
+                                height: 48.0,
+                                decoration: buildTextFormFieldContainer(
+                                    decorationColor)),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              obscureText: false,
+                              controller: _useraddressController,
+                              focusNode: _useraddressNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _useraddressNode, _userphoneNode),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Champs obligatoire';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.map_pin_2_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: 'Adresse',
+                                  fillColor: textInverseModeColor,
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _userphoneController,
+                              focusNode: _userphoneNode,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _userphoneNode, _useremailNode),
+                              validator: (value) => checkNumberValidity(value),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.phone_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: 'Telephone',
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _useremailController,
+                              focusNode: _useremailNode,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.emailAddress,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _useremailNode, _userloginNode),
+                              validator: (value) => checkEmailValidity(value),
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.at_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: 'Email',
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              controller: _userloginController,
+                              focusNode: _userloginNode,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => nextNode(
+                                  context, _userloginNode, _userpasswordNode),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Champs obligatoire';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(AmazingIcon.user_6_line,
+                                      color: textInverseModeColor, size: 15.0),
+                                  hintText: 'Nom d\'utilisateur',
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Container(
+                              height: 48.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: TextFormField(
+                              obscureText: _obscureText,
+                              controller: _userpasswordController,
+                              focusNode: _userpasswordNode,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) =>
+                                  _userpasswordNode.unfocus(),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Champs obligatoire';
+                                }
+                                if (value.length < 8) {
+                                  return 'Au minimum 8 carateres';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 50.0),
+                                  prefixIcon: Icon(
+                                      AmazingIcon.lock_password_line,
+                                      color: textInverseModeColor,
+                                      size: 15.0),
+                                  hintText: 'Mot de passe',
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureText = !_obscureText;
+                                      });
+                                    },
+                                    icon: Icon(
+                                        _obscureText
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
                                         color: textInverseModeColor,
                                         size: 15.0),
-                                    hintText: 'Nom complet',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
+                                  ),
+                                  hintStyle: TextStyle(
+                                      color:
+                                          textInverseModeColor.withOpacity(.35),
+                                      fontSize: 18.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Container(
+                          height: 48.0,
+                          decoration:
+                              buildTextFormFieldContainer(decorationColor),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: DropdownButton<Role>(
+                              underline: Text(''),
+                              isExpanded: true,
+                              icon: Icon(AmazingIcon.arrow_down_s_line,
+                                  color: textInverseModeColor, size: 15.0),
+                              hint: Text('Selectionnez un role'),
+                              items: _roles.map((role) {
+                                return DropdownMenuItem<Role>(
+                                  child: Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 10.0),
+                                            child: Icon(
+                                                AmazingIcon.community_line,
+                                                size: 15.0)),
+                                        Text(role.name),
+                                      ],
                                     ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.5),
-                              child: Container(
-                                  height: 48.0,
-                                  decoration: buildTextFormFieldContainer(
-                                      decorationColor)),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                obscureText: false,
-                                controller: _useraddressController,
-                                focusNode: _useraddressNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _useraddressNode, _userphoneNode),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: 'Adresse',
-                                    fillColor: textInverseModeColor,
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                controller: _userphoneController,
-                                focusNode: _userphoneNode,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _userphoneNode, _useremailNode),
-                                validator: (value) =>
-                                    checkNumberValidity(value),
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.phone_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: 'Telephone',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                controller: _useremailController,
-                                focusNode: _useremailNode,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.emailAddress,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _useremailNode, _userloginNode),
-                                validator: (value) => checkEmailValidity(value),
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.at_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: 'Email',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                controller: _userloginController,
-                                focusNode: _userloginNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => nextNode(
-                                    context, _userloginNode, _userpasswordNode),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(AmazingIcon.user_6_line,
-                                        color: textInverseModeColor, size: 15.0),
-                                    hintText: 'Nom d\'utilisateur',
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 48.0,
-                                decoration: buildTextFormFieldContainer(
-                                    decorationColor),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: TextFormField(
-                                obscureText: _obscureText,
-                                controller: _userpasswordController,
-                                focusNode: _userpasswordNode,
-                                textInputAction: TextInputAction.done,
-                                onFieldSubmitted: (_) =>
-                                    _userpasswordNode.unfocus(),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Champs obligatoire';
-                                  }
-                                  if (value.length < 8) {
-                                    return 'Au minimum 8 carateres';
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 50.0),
-                                    prefixIcon: Icon(
-                                        AmazingIcon.lock_password_line,
-                                        color: textInverseModeColor,
-                                        size: 15.0),
-                                    hintText: 'Mot de passe',
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureText = !_obscureText;
-                                        });
-                                      },
-                                      icon: Icon(
-                                          _obscureText
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
-                                          color: textInverseModeColor,
-                                          size: 15.0),
-                                    ),
-                                    hintStyle: TextStyle(
-                                        color:
-                                            textInverseModeColor.withOpacity(.35),
-                                        fontSize: 18.0),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Container(
-                            height: 48.0,
-                            decoration:
-                                buildTextFormFieldContainer(decorationColor),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: DropdownButton<Role>(
-                                underline: Text(''),
-                                isExpanded: true,
-                                icon: Icon(AmazingIcon.arrow_down_s_line,
-                                    color: textInverseModeColor, size: 15.0),
-                                hint: Text('Selectionnez un role'),
-                                items: _roles.map((role) {
-                                  return DropdownMenuItem<Role>(
-                                    child: Expanded(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                              padding:
-                                                  EdgeInsets.only(right: 10.0),
-                                              child: Icon(
-                                                  AmazingIcon.community_line,
-                                                  size: 15.0)),
-                                          Text(role.name),
-                                        ],
-                                      ),
-                                    ),
-                                    value: role,
-                                  );
-                                }).toList(),
-                                onChanged: (Role role) {
-                                  setState(() {
-                                    _selectedRoleId = role.id;
-                                    _role = role;
-                                  });
-                                },
-                                value: _role,
-                              ),
+                                  ),
+                                  value: role,
+                                );
+                              }).toList(),
+                              onChanged: (Role role) {
+                                setState(() {
+                                  _selectedRoleId = role.id;
+                                  _role = role;
+                                });
+                              },
+                              value: _role,
                             ),
                           ),
                         ),
-                        _showErrorRole
-                            ? Positioned(
-                                left: 0.0,
+                      ),
+                      _showErrorRole
+                          ? Positioned(
+                              left: 0.0,
+                              child: Text(
+                                'choisissez un role',
+                                style: TextStyle(
+                                    color: Colors.red, fontSize: 15.0),
+                              ),
+                            )
+                          : Container(
+                              height: 0.0,
+                            ),
+                      SizedBox(
+                        height: myHeight(context) / 31.0,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          if (_formKey.currentState.validate()) {
+                            this._attemptSave();
+                          }
+                        },
+                        child: Container(
+                            height: myHeight(context) / 17.0,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [gradient1, gradient2]),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Center(
                                 child: Text(
-                                  'choisissez un role',
+                                  'Enregistrer',
                                   style: TextStyle(
-                                      color: Colors.red, fontSize: 15.0),
+                                      color: textSameModeColor,
+                                      fontSize: myHeight(context) / 40.0),
                                 ),
-                              )
-                            : Container(
-                                height: 0.0,
                               ),
-                        SizedBox(
-                          height: myHeight(context) / 31.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            if (_formKey.currentState.validate()) {
-                              if (_selectedRoleId == null) {
-                                setState(() {
-                                  _showErrorRole = true;
-                                });
-                              } else {
-                                _attemptSave();
-                              }
-                            }
-                          },
-                          child: Container(
-                              height: 48.0,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30.0)),
-                                gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [gradient1, gradient2]),
-                              ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Center(
-                                  child: Text(
-                                    'Sauvegarder',
-                                    style: TextStyle(
-                                        color: textInverseModeColor, fontSize: 18),
-                                  ),
-                                ),
-                              )),
-                        )
-                      ],
-                    ),
+                            )),
+                      )
+                    ],
                   ),
                 );
               })),
-        ],
-      ),
-    );
+        ));
   }
 
   _showConfirmationMessage(int index) {
@@ -1115,7 +1253,8 @@ class _UserPageState extends State<UserPage> {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0))),
-                              borderSide: BorderSide(color: textInverseModeColor),
+                              borderSide:
+                                  BorderSide(color: textInverseModeColor),
                               onPressed: () => Navigator.pop(context),
                               child: Container(
                                   alignment: Alignment.center,
@@ -1196,6 +1335,495 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+        top: true,
+        child: Scaffold(
+            backgroundColor: backgroundColor,
+            key: _scaffoldKey,
+            body: Stack(
+              children: [
+                FutureBuilder(
+                  future: _futureEmployees,
+                  builder: (context, snapshot) {
+                    print(_futureEmployees);
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      _users = snapshot.data['employees']
+                          .map((e) => User.fromJson(e['user']))
+                          .toList();
+                      _userRole = snapshot.data['employees']
+                          .map((e) => Role.fromJson(e['user']['role']))
+                          .toList();
+                      if (_roles == null) {
+                        return FutureBuilder(
+                          future: _futureRoles,
+                          builder: (context, snapshotRole) {
+                            if (snapshotRole.hasData) {
+                              _roles = snapshotRole.data;
+                              return CustomScrollView(
+                                slivers: [
+                                  sliverHeader(
+                                      context,
+                                      'Site ${widget.site["name"]} 1',
+                                      'Employee',
+                                      canAdd: true,
+                                      onClick: _createUser),
+                                  _users == null || _users.length == 0
+                                      ? SliverList(
+                                          delegate:
+                                              SliverChildListDelegate.fixed([
+                                            Container(
+                                              height: myHeight(context) / 1.5,
+                                              width: double.infinity,
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'Aucun employe',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            50.0),
+                                              ),
+                                            )
+                                          ]),
+                                        )
+                                      : SliverList(
+                                          delegate: SliverChildBuilderDelegate(
+                                              (context, index) {
+                                            return Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: index == 0
+                                                        ? myHeight(context) /
+                                                            50.0
+                                                        : myHeight(context) /
+                                                            100.0,
+                                                    horizontal:
+                                                        myHeight(context) /
+                                                            40.0),
+                                                child: Container(
+                                                    height:
+                                                        myHeight(context) / 6.5,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    myHeight(context) /
+                                                                        70.0)),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.black12)),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.all(
+                                                          myHeight(context) /
+                                                              60.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: <Widget>[
+                                                          Row(
+                                                            children: <Widget>[
+                                                              InkWell(
+                                                                /*  onTap: () =>
+                                                            _showDetails(
+                                                          _users[index],
+                                                        ), */
+                                                                child:
+                                                                    Container(
+                                                                  width: myWidth(
+                                                                          context) /
+                                                                      1.4,
+                                                                  child: Text(
+                                                                    '${capitalize(_users[index].name)}',
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            screenSize(context).height /
+                                                                                35,
+                                                                        fontWeight:
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Spacer(),
+                                                              InkWell(
+                                                                  onTap: () => _show(
+                                                                      index,
+                                                                      _users[
+                                                                          index]),
+                                                                  child: Icon(
+                                                                    AmazingIcon
+                                                                        .more_2_fill,
+                                                                    size: 25.0,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: <Widget>[
+                                                              Icon(
+                                                                AmazingIcon
+                                                                    .map_pin_2_line,
+                                                                color: Colors
+                                                                    .black54,
+                                                                size: myHeight(
+                                                                        context) /
+                                                                    40.0,
+                                                              ),
+                                                              SizedBox(
+                                                                width: screenSize(
+                                                                            context)
+                                                                        .width /
+                                                                    40,
+                                                              ),
+                                                              Text(
+                                                                '${_users[index].name}, Cameroun',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black54,
+                                                                    fontSize:
+                                                                        screenSize(context).height /
+                                                                            42.0),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: <Widget>[
+                                                              Icon(
+                                                                AmazingIcon
+                                                                    .phone_line,
+                                                                color: Colors
+                                                                    .black54,
+                                                                size: myHeight(
+                                                                        context) /
+                                                                    40.0,
+                                                              ),
+                                                              SizedBox(
+                                                                width: screenSize(
+                                                                            context)
+                                                                        .width /
+                                                                    40,
+                                                              ),
+                                                              Text(
+                                                                '${_users[index]}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black54,
+                                                                    fontSize:
+                                                                        screenSize(context).height /
+                                                                            42.0),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )));
+                                          }, childCount: _users.length),
+                                        )
+                                ],
+                              );
+                            }
+                            return CustomScrollView(
+                              slivers: [
+                                sliverHeader(context,
+                                    'Site ${widget.site["name"]}', 'Employee',
+                                    canAdd: true, onClick: () {}),
+                                SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: index == 0
+                                                ? myHeight(context) / 50.0
+                                                : myHeight(context) / 100.0,
+                                            horizontal:
+                                                myHeight(context) / 40.0),
+                                        child: Container(
+                                            height: myHeight(context) / 6.5,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(
+                                                        myHeight(context) /
+                                                            70.0)),
+                                                border: Border.all(
+                                                    color: Colors.black12)),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(
+                                                  myHeight(context) / 60.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: <Widget>[
+                                                  Container(
+                                                    color: Color(0xFFE4E4E4),
+                                                    height: myHeight(context) /
+                                                        30.0,
+                                                    width: myWidth(context) / 2,
+                                                  ),
+                                                  Container(
+                                                    color: Color(0xFFE4E4E4),
+                                                    width:
+                                                        myWidth(context) / 1.5,
+                                                    height: myHeight(context) /
+                                                        30.0,
+                                                  ),
+                                                  Container(
+                                                    color: Color(0xFFE4E4E4),
+                                                    width:
+                                                        myWidth(context) / 3.5,
+                                                    height: myHeight(context) /
+                                                        30.0,
+                                                  ),
+                                                ],
+                                              ),
+                                            )));
+                                  }),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      return CustomScrollView(
+                        slivers: [
+                          sliverHeader(context, 'Gestion', 'Mes sites',
+                              canAdd: true, onClick: _createUser),
+                          _users == null || _users.length == 0
+                              ? SliverList(
+                                  delegate: SliverChildListDelegate.fixed([
+                                    Container(
+                                      height: myHeight(context) / 1.5,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Aucun site',
+                                        style: TextStyle(
+                                            fontSize: myHeight(context) / 50.0),
+                                      ),
+                                    )
+                                  ]),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: index == 0
+                                                ? myHeight(context) / 50.0
+                                                : myHeight(context) / 100.0,
+                                            horizontal:
+                                                myHeight(context) / 40.0),
+                                        child: Container(
+                                            height: myHeight(context) / 6.5,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(
+                                                        myHeight(context) /
+                                                            70.0)),
+                                                border: Border.all(
+                                                    color: Colors.black12)),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(
+                                                  myHeight(context) / 60.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: <Widget>[
+                                                  Row(
+                                                    children: <Widget>[
+                                                      InkWell(
+                                                        /*  onTap: () =>
+                                                            _showDetails(
+                                                          _users[index],
+                                                        ), */
+                                                        child: Container(
+                                                          width:
+                                                              myWidth(context) /
+                                                                  1.4,
+                                                          child: Text(
+                                                            '${capitalize(_users[index].name)}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                fontSize: screenSize(
+                                                                            context)
+                                                                        .height /
+                                                                    35,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Spacer(),
+                                                      InkWell(
+                                                          onTap: () => _show(
+                                                              index,
+                                                              _users[index]),
+                                                          child: Icon(
+                                                            AmazingIcon
+                                                                .more_2_fill,
+                                                            size: 25.0,
+                                                            color: Colors.black,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        AmazingIcon
+                                                            .map_pin_2_line,
+                                                        color: Colors.black54,
+                                                        size:
+                                                            myHeight(context) /
+                                                                40.0,
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            screenSize(context)
+                                                                    .width /
+                                                                40,
+                                                      ),
+                                                      Text(
+                                                        '${_users[index].address}, Cameroun',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black54,
+                                                            fontSize: screenSize(
+                                                                        context)
+                                                                    .height /
+                                                                42.0),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        AmazingIcon.user_6_line,
+                                                        color: Colors.black54,
+                                                        size:
+                                                            myHeight(context) /
+                                                                40.0,
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            screenSize(context)
+                                                                    .width /
+                                                                40,
+                                                      ),
+                                                      Text(
+                                                        '${_userRole[index].name}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black54,
+                                                            fontSize: screenSize(
+                                                                        context)
+                                                                    .height /
+                                                                42.0),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            )));
+                                  }, childCount: _users.length),
+                                )
+                        ],
+                      );
+                    }
+                    return CustomScrollView(
+                      slivers: [
+                        sliverHeader(
+                            context, 'Site ${widget.site["name"]}', 'Employee',
+                            canAdd: true, onClick: () {}),
+                        SliverList(
+                          delegate:
+                              SliverChildBuilderDelegate((context, index) {
+                            return Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: index == 0
+                                        ? myHeight(context) / 50.0
+                                        : myHeight(context) / 100.0,
+                                    horizontal: myHeight(context) / 40.0),
+                                child: Container(
+                                    height: myHeight(context) / 6.5,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                myHeight(context) / 70.0)),
+                                        border:
+                                            Border.all(color: Colors.black12)),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          myHeight(context) / 60.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            height: myHeight(context) / 30.0,
+                                            width: myWidth(context) / 2,
+                                          ),
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            width: myWidth(context) / 1.5,
+                                            height: myHeight(context) / 30.0,
+                                          ),
+                                          Container(
+                                            color: Color(0xFFE4E4E4),
+                                            width: myWidth(context) / 3.5,
+                                            height: myHeight(context) / 30.0,
+                                          ),
+                                        ],
+                                      ),
+                                    )));
+                          }),
+                        )
+                      ],
+                    );
+                  },
+                ),
+                _isLoading
+                    ? Container(
+                        width: myWidth(context),
+                        height: myHeight(context),
+                        color: textSameModeColor.withOpacity(.89),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                new AlwaysStoppedAnimation<Color>(gradient1),
+                          ),
+                        ))
+                    : Container(),
+              ],
+            )));
+    /* SafeArea(
         top: true,
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
@@ -1645,7 +2273,7 @@ class _UserPageState extends State<UserPage> {
                                                                     _users[index]
                                                                         .name,
                                                                     style: TextStyle(
-                                                                        fontSize:
+                                                                        fontSize: 
                                                                             myHeight(context) /
                                                                                 30,
                                                                         fontWeight:
@@ -1853,5 +2481,6 @@ class _UserPageState extends State<UserPage> {
             ],
           ),
         ));
+  */
   }
 }

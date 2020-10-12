@@ -4,8 +4,10 @@ import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
+import 'package:easytrack/services/agendaService.dart';
 import 'package:easytrack/services/contactService.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/style.dart';
 
@@ -210,45 +212,6 @@ formatDate(DateTime date) {
                               : '${(now.difference(date).inDays ~/ 365)} ans';
 }
 
-generateColor(int index) {
-  List colors = [
-    Colors.tealAccent.withOpacity(.5),
-    Colors.amber.withOpacity(.5),
-    Colors.blue.withOpacity(.5),
-    Colors.redAccent.withOpacity(.5),
-    Colors.blueGrey.withOpacity(.5),
-    Colors.orangeAccent.withOpacity(.5),
-    Colors.brown.withOpacity(.5),
-    Colors.cyan.withOpacity(.5),
-    Colors.deepOrange.withOpacity(.5),
-    Colors.amberAccent.withOpacity(.5),
-    Colors.deepPurple.withOpacity(.5),
-    Colors.green.withOpacity(.5),
-    Colors.indigo.withOpacity(.5),
-    Colors.yellowAccent.withOpacity(.5),
-    Colors.deepOrangeAccent.withOpacity(.5),
-    Colors.grey.withOpacity(.5),
-    Colors.blueAccent.withOpacity(.5),
-    Colors.indigoAccent.withOpacity(.5),
-    Colors.lightBlue.withOpacity(.5),
-    Colors.lightGreenAccent.withOpacity(.5),
-    Colors.lime.withOpacity(.5),
-    Colors.orange.withOpacity(.5),
-    Colors.cyanAccent.withOpacity(.5),
-    Colors.pink.withOpacity(.5),
-    Colors.purple.withOpacity(.5),
-    Colors.limeAccent.withOpacity(.5),
-    Colors.red.withOpacity(.5),
-    Colors.teal.withOpacity(.5),
-    Colors.yellow.withOpacity(.5),
-    Colors.purpleAccent.withOpacity(.5),
-    Colors.greenAccent.withOpacity(.5),
-    Colors.lightBlueAccent.withOpacity(.5),
-  ];
-
-  return colors[index % colors.length];
-}
-
 capitalize(String data) {
   List words = data.split(' ');
   String result = '';
@@ -288,6 +251,15 @@ fetchUserContacts() async {
   allUserContacts = await fetchContacts();
 }
 
+fetchSitesOfUserFunction() async {
+  var sites = await fetchSitesOfUser();
+  if (user.isAdmin == 2) {
+    userSites = sites;
+  } else {
+    userSites.add(sites);
+  }
+}
+
 logUserOnFirebase() async {
   final QuerySnapshot result = await FirebaseFirestore.instance
       .collection('users')
@@ -309,21 +281,48 @@ logUserOnFirebase() async {
 }
 
 formatPrice(int price) {
-  String result;
-  if(price > 1000) {
+  if (price == null) return '0';
+  String result = price.toString();
+  if (price > 1000) {
     result = '${price ~/ 1000}k';
   }
 
-  if(price > 1000000) {
+  if (price > 1000000) {
     result = '${price ~/ 1000000}m';
   }
 
-  return result.toString();
+  return result;
+}
+
+String spaceWord(String word) {
+  String newWord = '';
+  for (var i = 0; i < word.length; i++) {
+    newWord += word[i] + ' ';
+  }
+  return newWord;
+}
+
+String getDay(DateTime date) {
+  String eng = DateFormat('EEEE').format(date.add(Duration(days: 1)));
+  if (eng == 'Monday') {
+    return 'LUNDI';
+  } else if (eng == 'Tuesday') {
+    return 'MARDI';
+  } else if (eng == 'Wednesday') {
+    return 'MERCREDI';
+  } else if (eng == 'Thursday') {
+    return 'JEUDI';
+  } else if (eng == 'Friday') {
+    return 'VENDREDI';
+  } else if (eng == 'Saturday') {
+    return 'SAMEDI';
+  }
+  return 'DIMANCHE';
 }
 
 int errorStatusCode, userId;
 bool showBottom;
-List allUserContacts;
+List allUserContacts, userSites;
 Map userRole;
 String userToken;
 User user;

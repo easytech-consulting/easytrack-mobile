@@ -446,7 +446,282 @@ class _SalePageState extends State<SalePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Scaffold(
+      backgroundColor: Color(0xFFF8F8F8),
+      key: _scaffoldKey,
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: myWidth(context) / 20.0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    height: myHeight(context) / 17.0,
+                    margin: EdgeInsets.only(
+                        top: myWidth(context) / 30.0,),
+                    decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius:
+                            BorderRadius.circular(myHeight(context) / 10.0)),
+                    child: TextFormField(
+                      style: TextStyle(fontSize: myHeight(context) / 42.0),
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            AmazingIcon.search_2_line,
+                            color: Colors.black,
+                            size: myHeight(context) / 40.0,
+                          ),
+                          hintText: 'Entrer du texte',
+                          hintStyle:
+                              TextStyle(fontSize: myHeight(context) / 42.0),
+                          contentPadding: EdgeInsets.only(
+                              left: myHeight(context) / 25.0,
+                              top: myHeight(context) / 40.0),
+                          border:
+                              OutlineInputBorder(borderSide: BorderSide.none)),
+                    ),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(Icons.arrow_back)),
+                      SizedBox(
+                        width: myHeight(context) / 40.0,
+                      ),
+                      Text(
+                        'Mes ventes',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 25.0,
+                        ),
+                      ),
+                      Spacer(),
+                      InkWell(
+                          onTap: () => _filterData(),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: Icon(
+                              AmazingIcon.list_settings_fill,
+                              size: myHeight(context) / 30.0,
+                            ),
+                          ))
+                    ],
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 40.0,
+                  ),
+                  Expanded(
+                    child: FutureBuilder(
+                        future: _companySales,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            if (_sales == null) {
+                              allSalesData = snapshot.data;
+                              _sales = _checkAllSales(allSalesData)
+                                  .map((sale) => Sale.fromJson(sale))
+                                  .toList();
+                              _salesForSearch = _sales;
+                            }
+                            return _sales == null || _sales.length == 0
+                                ? Center(
+                                    child: Text('Aucune vente'),
+                                  )
+                                : ListView.builder(
+                                    itemCount: _sales.length,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        child: InkWell(
+                                            child: Container(
+                                                height: myHeight(context) / 6.4,
+                                                margin: EdgeInsets.symmetric(
+                                                  vertical:
+                                                      myWidth(context) / 50.0,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius
+                                                        .all(Radius.circular(
+                                                            myHeight(context) /
+                                                                90.0)),
+                                                    border: Border.all(
+                                                        width: 1.0,
+                                                        color: Colors.black
+                                                            .withOpacity(.1))),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          myWidth(context) /
+                                                              30.0,
+                                                      vertical:
+                                                          myHeight(context) /
+                                                              70.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: <Widget>[
+                                                      Row(
+                                                        children: <Widget>[
+                                                          Text(
+                                                            'S0-${_sales[index].code}',
+                                                            style: TextStyle(
+                                                                fontSize: myHeight(
+                                                                        context) /
+                                                                    33.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                          Spacer(),
+                                                          Icon(
+                                                            Icons.more_vert,
+                                                            size: myWidth(
+                                                                    context) /
+                                                                16.0,
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(
+                                                            top: myHeight(
+                                                                    context) /
+                                                                62),
+                                                        child: Container(
+                                                          width:
+                                                              myWidth(context),
+                                                          height: 30.0,
+                                                          child:
+                                                              ListView.builder(
+                                                                  physics: null,
+                                                                  scrollDirection:
+                                                                      Axis
+                                                                          .horizontal,
+                                                                  itemCount: _productsOnSales[index]
+                                                                              .length >
+                                                                          1
+                                                                      ? 1
+                                                                      : _productsOnSales[
+                                                                              index]
+                                                                          .length,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                          ind) {
+                                                                    return Text(
+                                                                      _productsOnSales[index].length >
+                                                                              1
+                                                                          ? '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}...'
+                                                                          : '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}',
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          color: textInverseModeColor.withOpacity(
+                                                                              .54),
+                                                                          fontSize:
+                                                                              myHeight(context) / 45.0),
+                                                                    );
+                                                                  }),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(
+                                                            bottom: myHeight(
+                                                                    context) /
+                                                                200.0),
+                                                        child: Row(
+                                                          children: <Widget>[
+                                                            Text(
+                                                              _sales[index]
+                                                                          .status ==
+                                                                      2
+                                                                  ? 'Paye'
+                                                                  : _sales[index]
+                                                                              .status ==
+                                                                          1
+                                                                      ? 'Servie'
+                                                                      : 'En attente',
+                                                              style: TextStyle(
+                                                                  color: _sales[index]
+                                                                              .status ==
+                                                                          2
+                                                                      ? Colors
+                                                                          .green
+                                                                      : _sales[index].status ==
+                                                                              1
+                                                                          ? Colors
+                                                                              .orange
+                                                                          : gradient1,
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          53.0),
+                                                            ),
+                                                            Spacer(),
+                                                            Text(
+                                                              'Il y\'a ${formatDate(DateTime.parse(_sales[index].createdAt))}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black26,
+                                                                  fontSize:
+                                                                      screenSize(context)
+                                                                              .height /
+                                                                          60.0),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ))),
+                                      );
+                                    },
+                                  );
+                          }
+                          return Container(
+                            height: myHeight(context) * .86,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    new AlwaysStoppedAnimation(gradient1),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                ],
+              ),
+            ),
+            _isLoading
+                ? Container(
+                    height: myHeight(context),
+                    color: textSameModeColor.withOpacity(.9),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: new AlwaysStoppedAnimation(gradient1),
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 0.0,
+                  )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/* SafeArea(
         top: true,
         child: Scaffold(
           backgroundColor: backgroundColor,
@@ -756,5 +1031,4 @@ class _SalePageState extends State<SalePage> {
             ],
           ),
         ));
-  }
-}
+   */

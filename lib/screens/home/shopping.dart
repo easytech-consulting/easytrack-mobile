@@ -1,5 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
-import 'package:easytrack/commons/layouts.dart';
+import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/category.dart';
 import 'package:easytrack/screens/products/all.dart';
@@ -37,7 +37,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                otherHeader(context),
+                header2(context, user.isAdmin == 1 ? 'Mon Site' : 'Mon Snack', (){}),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -93,13 +93,15 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                             _categories[index],
                                                       ))),
                                       child: Container(
+                                        alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                             color: gradient2.withOpacity(.2),
                                             borderRadius:
                                                 BorderRadius.circular(30.0)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
-                                              horizontal: 30.0, vertical: 5.0),
+                                            horizontal: myHeight(context) / 40,
+                                          ),
                                           child: index == 0
                                               ? Row(
                                                   mainAxisSize:
@@ -107,17 +109,20 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                   children: <Widget>[
                                                     Icon(
                                                       AmazingIcon.archive_line,
-                                                      size: 20.0,
+                                                      size: myHeight(context) /
+                                                          40.0,
                                                       color: gradient1,
                                                     ),
                                                     SizedBox(
                                                       width: myHeight(context) /
-                                                          100.0,
+                                                          65.0,
                                                     ),
                                                     Text(
                                                       '${_categories[index].name}',
                                                       style: TextStyle(
-                                                          fontSize: 17.0,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              50.0,
                                                           color: gradient1,
                                                           fontWeight:
                                                               FontWeight.bold),
@@ -127,7 +132,9 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                               : Text(
                                                   '${_categories[index].name}',
                                                   style: TextStyle(
-                                                      fontSize: 17.0,
+                                                      fontSize:
+                                                          myHeight(context) /
+                                                              50.0,
                                                       color: gradient1,
                                                       fontWeight:
                                                           FontWeight.bold),
@@ -148,7 +155,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                 alignment: Alignment.center,
                                 children: <Widget>[
                                   Container(
-                                    height: 170.0,
+                                    height: myHeight(context) / 4.5,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                         color: gradient1,
@@ -188,6 +195,9 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                                 45.0,
                                                         color: Colors.white38))
                                               ])),
+                                          SizedBox(
+                                              height:
+                                                  myHeight(context) / 100.0),
                                           GestureDetector(
                                             onTap: () => Navigator.push(
                                                 context,
@@ -280,9 +290,10 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                 alignment: Alignment.bottomCenter,
                                 children: <Widget>[
                                   Container(
-                                    height: 170.0,
+                                    height: myHeight(context) / 5.2,
                                     decoration: BoxDecoration(
-                                        color: textInverseModeColor.withOpacity(.12),
+                                        color: textInverseModeColor
+                                            .withOpacity(.12),
                                         borderRadius:
                                             BorderRadius.circular(10.0)),
                                     child: Padding(
@@ -340,7 +351,8 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                       Text(
                                                         'Voir tous les achats',
                                                         style: TextStyle(
-                                                          color: textInverseModeColor,
+                                                          color:
+                                                              textInverseModeColor,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           fontSize: myHeight(
@@ -356,7 +368,8 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                                       Icon(
                                                         AmazingIcon
                                                             .arrow_right_s_line,
-                                                        color: textInverseModeColor,
+                                                        color:
+                                                            textInverseModeColor,
                                                         size:
                                                             myHeight(context) /
                                                                 35.0,
@@ -373,7 +386,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                                   ),
                                   Positioned(
                                     left: 0.0,
-                                    top: 0.0,
+                                    bottom: 0.0,
                                     child: Container(
                                       height: myHeight(context) / 4,
                                       child: Image.asset(

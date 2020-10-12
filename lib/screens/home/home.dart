@@ -1,9 +1,9 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/current_discussion.dart';
-import 'package:easytrack/screens/home/calendar.dart';
+import 'package:easytrack/screens/home/agenda/calendar.dart';
 import 'package:easytrack/screens/home/shopping.dart';
-import 'package:easytrack/screens/home/stats.dart';
+import 'package:easytrack/screens/home/stats/stats.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -102,77 +102,66 @@ class _MainPageState extends State<MainPage> {
         false;
   }
 
-  
   @override
   Widget build(BuildContext context) {
     List<BottomNavigationBarItem> _bottomItems = [
       BottomNavigationBarItem(
-          activeIcon: Container(
-              width: myHeight(context) / 17,
-              height: myHeight(context) / 17,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  color: gradient1.withOpacity(.1)),
-              child: Icon(AmazingIcon.home_line, color: gradient1)),
-          icon: Icon(AmazingIcon.home_line),
+          activeIcon: Icon(AmazingIcon.logo___white,
+              color: Colors.white, size: myHeight(context) / 25),
+          icon: Icon(AmazingIcon.logo___white),
           title: Text('Accueil')),
       BottomNavigationBarItem(
-          activeIcon: Container(
-              width: myHeight(context) / 17,
-              height: myHeight(context) / 17,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  color: gradient1.withOpacity(.1)),
-              child: Icon(AmazingIcon.shopping_cart_line, color: gradient1)),
-          icon: Icon(AmazingIcon.shopping_cart_line),
+          activeIcon: Icon(AmazingIcon.building_2_line,
+              color: Colors.white, size: myHeight(context) / 25),
+          icon: Icon(AmazingIcon.building_2_line),
           title: Text('Produits')),
       BottomNavigationBarItem(
-          activeIcon: Container(
-              width: myHeight(context) / 17,
-              height: myHeight(context) / 17,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  color: gradient1.withOpacity(.1)),
-              child: Icon(AmazingIcon.calendar_line, color: gradient1)),
+          activeIcon: Icon(AmazingIcon.calendar_line,
+              color: Colors.white, size: myHeight(context) / 25),
           icon: Icon(AmazingIcon.calendar_line),
           title: Text('Promotions')),
       BottomNavigationBarItem(
-          activeIcon: Container(
-              width: myHeight(context) / 17,
-              height: myHeight(context) / 17,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  color: gradient1.withOpacity(.1)),
-              child: Icon(AmazingIcon.chat_1_line, color: gradient1)),
+          activeIcon: Icon(AmazingIcon.chat_1_line,
+              color: Colors.white, size: myHeight(context) / 25),
           icon: Icon(AmazingIcon.chat_1_line),
-          title: Text('Commandes')),
+          title: Text('Chat')),
     ];
 
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: backgroundColor,
-        bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: textSameModeColor,
-            showSelectedLabels: false,
-            type: BottomNavigationBarType.fixed,
-            showUnselectedLabels: false,
-            selectedItemColor: gradient1,
-            iconSize: myHeight(context) / 35,
-            onTap: (int index) {
-              if (_pageController.hasClients) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-            currentIndex: _currentIndex,
-            items: _bottomItems),
+        bottomNavigationBar: Container(
+          height: myHeight(context) / 10.0,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+            colors: [gradient1, gradient2],
+            begin: Alignment.center,
+            end: Alignment.centerRight,
+            stops: [0.0, 0.8]
+          )),
+          child: BottomNavigationBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0.0,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              type: BottomNavigationBarType.fixed,
+              unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(.4)),
+              iconSize: myHeight(context) / 35,
+              onTap: (int index) {
+                if (_pageController.hasClients) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              currentIndex: _currentIndex,
+              items: _bottomItems),
+        ),
         body: Scaffold(
           body: PageView(
             controller: _pageController,

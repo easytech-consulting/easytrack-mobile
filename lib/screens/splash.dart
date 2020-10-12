@@ -4,6 +4,7 @@ import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
 import 'package:easytrack/screens/home/home.dart';
+import 'package:easytrack/services/agendaService.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -51,6 +52,7 @@ class _SplashPageState extends State<SplashPage> {
             site = Site.fromJson(await getUserSite());
           }
           await fetchUserContacts();
+          await fetchSitesOfUserFunction();
           await logUserOnFirebase();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => MainPage()));

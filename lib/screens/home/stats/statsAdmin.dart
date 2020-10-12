@@ -1,0 +1,1134 @@
+import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/gradientIcon.dart';
+import 'package:easytrack/commons/header.dart';
+import 'package:easytrack/icons/amazingIcon.dart';
+import 'package:easytrack/models/customer_with_id.dart';
+import 'package:easytrack/models/sale.dart';
+import 'package:easytrack/models/site_with_id.dart';
+import 'package:easytrack/models/user_with_id.dart';
+import 'package:easytrack/screens/auth/login.dart';
+import 'package:easytrack/screens/notifications/all.dart';
+import 'package:easytrack/screens/purchases/all.dart';
+import 'package:easytrack/screens/sales/add.dart';
+import 'package:easytrack/screens/site/all.dart';
+import 'package:easytrack/services/authService.dart';
+import 'package:easytrack/services/homerService.dart';
+import 'package:easytrack/services/saleService.dart';
+import 'package:flutter/material.dart';
+import '../../../styles/style.dart';
+
+class StatsAdminPage extends StatefulWidget {
+  @override
+  _StatsAdminPageState createState() => _StatsAdminPageState();
+}
+
+class _StatsAdminPageState extends State<StatsAdminPage> {
+  bool searchMode;
+  bool _isLoading;
+  Future stats;
+  OverlayEntry _overlayEntry;
+  int _indexOfCurrentCard;
+
+  bool showAll = true;
+  Future _futureSales;
+  List _sales, _customers, _initiators, _validators, _sites, _productsOnSales;
+  List allSalesData;
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    stats = fetchStats();
+    searchMode = false;
+    _indexOfCurrentCard = 0;
+    _isLoading = false;
+    _customers = [];
+    _initiators = [];
+    _validators = [];
+    _productsOnSales = [];
+    _sales = [];
+    _sites = [];
+    _futureSales = fetchSales();
+  }
+
+  OverlayEntry _overlaySales;
+
+  _showSalesMenu() {
+    setState(() {
+      this._overlaySales = this._createOverlayEntrySalesMenu();
+      Overlay.of(context).insert(this._overlaySales);
+    });
+  }
+
+  OverlayEntry _createOverlayEntrySalesMenu() {
+    return OverlayEntry(
+        builder: (context) => Positioned(
+            bottom: 0.0,
+            height: myHeight(context),
+            width: myWidth(context),
+            child: Material(
+              color: Colors.black38,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => this._overlaySales.remove(),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: myHeight(context) * .18,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(myHeight(context) / 70.0))),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: myWidth(context) / 13),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                  width: myWidth(context) / 7,
+                                  height: myHeight(context) / 150.0,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(.3),
+                                      borderRadius: BorderRadius.circular(
+                                          myHeight(context) / 100.0))),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 60,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                this._overlaySales.remove();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddSalesPage()));
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      AmazingIcon.shopping_bag_3_line,
+                                      size: myHeight(context) / 30.0,
+                                      color: gradient1,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: myHeight(context) / 25.0),
+                                      child: Text(
+                                        'Commande client',
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: myHeight(context) / 40.0,
+                                            color: textInverseModeColor),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                this._overlaySales.remove();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PurchasePage()));
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.add,
+                                      size: myHeight(context) / 30.0,
+                                      color: gradient1,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: myHeight(context) / 25.0),
+                                      child: Text(
+                                        'Commande fournisseur',
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: myHeight(context) / 40.0,
+                                            color: textInverseModeColor),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            )));
+  }
+
+  //Show Main Menu
+  _show() {
+    setState(() {
+      this._overlayEntry = this._createOverlayEntry();
+      Overlay.of(context).insert(this._overlayEntry);
+    });
+  }
+
+  //Create Menu
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+        builder: (context) => Positioned(
+            bottom: 0.0,
+            height: myHeight(context),
+            width: myWidth(context),
+            child: Material(
+              color: Colors.black38,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => this._overlayEntry.remove(),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: myHeight(context) * .8,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(myHeight(context) / 70.0))),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: myWidth(context) / 13),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                  width: myWidth(context) / 7,
+                                  height: myHeight(context) / 150.0,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(.3),
+                                      borderRadius: BorderRadius.circular(
+                                          myHeight(context) / 100.0))),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Color(0xff267FC9),
+                                      shape: BoxShape.circle),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(
+                                        myHeight(context) / 50.0),
+                                    child: Text(
+                                      '${user.name.substring(0, 2).toUpperCase()}',
+                                      style: TextStyle(
+                                          color: textSameModeColor,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: myHeight(context) / 50.0),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 20.0,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${capitalize(user.name)}',
+                                      style: TextStyle(
+                                          color: textInverseModeColor,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: myHeight(context) / 40.0),
+                                    ),
+                                    Text(
+                                      '${capitalize(company.name.toLowerCase())} (${capitalize(userRole["name"])})',
+                                      style: TextStyle(
+                                          color: textInverseModeColor
+                                              .withOpacity(.38),
+                                          fontSize: myHeight(context) / 60.0),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 20.0,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                this._overlayEntry.remove();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            NotificationsPage()));
+                              },
+                              child: Row(
+                                children: [
+                                  Stack(
+                                    fit: StackFit.loose,
+                                    children: [
+                                      Icon(
+                                        AmazingIcon.notification_4_line,
+                                        color: textInverseModeColor,
+                                        size: myHeight(context) / 35.0,
+                                      ),
+                                      Positioned(
+                                        top: 0.0,
+                                        right: 0.0,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle),
+                                          width: myHeight(context) / 100.0,
+                                          height: myHeight(context) / 100.0,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Notifications',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                this._overlayEntry.remove();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SitePage()));
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    AmazingIcon.building_2_line,
+                                    color: textInverseModeColor,
+                                    size: myHeight(context) / 35.0,
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Mes sites',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.bar_chart_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Rapports',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.settings_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Configurations',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  AmazingIcon.money_dollar_circle_line,
+                                  color: textInverseModeColor,
+                                  size: myHeight(context) / 35.0,
+                                ),
+                                SizedBox(
+                                  width: myWidth(context) / 10.0,
+                                ),
+                                Text(
+                                  'Abonnement',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: myHeight(context) / 45.0),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 20.0,
+                            ),
+                            Text(
+                              'MENU',
+                              style: TextStyle(
+                                  color: textInverseModeColor.withOpacity(.45),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 35.0,
+                            ),
+                            Text(
+                              'Politique de confidentialite',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'Termes et conditions',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'A Propos',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 55.0,
+                            ),
+                            Text(
+                              'Aide',
+                              style: TextStyle(
+                                  color: textInverseModeColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: myHeight(context) / 45.0),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: myHeight(context) / 60.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  this._overlayEntry.remove();
+                                  _logoutUser();
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      AmazingIcon.logout_box_line,
+                                      color: textInverseModeColor,
+                                      size: myHeight(context) / 30.0,
+                                    ),
+                                    SizedBox(
+                                      width: myWidth(context) / 10.0,
+                                    ),
+                                    Text(
+                                      'Deconnexion',
+                                      style: TextStyle(
+                                          color: textInverseModeColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: myHeight(context) / 40.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            )));
+  }
+
+  //Load Sales
+  List _checkAllSales(datas) {
+    List result = [];
+    if (user.isAdmin == 1) {
+      for (var sale in datas) {
+        _initiators.add(UserWithId.fromJson(sale['initiator']));
+        _validators.add(sale['validator'] == null
+            ? null
+            : UserWithId.fromJson(sale['validator']));
+        _productsOnSales.add(sale['products']);
+        if (!_sites.contains(site)) {
+          _sites.add(site);
+        }
+        _customers.add(CustomerWithId.fromJson(sale['customer']));
+
+        result.add(sale);
+      }
+    } else {
+      for (var site in datas) {
+        for (var sale in site['sales']) {
+          if (!result.contains(sale)) {
+            _initiators.add(UserWithId.fromJson(sale['initiator']));
+            _productsOnSales.add(sale['products']);
+            _validators.add(sale['validator'] == null
+                ? null
+                : UserWithId.fromJson(sale['validator']));
+            _sites.add(SiteWithId.fromJson(site));
+            /* 
+            _customers.add(Customer.fromJson(sale['customer'])); */
+
+            result.add(sale);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  //Load Stats Data
+  _loadStats(datas) {
+    if (user.isAdmin == 1) {
+      allSales = datas['allSales'];
+      allPurchases = datas['allPurchases'];
+      allIncomes = datas['allIncomes'];
+      dailySales = datas['dailySales'];
+      dailyPurchases = datas['dailyPurchases'];
+      dailyIncomes = datas['dailyIncome'];
+    } else {
+      allSales = 0;
+      allPurchases = 0;
+      dailySales = 0;
+      dailyPurchases = 0;
+      allIncomes = 0;
+      dailyIncomes = 0;
+
+      for (var data in datas) {
+        allSales += data['allSales'];
+        allPurchases += data['allPurchases'];
+        allIncomes += data['allIncomes'];
+        dailySales += data['dailySales'];
+        dailyPurchases += data['dailyPurchases'];
+        dailyIncomes += data['dailyIncome'];
+      }
+    }
+  }
+
+  //Log user out
+  _logoutUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await logout().then((value) => Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage())));
+  }
+
+  Widget getCard(int index) {
+    var list = [
+      StatCards(
+        index: 1,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'VENTES',
+      ),
+      StatCards(
+        index: 2,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'ACHATS GLOBAUX',
+      ),
+      StatCards(
+        index: 3,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'BENEFICE GLOBAL',
+      ),
+    ];
+    return list[index % 3];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: backgroundColor,
+        key: _scaffoldKey,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showSalesMenu(),
+          backgroundColor: Colors.white,
+          child: GradientIcon(
+            Icons.add,
+            myHeight(context) / 22,
+            LinearGradient(
+                colors: [gradient1, gradient2],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight),
+          ),
+        ),
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    header(context, _show),
+                    SizedBox(
+                      height: myHeight(context) / 30,
+                    ),
+                    FutureBuilder(
+                      future: stats,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          _loadStats(snapshot.data);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                  onHorizontalDragUpdate: (details) {
+                                    setState(() {
+                                      _indexOfCurrentCard++;
+                                    });
+                                  },
+                                  child: getCard(_indexOfCurrentCard)),
+                              SizedBox(
+                                height: myHeight(context) / 30.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: myHeight(context) / 30.0),
+                                child: Text(
+                                  'Commandes recentes',
+                                  style: mainPartTitleStyle,
+                                ),
+                              ),
+                              SizedBox(
+                                height: myHeight(context) / 60.0,
+                              ),
+                              Container(
+                                  height: myHeight(context) / 2.5,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: myHeight(context) / 30.0),
+                                  child: FutureBuilder(
+                                    future: _futureSales,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.done &&
+                                          snapshot.hasData) {
+                                        allSalesData = snapshot.data;
+                                        _sales = _checkAllSales(allSalesData)
+                                            .map((sale) => Sale.fromJson(sale))
+                                            .toList();
+                                        return _sales == null ||
+                                                _sales.length == 0
+                                            ? Center(
+                                                child: Text(
+                                                    'Aucune commande recente'))
+                                            : ListView.builder(
+                                                itemCount: _sales.length > 10
+                                                    ? 10
+                                                    : _sales.length,
+                                                itemBuilder: (context, index) {
+                                                  return Container(
+                                                    child: InkWell(
+                                                        child: Container(
+                                                            height: myHeight(
+                                                                    context) /
+                                                                6.4,
+                                                            margin: EdgeInsets
+                                                                .symmetric(
+                                                              vertical: myWidth(
+                                                                      context) /
+                                                                  50.0,
+                                                            ),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        myHeight(context) /
+                                                                            90.0)),
+                                                                border: Border.all(
+                                                                    width: 1.0,
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            .1))),
+                                                            child: Padding(
+                                                              padding: EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      myWidth(context) /
+                                                                          30.0,
+                                                                  vertical:
+                                                                      myHeight(
+                                                                              context) /
+                                                                          70.0),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: <
+                                                                    Widget>[
+                                                                  Row(
+                                                                    children: <
+                                                                        Widget>[
+                                                                      Text(
+                                                                        'S0-${_sales[index].code}',
+                                                                        style: TextStyle(
+                                                                            fontSize: myHeight(context) /
+                                                                                33.0,
+                                                                            fontWeight:
+                                                                                FontWeight.w500),
+                                                                      ),
+                                                                      Spacer(),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .more_vert,
+                                                                        size: myWidth(context) /
+                                                                            16.0,
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsets.only(
+                                                                        top: myHeight(context) /
+                                                                            62),
+                                                                    child:
+                                                                        Container(
+                                                                      width: myWidth(
+                                                                          context),
+                                                                      height:
+                                                                          30.0,
+                                                                      child: ListView.builder(
+                                                                          physics: null,
+                                                                          scrollDirection: Axis.horizontal,
+                                                                          itemCount: _productsOnSales[index].length > 1 ? 1 : _productsOnSales[index].length,
+                                                                          itemBuilder: (context, ind) {
+                                                                            return Text(
+                                                                              _productsOnSales[index].length > 1 ? '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}...' : '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}',
+                                                                              style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
+                                                                            );
+                                                                          }),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsets.only(
+                                                                        bottom: myHeight(context) /
+                                                                            200.0),
+                                                                    child: Row(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Text(
+                                                                          _sales[index].status == 2
+                                                                              ? 'Paye'
+                                                                              : _sales[index].status == 1 ? 'Servie' : 'En attente',
+                                                                          style: TextStyle(
+                                                                              color: _sales[index].status == 2 ? Colors.green : _sales[index].status == 1 ? Colors.orange : gradient1,
+                                                                              fontSize: screenSize(context).height / 53.0),
+                                                                        ),
+                                                                        Spacer(),
+                                                                        Text(
+                                                                          'Il y\'a ${formatDate(DateTime.parse(_sales[index].createdAt))}',
+                                                                          style: TextStyle(
+                                                                              color: Colors.black26,
+                                                                              fontSize: screenSize(context).height / 60.0),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ))),
+                                                  );
+                                                },
+                                              );
+                                      }
+                                      return Center(
+                                          child: CircularProgressIndicator(
+                                        valueColor: new AlwaysStoppedAnimation(
+                                            gradient1),
+                                      ));
+                                    },
+                                  ))
+                            ],
+                          );
+                        }
+                        return Container(
+                          height: myHeight(context) / 1.4,
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ),
+              _isLoading
+                  ? Container(
+                      width: myWidth(context),
+                      height: myHeight(context),
+                      color: textSameModeColor.withOpacity(.89),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              new AlwaysStoppedAnimation<Color>(gradient1),
+                        ),
+                      ))
+                  : Container(),
+            ],
+          ),
+        ));
+  }
+}
+
+class StatCards extends StatefulWidget {
+  final int index;
+  final String name;
+  final GlobalKey scaffoldKey;
+  final BuildContext parentContext;
+  const StatCards({
+    @required this.index,
+    Key key,
+    @required this.parentContext,
+    @required this.scaffoldKey,
+    this.name,
+  }) : super(key: key);
+
+  @override
+  _StatsCardsState createState() => _StatsCardsState();
+}
+
+class _StatsCardsState extends State<StatCards> {
+  OverlayEntry _overlay;
+
+  _show(_key, index) {
+    setState(() {
+      this._overlay = this._createOverlayEntry(_key, index);
+      Overlay.of(context).insert(this._overlay);
+    });
+  }
+
+  OverlayEntry _createOverlayEntry(_key, index) {
+    return OverlayEntry(
+        builder: (context) => Positioned(
+            bottom: 0.0,
+            height: myHeight(context),
+            width: myWidth(context),
+            child: Material(
+              color: Colors.black38,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => this._overlay.remove(),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: myHeight(context) * .18,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(myHeight(context) / 70.0))),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: myWidth(context) / 13),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                  width: myWidth(context) / 7,
+                                  height: myHeight(context) / 150.0,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(.3),
+                                      borderRadius: BorderRadius.circular(
+                                          myHeight(context) / 100.0))),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 60,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                this._overlay.remove();
+                                setState(() {
+                                  if (index == 1) {
+                                    _priceCard1 = allSales;
+                                    _labelCard1 = 'Global';
+                                  } else if (index == 2) {
+                                    _priceCard2 = allPurchases;
+                                    _labelCard2 = 'Global';
+                                  } else {
+                                    _priceCard3 = allIncomes;
+                                    _labelCard3 = 'Global';
+                                  }
+                                });
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      AmazingIcon.calendar_line,
+                                      size: myHeight(context) / 30.0,
+                                      color: gradient1,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: myHeight(context) / 25.0),
+                                      child: Text(
+                                        'Global',
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: myHeight(context) / 40.0,
+                                            color: textInverseModeColor),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                this._overlay.remove();
+                                setState(() {
+                                  if (index == 1) {
+                                    _priceCard1 = dailySales;
+                                    _labelCard1 = 'Auj.';
+                                  } else if (index == 2) {
+                                    _priceCard2 = dailyPurchases;
+                                    _labelCard2 = 'Auj.';
+                                  } else {
+                                    _priceCard3 = dailyIncomes;
+                                    _labelCard3 = 'Auj.';
+                                  }
+                                });
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      AmazingIcon.calendar_line,
+                                      size: myHeight(context) / 30.0,
+                                      color: gradient1,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: myHeight(context) / 25.0),
+                                      child: Text(
+                                        'Aujourd\'hui',
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: myHeight(context) / 40.0,
+                                            color: textInverseModeColor),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            )));
+  }
+
+  int _priceCard1, _priceCard2, _priceCard3;
+  String _labelCard1, _labelCard2, _labelCard3;
+
+  @override
+  void initState() {
+    super.initState();
+    _labelCard1 = _labelCard2 = _labelCard3 = 'Global';
+    _priceCard1 = allSales;
+    _priceCard2 = allPurchases;
+    _priceCard3 = allIncomes;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: myHeight(context) / 30.0),
+      child: Column(
+        children: [
+          Container(
+            width: myWidth(context) * .75,
+            height: myHeight(context) / 80,
+            child: Card(
+              margin: EdgeInsets.zero,
+              elevation: 10.0,
+              shape: RoundedRectangleBorder(
+                  side:
+                      BorderSide(color: textInverseModeColor.withOpacity(.05)),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(10.0))),
+            ),
+          ),
+          Container(
+            width: myWidth(context) * .8,
+            height: myHeight(context) / 80,
+            child: Card(
+              margin: EdgeInsets.zero,
+              elevation: 10.0,
+              shape: RoundedRectangleBorder(
+                  side:
+                      BorderSide(color: textInverseModeColor.withOpacity(.05)),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(10.0))),
+            ),
+          ),
+          Container(
+            height: myHeight(context) / 4.5,
+            child: Card(
+              elevation: 10.0,
+              margin: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                  side:
+                      BorderSide(color: textInverseModeColor.withOpacity(.05)),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 19.5, vertical: 15.25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text('${widget.name}',
+                            style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: myHeight(context) / 50.0)),
+                        Spacer(),
+                        GestureDetector(
+                          onTap: () => _show(widget.scaffoldKey, widget.index),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.index == 1
+                                    ? _labelCard1
+                                    : widget.index == 2
+                                        ? _labelCard2
+                                        : _labelCard3,
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: myHeight(context) / 50.0),
+                              ),
+                              SizedBox(width: myWidth(context) / 40),
+                              Icon(
+                                AmazingIcon.arrow_down_s_line,
+                                color: Colors.black87,
+                                size: myHeight(context) / 40.0,
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          widget.index == 1
+                              ? formatPrice(_priceCard1)
+                              : widget.index == 2
+                                  ? formatPrice(_priceCard2)
+                                  : formatPrice(_priceCard3),
+                          style: TextStyle(
+                              color: textInverseModeColor,
+                              fontSize: myHeight(context) / 20.0),
+                        ),
+                        Text(
+                          ' Fcfa',
+                          style: TextStyle(
+                              color: textInverseModeColor,
+                              fontSize: myHeight(context) / 20.0),
+                        ),
+                      ],
+                    ),
+                    Container(
+                        height: myHeight(context) / 13.5,
+                        width: double.infinity,
+                        child: Image.asset('img/charts.png', fit: BoxFit.cover))
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,8 +1,8 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site_with_id.dart';
+import 'package:easytrack/screens/sales/add.dart';
 import 'package:easytrack/services/externalService.dart';
-import 'package:easytrack/services/productService.dart';
 import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -426,304 +426,6 @@ class _ManageSalesState extends State<ManageSales> {
         ),
       ),
     );
-  }
-
-  showSnackBar(
-      GlobalKey<ScaffoldState> _key, int status, int saleId, currentIndex) {
-    _key.currentState.showSnackBar(SnackBar(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
-      duration: Duration(seconds: 30),
-      backgroundColor: textSameModeColor,
-      content: Container(
-        height: status == 2
-            ? _salesToShow[currentIndex]['validator'] == null ||
-                    _salesToShow[currentIndex]['validator']['id'] != user.id
-                ? myHeight(context) * 2.5 / 15
-                : myHeight(context) * 3.5 / 15
-            : myHeight(context) * 4 / 15,
-        child: Column(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  color: greyColor,
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
-              height: 7.0,
-              width: 50.0,
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-            status != 0
-                ? Container(
-                    height: 0.0,
-                  )
-                : InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState.hideCurrentSnackBar();
-                      _currentIndex = 0;
-                      _changeSaleStatus(1, saleId);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            AmazingIcon.account_circle_line,
-                            size: 15.0,
-                            color: gradient1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Servir commande',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-            status != 1
-                ? Container(
-                    height: 0.0,
-                  )
-                : InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState.hideCurrentSnackBar();
-                      _currentIndex = 0;
-                      _changeSaleStatus(2, saleId);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            AmazingIcon.shopping_cart_line,
-                            size: 15.0,
-                            color: gradient1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Payer commande',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-            _salesToShow[currentIndex]['validator'] == null
-                ? Container(height: 0.0)
-                : InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState.hideCurrentSnackBar();
-                      showBill(
-                          _salesToShow[currentIndex]['customer'],
-                          _sites[currentIndex],
-                          _salesToShow[currentIndex],
-                          _salesToShow[currentIndex]['initiator'],
-                          validator: _salesToShow[currentIndex]['validator']);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            AmazingIcon.repeat_2_line,
-                            size: 15.0,
-                            color: gradient1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Voir la facture',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-            userRole['slug'] == 'server' ||
-                    _salesToShow[currentIndex]['validator'] != null
-                ? Container(
-                    height: 0.0,
-                  )
-                : InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState.hideCurrentSnackBar();
-                      _currentIndex = 0;
-                      _validateSale(saleId);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            AmazingIcon.repeat_2_line,
-                            size: 15.0,
-                            color: gradient1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Valider Commande',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-            _salesToShow[currentIndex]['validator'] == null ||
-                    _salesToShow[currentIndex]['validator']['id'] != user.id
-                ? Container(
-                    height: 0.0,
-                  )
-                : InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState.hideCurrentSnackBar();
-                      _currentIndex = 0;
-                      _invalidateSale(saleId);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            AmazingIcon.account_circle_line,
-                            size: 15.0,
-                            color: gradient1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Invalider commande',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-            status == 2
-                ? Container(
-                    height: 0.0,
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          AmazingIcon.edit_2_line,
-                          size: 15.0,
-                          color: gradient1,
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            _scaffoldKey.currentState.hideCurrentSnackBar();
-                            if (sitesToShow == null) {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              await fetchProductsOfSnack().then((value) {
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                                sitesToShow = _fieldValues(value);
-                                updateSales(
-                                    _salesToShow[currentIndex],
-                                    user.isAdmin == 1
-                                        ? sitesToShow
-                                        : checkSiteProduct(
-                                            sitesToShow,
-                                            _salesToShow[currentIndex]
-                                                ['site_id']),
-                                    _salesToShow[currentIndex]['products']);
-                              });
-                            } else {
-                              updateSales(
-                                  _salesToShow[currentIndex],
-                                  user.isAdmin == 1
-                                      ? sitesToShow
-                                      : checkSiteProduct(
-                                          sitesToShow,
-                                          _salesToShow[currentIndex]
-                                              ['site_id']),
-                                  _salesToShow[currentIndex]['products']);
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Text(
-                              'Modifier',
-                              style: TextStyle(
-                                  fontFamily: 'Ubuntu',
-                                  fontSize: 17.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: textInverseModeColor),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-            InkWell(
-              onTap: () {
-                _scaffoldKey.currentState.hideCurrentSnackBar();
-                /* 
-                _deleteSite(index); */
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      AmazingIcon.delete_bin_6_line,
-                      size: 15.0,
-                      color: redColor,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Text(
-                        'Supprimer',
-                        style: TextStyle(
-                            fontFamily: 'Ubuntu',
-                            fontSize: 17.0,
-                            fontWeight: FontWeight.bold,
-                            color: textInverseModeColor),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ));
   }
 
   checkSiteProduct(sites, siteId) {
@@ -1631,7 +1333,7 @@ class _ManageSalesState extends State<ManageSales> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  if (currentSite != null ||
+                                  /* if (currentSite != null ||
                                       user.isAdmin == 1) {
                                     _attemptSave(
                                         _productsOnOrder,
@@ -1639,7 +1341,7 @@ class _ManageSalesState extends State<ManageSales> {
                                         user.isAdmin == 1
                                             ? site.id
                                             : currentSite['id']);
-                                  }
+                                  } */
                                 },
                                 child: Container(
                                   width: double.infinity,
@@ -1670,38 +1372,7 @@ class _ManageSalesState extends State<ManageSales> {
             }));
   }
 
-  _attemptSave(List products, List quantities, int siteId) async {
-    Navigator.pop(context);
-
-    String order = '';
-    for (var i = 0; i < products.length; i++) {
-      order += products[i]['id'].toString() +
-          ';' +
-          quantities[i].toString() +
-          ';' +
-          products[i]['pivot']['price'].toString() +
-          '|';
-    }
-
-    Map<String, dynamic> params = Map();
-    params['order'] = order;
-    params['site_id'] = siteId.toString();
-    params['customer_id'] = '3';
-    params['status'] = '0';
-    params['paying_method'] = _paymentMode;
-    params['sale_note'] = '';
-    setState(() {
-      _isLoading = true;
-    });
-    await storeSale(params).then((response) {
-      setState(() {
-        _isLoading = false;
-        _salesAlreadyLoad = false;
-        _companySales = fetchSales();
-      });
-    });
-  }
-
+  
   List _fieldValues(datas) {
     List result = [];
     for (var site in datas) {
@@ -1815,7 +1486,7 @@ class _ManageSalesState extends State<ManageSales> {
     return SafeArea(
       top: true,
       child: Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: Color(0xFFF8F8F8),
         key: _scaffoldKey,
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(
@@ -1892,98 +1563,8 @@ class _ManageSalesState extends State<ManageSales> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          child: Stack(
-                            children: <Widget>[
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Container(
-                                  height: 46.0,
-                                  decoration: buildTextFormFieldContainer(
-                                      decorationColor),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
-                                child: Container(
-                                  height: 46.0,
-                                  child: TextFormField(
-                                    textInputAction: TextInputAction.done,
-                                    style: TextStyle(
-                                        color: textInverseModeColor
-                                            .withOpacity(.87)),
-                                    controller: _searchController,
-                                    focusNode: _searchNode,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _sales = searchMethod(
-                                            _salesForSearch, value);
-                                        loadDesireSales(_sales);
-                                      });
-                                    },
-                                    onFieldSubmitted: (value) {
-                                      setState(() {
-                                        _sales = searchMethod(
-                                            _salesForSearch, value);
-                                        loadDesireSales(_sales);
-                                        _searchController.text = '';
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 50.0),
-                                        suffixIcon: GestureDetector(
-                                          onTap: () {
-                                            _searchController.text = '';
-                                            _searchNode.unfocus();
-                                            _sales = _salesForSearch;
-                                            loadDesireSales(_sales);
-                                          },
-                                          child: Icon(AmazingIcon.close_fill,
-                                              color: textInverseModeColor),
-                                        ),
-                                        hintText: 'Recherche...',
-                                        prefixIcon: Icon(
-                                            AmazingIcon.search_2_line,
-                                            color: textInverseModeColor),
-                                        hintStyle: TextStyle(
-                                            color: textInverseModeColor
-                                                .withOpacity(.35),
-                                            fontSize: 18.0),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                        )),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Icon(
-                              AmazingIcon.arrow_down_s_line,
-                              size: myHeight(context) / 20.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 20.0,
-                  ),
                   Container(
-                    height: myHeight(context) * .8,
+                    height: myHeight(context) * .9,
                     child: FutureBuilder(
                         future: _companySales,
                         builder: (context, snapshot) {
@@ -2014,74 +1595,165 @@ class _ManageSalesState extends State<ManageSales> {
                                             children: <Widget>[
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15.0),
+                                                    const EdgeInsets.fromLTRB(
+                                                        15.0, 20.0, 15.0, 0.0),
                                                 child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.brightness_1,
                                                       color: gradient1,
-                                                      size: 26,
+                                                      size: myWidth(context) /
+                                                          15.0,
                                                     ),
                                                     SizedBox(
-                                                      width: 11.0,
-                                                    ),
+                                                        width:
+                                                            myWidth(context) /
+                                                                30.0),
                                                     Text(
                                                       'En attente',
                                                       style: TextStyle(
-                                                          fontSize: 17.0,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              40.0,
                                                           fontWeight:
                                                               FontWeight.w700),
                                                     ),
                                                     Spacer(),
                                                     GestureDetector(
-                                                      onTap: () async {
-                                                        if (sitesToShow ==
-                                                            null) {
-                                                          setState(() {
-                                                            _isLoading = true;
-                                                          });
-                                                          await fetchProductsOfSnack()
-                                                              .then((value) {
-                                                            setState(() {
-                                                              _isLoading =
-                                                                  false;
-                                                            });
-                                                            sitesToShow =
-                                                                _fieldValues(
-                                                                    value);
-                                                            addSales(
-                                                                sites:
-                                                                    sitesToShow);
-                                                          });
-                                                        } else {
-                                                          addSales(
-                                                              sites:
-                                                                  sitesToShow);
-                                                        }
-                                                      },
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        size:
-                                                            myHeight(context) /
-                                                                26.0,
+                                                      onTap: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Icon(
+                                                          AmazingIcon
+                                                              .arrow_down_s_line,
+                                                          size: myHeight(
+                                                                  context) /
+                                                              20.0,
+                                                        ),
                                                       ),
                                                     ),
-                                                    SizedBox(
-                                                      width: myHeight(context) /
-                                                          50.0,
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    myHeight(context) / 50.0,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Stack(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              decoration:
+                                                                  buildTextFormFieldContainer(
+                                                                      decorationColor),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        10.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              child:
+                                                                  TextFormField(
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .done,
+                                                                style: TextStyle(
+                                                                    color: textInverseModeColor
+                                                                        .withOpacity(
+                                                                            .87)),
+                                                                controller:
+                                                                    _searchController,
+                                                                focusNode:
+                                                                    _searchNode,
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                  });
+                                                                },
+                                                                onFieldSubmitted:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                    _searchController
+                                                                        .text = '';
+                                                                  });
+                                                                },
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                        contentPadding: const EdgeInsets.only(
+                                                                            left:
+                                                                                50.0),
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _searchController.text =
+                                                                                '';
+                                                                            _searchNode.unfocus();
+                                                                            _sales =
+                                                                                _salesForSearch;
+                                                                            loadDesireSales(_sales);
+                                                                          },
+                                                                          child: Icon(
+                                                                              AmazingIcon.close_fill,
+                                                                              color: textInverseModeColor),
+                                                                        ),
+                                                                        hintText:
+                                                                            'Recherche...',
+                                                                        prefixIcon: Icon(
+                                                                            AmazingIcon
+                                                                                .search_2_line,
+                                                                            color:
+                                                                                textInverseModeColor),
+                                                                        hintStyle: TextStyle(
+                                                                            color: textInverseModeColor.withOpacity(
+                                                                                .35),
+                                                                            fontSize:
+                                                                                18.0),
+                                                                        border:
+                                                                            OutlineInputBorder(
+                                                                          borderSide:
+                                                                              BorderSide.none,
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                    GestureDetector(
-                                                        onTap: () =>
-                                                            selectionMode
-                                                                ? _cancelMode(
-                                                                    _scaffoldKey)
-                                                                : _filterData(),
-                                                        child: Icon(selectionMode
-                                                            ? AmazingIcon
-                                                                .close_line
-                                                            : AmazingIcon
-                                                                .list_settings_fill)),
                                                   ],
                                                 ),
                                               ),
@@ -2155,7 +1827,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             height: 0.0,
                                                                                           )
                                                                                         : GestureDetector(
-                                                                                            onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                            /* onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                             */
                                                                                             child: Icon(Icons.more_vert, size: myHeight(context) / 25.0),
                                                                                           ),
                                                                                   ],
@@ -2294,74 +1967,184 @@ class _ManageSalesState extends State<ManageSales> {
                                             children: <Widget>[
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15.0),
+                                                    const EdgeInsets.fromLTRB(
+                                                        15.0, 20.0, 15.0, 0.0),
                                                 child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.brightness_1,
                                                       color: gradient1,
-                                                      size: 26,
+                                                      size: myWidth(context) /
+                                                          15.0,
                                                     ),
                                                     SizedBox(
-                                                      width: 11.0,
-                                                    ),
+                                                        width:
+                                                            myWidth(context) /
+                                                                30.0),
                                                     Text(
                                                       'En attente',
                                                       style: TextStyle(
-                                                          fontSize: 17.0,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              40.0,
                                                           fontWeight:
                                                               FontWeight.w700),
                                                     ),
                                                     Spacer(),
                                                     GestureDetector(
-                                                      onTap: () async {
-                                                        if (sitesToShow ==
-                                                            null) {
-                                                          setState(() {
-                                                            _isLoading = true;
-                                                          });
-                                                          await fetchProductsOfSnack()
-                                                              .then((value) {
-                                                            setState(() {
-                                                              _isLoading =
-                                                                  false;
-                                                            });
-                                                            sitesToShow =
-                                                                _fieldValues(
-                                                                    value);
-                                                            addSales(
-                                                                sites:
-                                                                    sitesToShow);
-                                                          });
-                                                        } else {
-                                                          addSales(
-                                                              sites:
-                                                                  sitesToShow);
-                                                        }
-                                                      },
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        size:
-                                                            myHeight(context) /
-                                                                26.0,
+                                                      onTap: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Icon(
+                                                          AmazingIcon
+                                                              .arrow_down_s_line,
+                                                          size: myHeight(
+                                                                  context) /
+                                                              20.0,
+                                                        ),
                                                       ),
                                                     ),
-                                                    SizedBox(
-                                                      width: myHeight(context) /
-                                                          50.0,
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    myHeight(context) / 50.0,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Stack(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              decoration:
+                                                                  buildTextFormFieldContainer(
+                                                                      decorationColor),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        10.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              child:
+                                                                  TextFormField(
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .done,
+                                                                style: TextStyle(
+                                                                    color: textInverseModeColor
+                                                                        .withOpacity(
+                                                                            .87)),
+                                                                controller:
+                                                                    _searchController,
+                                                                focusNode:
+                                                                    _searchNode,
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                  });
+                                                                },
+                                                                onFieldSubmitted:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                    _searchController
+                                                                        .text = '';
+                                                                  });
+                                                                },
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                        contentPadding: const EdgeInsets.only(
+                                                                            left:
+                                                                                50.0),
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _searchController.text =
+                                                                                '';
+                                                                            _searchNode.unfocus();
+                                                                            _sales =
+                                                                                _salesForSearch;
+                                                                            loadDesireSales(_sales);
+                                                                          },
+                                                                          child: Icon(
+                                                                              AmazingIcon.close_fill,
+                                                                              color: textInverseModeColor),
+                                                                        ),
+                                                                        hintText:
+                                                                            'Recherche...',
+                                                                        prefixIcon: Icon(
+                                                                            AmazingIcon
+                                                                                .search_2_line,
+                                                                            color:
+                                                                                textInverseModeColor),
+                                                                        hintStyle: TextStyle(
+                                                                            color: textInverseModeColor.withOpacity(
+                                                                                .35),
+                                                                            fontSize:
+                                                                                18.0),
+                                                                        border:
+                                                                            OutlineInputBorder(
+                                                                          borderSide:
+                                                                              BorderSide.none,
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                    GestureDetector(
-                                                        onTap: () =>
-                                                            selectionMode
-                                                                ? _cancelMode(
-                                                                    _scaffoldKey)
-                                                                : _filterData(),
-                                                        child: Icon(selectionMode
-                                                            ? AmazingIcon
-                                                                .close_line
-                                                            : AmazingIcon
-                                                                .list_settings_fill)),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: gradient1
+                                                              .withOpacity(.2)),
+                                                      child: IconButton(
+                                                        onPressed: () => Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        AddSalesPage())),
+                                                        icon: Icon(
+                                                          Icons.add,
+                                                          color: gradient1,
+                                                        ),
+                                                      ),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -2435,7 +2218,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             height: 0.0,
                                                                                           )
                                                                                         : GestureDetector(
-                                                                                            onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                            /* onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                             */
                                                                                             child: Icon(Icons.more_vert, size: myHeight(context) / 25.0),
                                                                                           ),
                                                                                   ],
@@ -2572,41 +2356,165 @@ class _ManageSalesState extends State<ManageSales> {
                                             children: <Widget>[
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15.0),
+                                                    const EdgeInsets.fromLTRB(
+                                                        15.0, 20.0, 15.0, 0.0),
                                                 child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.brightness_1,
                                                       color: Colors.orange,
-                                                      size: 26,
+                                                      size: myWidth(context) /
+                                                          15.0,
                                                     ),
                                                     SizedBox(
-                                                      width: 11.0,
-                                                    ),
+                                                        width:
+                                                            myWidth(context) /
+                                                                30.0),
                                                     Text(
                                                       'Servie',
                                                       style: TextStyle(
-                                                          fontSize: 17.0,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              40.0,
                                                           fontWeight:
                                                               FontWeight.w700),
                                                     ),
                                                     Spacer(),
-                                                    SizedBox(
-                                                      width: myHeight(context) /
-                                                          100.0,
-                                                    ),
                                                     GestureDetector(
-                                                        onTap: () =>
-                                                            selectionMode
-                                                                ? _cancelMode(
-                                                                    _scaffoldKey)
-                                                                : _filterData(),
-                                                        child: Icon(selectionMode
-                                                            ? AmazingIcon
-                                                                .close_line
-                                                            : AmazingIcon
-                                                                .list_settings_fill)),
+                                                      onTap: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Icon(
+                                                          AmazingIcon
+                                                              .arrow_down_s_line,
+                                                          size: myHeight(
+                                                                  context) /
+                                                              20.0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    myHeight(context) / 50.0,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Stack(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              decoration:
+                                                                  buildTextFormFieldContainer(
+                                                                      decorationColor),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        10.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              child:
+                                                                  TextFormField(
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .done,
+                                                                style: TextStyle(
+                                                                    color: textInverseModeColor
+                                                                        .withOpacity(
+                                                                            .87)),
+                                                                controller:
+                                                                    _searchController,
+                                                                focusNode:
+                                                                    _searchNode,
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                  });
+                                                                },
+                                                                onFieldSubmitted:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                    _searchController
+                                                                        .text = '';
+                                                                  });
+                                                                },
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                        contentPadding: const EdgeInsets.only(
+                                                                            left:
+                                                                                50.0),
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _searchController.text =
+                                                                                '';
+                                                                            _searchNode.unfocus();
+                                                                            _sales =
+                                                                                _salesForSearch;
+                                                                            loadDesireSales(_sales);
+                                                                          },
+                                                                          child: Icon(
+                                                                              AmazingIcon.close_fill,
+                                                                              color: textInverseModeColor),
+                                                                        ),
+                                                                        hintText:
+                                                                            'Recherche...',
+                                                                        prefixIcon: Icon(
+                                                                            AmazingIcon
+                                                                                .search_2_line,
+                                                                            color:
+                                                                                textInverseModeColor),
+                                                                        hintStyle: TextStyle(
+                                                                            color: textInverseModeColor.withOpacity(
+                                                                                .35),
+                                                                            fontSize:
+                                                                                18.0),
+                                                                        border:
+                                                                            OutlineInputBorder(
+                                                                          borderSide:
+                                                                              BorderSide.none,
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -2680,7 +2588,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             height: 0.0,
                                                                                           )
                                                                                         : GestureDetector(
-                                                                                            onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                            /* onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                             */
                                                                                             child: Icon(Icons.more_vert, size: myHeight(context) / 25.0),
                                                                                           ),
                                                                                   ],
@@ -2817,41 +2726,165 @@ class _ManageSalesState extends State<ManageSales> {
                                             children: <Widget>[
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15.0),
+                                                    const EdgeInsets.fromLTRB(
+                                                        15.0, 20.0, 15.0, 0.0),
                                                 child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: <Widget>[
                                                     Icon(
                                                       Icons.brightness_1,
                                                       color: Colors.green,
-                                                      size: 26,
+                                                      size: myWidth(context) /
+                                                          15.0,
                                                     ),
                                                     SizedBox(
-                                                      width: 11.0,
-                                                    ),
+                                                        width:
+                                                            myWidth(context) /
+                                                                30.0),
                                                     Text(
                                                       'Payee',
                                                       style: TextStyle(
-                                                          fontSize: 17.0,
+                                                          fontSize: myHeight(
+                                                                  context) /
+                                                              40.0,
                                                           fontWeight:
                                                               FontWeight.w700),
                                                     ),
                                                     Spacer(),
-                                                    SizedBox(
-                                                      width: myHeight(context) /
-                                                          100.0,
-                                                    ),
                                                     GestureDetector(
-                                                        onTap: () =>
-                                                            selectionMode
-                                                                ? _cancelMode(
-                                                                    _scaffoldKey)
-                                                                : _filterData(),
-                                                        child: Icon(selectionMode
-                                                            ? AmazingIcon
-                                                                .close_line
-                                                            : AmazingIcon
-                                                                .list_settings_fill)),
+                                                      onTap: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                right: 8.0),
+                                                        child: Icon(
+                                                          AmazingIcon
+                                                              .arrow_down_s_line,
+                                                          size: myHeight(
+                                                                  context) /
+                                                              20.0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    myHeight(context) / 50.0,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Stack(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              decoration:
+                                                                  buildTextFormFieldContainer(
+                                                                      decorationColor),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        10.0),
+                                                            child: Container(
+                                                              height: 46.0,
+                                                              child:
+                                                                  TextFormField(
+                                                                textInputAction:
+                                                                    TextInputAction
+                                                                        .done,
+                                                                style: TextStyle(
+                                                                    color: textInverseModeColor
+                                                                        .withOpacity(
+                                                                            .87)),
+                                                                controller:
+                                                                    _searchController,
+                                                                focusNode:
+                                                                    _searchNode,
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                  });
+                                                                },
+                                                                onFieldSubmitted:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    _sales = searchMethod(
+                                                                        _salesForSearch,
+                                                                        value);
+                                                                    loadDesireSales(
+                                                                        _sales);
+                                                                    _searchController
+                                                                        .text = '';
+                                                                  });
+                                                                },
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                        contentPadding: const EdgeInsets.only(
+                                                                            left:
+                                                                                50.0),
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _searchController.text =
+                                                                                '';
+                                                                            _searchNode.unfocus();
+                                                                            _sales =
+                                                                                _salesForSearch;
+                                                                            loadDesireSales(_sales);
+                                                                          },
+                                                                          child: Icon(
+                                                                              AmazingIcon.close_fill,
+                                                                              color: textInverseModeColor),
+                                                                        ),
+                                                                        hintText:
+                                                                            'Recherche...',
+                                                                        prefixIcon: Icon(
+                                                                            AmazingIcon
+                                                                                .search_2_line,
+                                                                            color:
+                                                                                textInverseModeColor),
+                                                                        hintStyle: TextStyle(
+                                                                            color: textInverseModeColor.withOpacity(
+                                                                                .35),
+                                                                            fontSize:
+                                                                                18.0),
+                                                                        border:
+                                                                            OutlineInputBorder(
+                                                                          borderSide:
+                                                                              BorderSide.none,
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -2925,7 +2958,8 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                             height: 0.0,
                                                                                           )
                                                                                         : GestureDetector(
-                                                                                            onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                            /* onTap: () => showSnackBar(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index),
+                                                                                             */
                                                                                             child: Icon(Icons.more_vert, size: myHeight(context) / 25.0),
                                                                                           ),
                                                                                   ],

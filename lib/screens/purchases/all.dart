@@ -316,104 +316,76 @@ class _PurchasePageState extends State<PurchasePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        top: true,
-        child: Scaffold(
-          backgroundColor: backgroundColor,
-          key: _scaffoldKey,
-          body: Stack(
-            children: <Widget>[
-              ListView(
+    return Scaffold(
+      backgroundColor: Color(0xFFF8F8F8),
+      key: _scaffoldKey,
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: myWidth(context) / 30.0),
+              child: Column(
                 children: <Widget>[
-                  Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                      child: Stack(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Container(
-                              height: myHeight(context) / 17.0,
-                              decoration:
-                                  buildTextFormFieldContainer(decorationColor),
-                            ),
+                  Container(
+                    height: myHeight(context) / 17.0,
+                    margin: EdgeInsets.only(
+                        top: myWidth(context) / 30.0,),
+                    decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius:
+                            BorderRadius.circular(myHeight(context) / 10.0)),
+                    child: TextFormField(
+                      style: TextStyle(fontSize: myHeight(context) / 42.0),
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            AmazingIcon.search_2_line,
+                            color: Colors.black,
+                            size: myHeight(context) / 40.0,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Hero(
-                              tag: 'search',
-                              child: Container(
-                                height: myHeight(context) / 17.0,
-                                child: TextFormField(
-                                  onFieldSubmitted: (_) {},
-                                  controller: _controller,
-                                  textInputAction: TextInputAction.done,
-                                  style: TextStyle(color: textSameModeColor),
-                                  decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.only(
-                                          top: 10.0, left: 50.0),
-                                      prefixIcon: Icon(
-                                          AmazingIcon.search_2_line,
-                                          color: textInverseModeColor,
-                                          size: 20.0),
-                                      suffixIcon: IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(AmazingIcon.close_fill,
-                                              color: textInverseModeColor,
-                                              size: 20.0)),
-                                      hintText: 'Recherche...',
-                                      hintStyle: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: textInverseModeColor
-                                              .withOpacity(.35),
-                                          fontSize: 18.0),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      )),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
+                          hintText: 'Entrer du texte',
+                          hintStyle:
+                              TextStyle(fontSize: myHeight(context) / 42.0),
+                          contentPadding: EdgeInsets.only(
+                              left: myHeight(context) / 25.0,
+                              top: myHeight(context) / 40.0),
+                          border:
+                              OutlineInputBorder(borderSide: BorderSide.none)),
+                    ),
+                  ),
                   SizedBox(
                     height: myHeight(context) / 50.0,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      children: <Widget>[
-                        InkWell(
-                            onTap: () => Navigator.pop(context),
-                            child: Icon(Icons.arrow_back)),
-                        SizedBox(
-                          width: myHeight(context) / 40.0,
+                  Row(
+                    children: <Widget>[
+                      InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(Icons.arrow_back)),
+                      SizedBox(
+                        width: myHeight(context) / 40.0,
+                      ),
+                      Text(
+                        'Mes achats',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 25.0,
                         ),
-                        Text(
-                          'Mes achats',
-                          style: TextStyle(
-                              fontSize: myHeight(context) / 25.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Spacer(),
-                        InkWell(
-                            onTap: () => _filterData(),
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              child: Icon(
-                                AmazingIcon.list_settings_fill,
-                                size: myHeight(context) / 25.0,
-                              ),
-                            ))
-                      ],
-                    ),
+                      ),
+                      Spacer(),
+                      InkWell(
+                          onTap: () => _filterData(),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: Icon(
+                              AmazingIcon.list_settings_fill,
+                              size: myHeight(context) / 30.0,
+                            ),
+                          ))
+                    ],
                   ),
                   SizedBox(
                     height: myHeight(context) / 40.0,
                   ),
-                  Container(
-                    width: myWidth(context),
-                    height: myHeight(context) * .78,
+                  Expanded(
                     child: FutureBuilder(
                         future: _companyPurchases,
                         builder: (context, snapshot) {
@@ -441,14 +413,17 @@ class _PurchasePageState extends State<PurchasePage> {
                                         child: Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Container(
-                                                height: myHeight(context) / 5.2,
+                                                height: myHeight(context) / 6.5,
                                                 decoration: BoxDecoration(
+                                                    color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10.0)),
+                                                        BorderRadius.all(Radius
+                                                            .circular(10.0)),
                                                     border: Border.all(
-                                                        color: textInverseModeColor.withOpacity(.38))),
+                                                        color:
+                                                            textInverseModeColor
+                                                                .withOpacity(
+                                                                    .1))),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -478,7 +453,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                                                   fontSize:
                                                                       screenSize(context)
                                                                               .height /
-                                                                          30,
+                                                                          35,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold),
@@ -495,7 +470,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                                               fontSize: screenSize(
                                                                           context)
                                                                       .height /
-                                                                  38.0),
+                                                                  43.0),
                                                         ),
                                                         Row(
                                                           children: <Widget>[
@@ -515,7 +490,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                                                   fontSize:
                                                                       screenSize(context)
                                                                               .height /
-                                                                          38.0),
+                                                                          45.0),
                                                             ),
                                                             Spacer(),
                                                             Text(
@@ -526,7 +501,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                                                   fontSize:
                                                                       screenSize(context)
                                                                               .height /
-                                                                          50.0),
+                                                                          62.0),
                                                             ),
                                                           ],
                                                         ),
@@ -551,21 +526,23 @@ class _PurchasePageState extends State<PurchasePage> {
                   ),
                 ],
               ),
-              _isLoading
-                  ? Container(
-                      height: myHeight(context),
-                      color: textSameModeColor.withOpacity(.9),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation(gradient1),
-                        ),
+            ),
+            _isLoading
+                ? Container(
+                    height: myHeight(context),
+                    color: textSameModeColor.withOpacity(.9),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: new AlwaysStoppedAnimation(gradient1),
                       ),
-                    )
-                  : Container(
-                      height: 0.0,
-                    )
-            ],
-          ),
-        ));
+                    ),
+                  )
+                : Container(
+                    height: 0.0,
+                  )
+          ],
+        ),
+      ),
+    );
   }
 }
