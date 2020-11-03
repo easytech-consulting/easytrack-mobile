@@ -217,9 +217,10 @@ capitalize(String data) {
   String result = '';
   int index = 0;
   for (var word in words) {
+    
     result += index == words.length - 1
-        ? '${word.substring(0, 1).toUpperCase()}${word.substring(1)}'
-        : '${word.substring(0, 1).toUpperCase()}${word.substring(1)} ';
+        ? '${word.substring(0, 1).toUpperCase()}${word.substring(1).toLowerCase()}'
+        : '${word.substring(0, 1).toUpperCase()}${word.substring(1).toLowerCase()} ';
   }
 
   return result;
@@ -244,19 +245,6 @@ loadModeColor(ThemeMode themeMode) {
     outlineBtnColor = Colors.black;
     raisedBtnColor = Colors.black;
     flatButtonColor = Colors.black;
-  }
-}
-
-fetchUserContacts() async {
-  allUserContacts = await fetchContacts();
-}
-
-fetchSitesOfUserFunction() async {
-  var sites = await fetchSitesOfUser();
-  if (user.isAdmin == 2) {
-    userSites = sites;
-  } else {
-    userSites.add(sites);
   }
 }
 
@@ -322,7 +310,6 @@ String getDay(DateTime date) {
 
 int errorStatusCode, userId;
 bool showBottom;
-List allUserContacts, userSites;
 Map userRole;
 String userToken;
 User user;

@@ -10,6 +10,11 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return user.isAdmin == 2 ? StatsAdminPage() : StatEmployee();
   }

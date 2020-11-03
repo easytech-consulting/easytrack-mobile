@@ -28,7 +28,6 @@ class _UserPageState extends State<UserPage> {
   Role _role;
   int _selectedRoleId;
   bool _obscureText;
-  TextEditingController _controller;
   List _users = [], _userRole = [];
   Site _site;
   Future _futureEmployees;
@@ -199,7 +198,6 @@ class _UserPageState extends State<UserPage> {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _futureRoles = fetchRoles();
-    _controller = new TextEditingController();
     _isLoading = false;
     _scaffoldKey = GlobalKey();
     _site = Site.fromJson(widget.site);
@@ -269,27 +267,33 @@ class _UserPageState extends State<UserPage> {
 
   _showDetails(User _user, Role _role) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
-        content: Container(
-          height: myHeight(context) * .76,
-          width: myWidth(context) * .82,
-          child: Padding(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
             padding: EdgeInsets.symmetric(
-                vertical: myHeight(context) / 60,
-                horizontal: myHeight(context) / 100),
+                vertical: myHeight(context) / 30,
+                horizontal: myHeight(context) / 25),
+            height: myHeight(context) * .8,
+            width: myWidth(context) * .9,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text(
-                      _user.name,
-                      style: TextStyle(
-                          fontSize: myHeight(context) / 30,
-                          fontWeight: FontWeight.bold),
+                    Container(
+                      height: myHeight(context)/1.5,
+                      child: Text(
+                        _user.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: myHeight(context) / 30,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Spacer(),
                     InkWell(
@@ -422,7 +426,7 @@ class _UserPageState extends State<UserPage> {
                           child: Text(
                             'Appeler',
                             style: TextStyle(
-                                color: textInverseModeColor, fontSize: 18),
+                                color: Colors.white, fontSize: 18),
                           ),
                         ),
                       )),
@@ -430,9 +434,7 @@ class _UserPageState extends State<UserPage> {
               ],
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   _attemptSave() async {
@@ -1122,20 +1124,18 @@ class _UserPageState extends State<UserPage> {
                               hint: Text('Selectionnez un role'),
                               items: _roles.map((role) {
                                 return DropdownMenuItem<Role>(
-                                  child: Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 10.0),
-                                            child: Icon(
-                                                AmazingIcon.community_line,
-                                                size: 15.0)),
-                                        Text(role.name),
-                                      ],
-                                    ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                          padding:
+                                              EdgeInsets.only(right: 10.0),
+                                          child: Icon(
+                                              AmazingIcon.community_line,
+                                              size: 15.0)),
+                                      Text(role.name),
+                                    ],
                                   ),
                                   value: role,
                                 );
@@ -1269,69 +1269,6 @@ class _UserPageState extends State<UserPage> {
             ));
   }
 
-  _filterData() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        content: Padding(
-          padding: EdgeInsets.symmetric(horizontal: myHeight(context) / 100),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text('Trier par',
-                  style: TextStyle(fontSize: myHeight(context) / 40.0)),
-              SizedBox(
-                height: myHeight(context) / 50.0,
-              ),
-              ListTile(
-                leading: Icon(AmazingIcon.list_settings_fill),
-                title: Text('Nom',
-                    style: TextStyle(fontSize: myHeight(context) / 40.0)),
-              ),
-              ListTile(
-                leading: Icon(AmazingIcon.list_settings_fill),
-                title: Text('Quantite',
-                    style: TextStyle(fontSize: myHeight(context) / 40.0)),
-              ),
-              ListTile(
-                leading: Icon(AmazingIcon.list_settings_fill),
-                title: Text('Prix',
-                    style: TextStyle(fontSize: myHeight(context) / 40.0)),
-              ),
-              ListTile(
-                leading: Icon(AmazingIcon.list_settings_fill),
-                title: Text('Date',
-                    style: TextStyle(fontSize: myHeight(context) / 40.0)),
-              ),
-              Divider(
-                thickness: 2.0,
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _futureEmployees = fetchEmployeesOfSite(_site.id);
-                  });
-                },
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(vertical: 0.0),
-                  leading: Icon(AmazingIcon.refresh_line),
-                  title: Text('Actualiser',
-                      style: TextStyle(
-                          fontSize: myHeight(context) / 40.0,
-                          fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -1344,7 +1281,6 @@ class _UserPageState extends State<UserPage> {
                 FutureBuilder(
                   future: _futureEmployees,
                   builder: (context, snapshot) {
-                    print(_futureEmployees);
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData) {
                       _users = snapshot.data['employees']
@@ -1361,12 +1297,9 @@ class _UserPageState extends State<UserPage> {
                               _roles = snapshotRole.data;
                               return CustomScrollView(
                                 slivers: [
-                                  sliverHeader(
-                                      context,
-                                      'Site ${widget.site["name"]} 1',
-                                      'Employee',
-                                      canAdd: true,
-                                      onClick: _createUser),
+                                  sliverHeader(context,
+                                      'Site ${widget.site["name"]}', 'Employee',
+                                      canAdd: true, onClick: _createUser),
                                   _users == null || _users.length == 0
                                       ? SliverList(
                                           delegate:
@@ -1425,10 +1358,11 @@ class _UserPageState extends State<UserPage> {
                                                           Row(
                                                             children: <Widget>[
                                                               InkWell(
-                                                                /*  onTap: () =>
-                                                            _showDetails(
-                                                          _users[index],
-                                                        ), */
+                                                                onTap: () => _showDetails(
+                                                                    _users[
+                                                                        index],
+                                                                    _userRole[
+                                                                        index]),
                                                                 child:
                                                                     Container(
                                                                   width: myWidth(
@@ -1484,7 +1418,7 @@ class _UserPageState extends State<UserPage> {
                                                                     40,
                                                               ),
                                                               Text(
-                                                                '${_users[index].name}, Cameroun',
+                                                                '${_users[index].address}, Cameroun',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black54,
@@ -1515,7 +1449,7 @@ class _UserPageState extends State<UserPage> {
                                                                     40,
                                                               ),
                                                               Text(
-                                                                '${_users[index]}',
+                                                                '${_users[index].tel}',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black54,
@@ -1599,7 +1533,8 @@ class _UserPageState extends State<UserPage> {
                       }
                       return CustomScrollView(
                         slivers: [
-                          sliverHeader(context, 'Gestion', 'Mes sites',
+                          sliverHeader(context, 'Site ${widget.site["name"]}',
+                              'Employee',
                               canAdd: true, onClick: _createUser),
                           _users == null || _users.length == 0
                               ? SliverList(
@@ -1609,7 +1544,7 @@ class _UserPageState extends State<UserPage> {
                                       width: double.infinity,
                                       alignment: Alignment.center,
                                       child: Text(
-                                        'Aucun site',
+                                        'Aucun employee',
                                         style: TextStyle(
                                             fontSize: myHeight(context) / 50.0),
                                       ),
@@ -1648,10 +1583,11 @@ class _UserPageState extends State<UserPage> {
                                                   Row(
                                                     children: <Widget>[
                                                       InkWell(
-                                                        /*  onTap: () =>
+                                                        onTap: () =>
                                                             _showDetails(
-                                                          _users[index],
-                                                        ), */
+                                                                _users[index],
+                                                                _userRole[
+                                                                    index]),
                                                         child: Container(
                                                           width:
                                                               myWidth(context) /
@@ -1823,664 +1759,5 @@ class _UserPageState extends State<UserPage> {
                     : Container(),
               ],
             )));
-    /* SafeArea(
-        top: true,
-        child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: textSameModeColor,
-            onPressed: () => _createUser(),
-            child: Icon(
-              Icons.add,
-              color: gradient1,
-            ),
-          ),
-          backgroundColor: backgroundColor,
-          key: _scaffoldKey,
-          body: Stack(
-            children: <Widget>[
-              ListView(
-                children: <Widget>[
-                  Container(
-                    height: myHeight(context) * .06,
-                    alignment: Alignment.bottomCenter,
-                    child: _searchMode
-                        ? Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Stack(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Container(
-                                    height: 36.0,
-                                    decoration: buildTextFormFieldContainer(
-                                        decorationColor),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: Container(
-                                    height: 36.0,
-                                    child: TextFormField(
-                                      onFieldSubmitted: (_) {
-                                        setState(() {
-                                          _searchMode = false;
-                                        });
-                                      },
-                                      controller: _controller,
-                                      textInputAction: TextInputAction.done,
-                                      style:
-                                          TextStyle(color: textInverseModeColor),
-                                      decoration: InputDecoration(
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 50.0),
-                                          suffixIcon: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  _searchMode = false;
-                                                });
-                                              },
-                                              icon: Icon(AmazingIcon.close_fill,
-                                                  size: 20.0)),
-                                          hintText: 'Recherche...',
-                                          prefixIcon:
-                                              Icon(AmazingIcon.search_2_line),
-                                          hintStyle: TextStyle(
-                                              color: textInverseModeColor
-                                                  .withOpacity(.35),
-                                              fontSize: 18.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                          )),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Row(
-                              children: <Widget>[
-                                InkWell(
-                                    onTap: () => Navigator.pop(context),
-                                    child: Icon(Icons.arrow_back)),
-                                SizedBox(
-                                  width: myHeight(context) / 40.0,
-                                ),
-                                Text(
-                                  'Site ${_site.street}',
-                                  style: TextStyle(
-                                      fontSize: myHeight(context) / 35.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _searchMode = true;
-                                        });
-                                      },
-                                      child: Icon(AmazingIcon.search_2_line)),
-                                ),
-                                InkWell(
-                                    onTap: () => _filterData(),
-                                    child: Icon(AmazingIcon.list_settings_fill))
-                              ],
-                            ),
-                          ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15.0, myHeight(context) / 80.0,
-                        15.0, myWidth(context) / 110.0),
-                    child: Divider(
-                      thickness: 1.5,
-                      color: greyColor,
-                    ),
-                  ),
-                  _futureEmployees != null
-                      ? FutureBuilder(
-                          future: _futureEmployees,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              _users = snapshot.data['employees']
-                                  .map((e) => User.fromJson(e['user']))
-                                  .toList();
-                              _userRole = snapshot.data['employees']
-                                  .map((e) => Role.fromJson(e['user']['role']))
-                                  .toList();
-                              return Container(
-                                width: myWidth(context),
-                                height: myHeight(context) * .86,
-                                child: ListView.builder(
-                                    itemCount: _users.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Container(
-                                              height: myHeight(context) / 5.2,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10.0)),
-                                                  border: Border.all(
-                                                      color:
-                                                          textInverseModeColor
-                                                              .withOpacity(
-                                                                  .38))),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 5.0),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: EdgeInsets.only(
-                                                            left: screenSize(
-                                                                        context)
-                                                                    .width /
-                                                                80),
-                                                        child: Row(
-                                                          children: <Widget>[
-                                                            InkWell(
-                                                              onTap: () =>
-                                                                  _showDetails(
-                                                                      _users[
-                                                                          index],
-                                                                      _userRole[
-                                                                          index]),
-                                                              child: Text(
-                                                                _users[index]
-                                                                    .name,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        screenSize(context).height /
-                                                                            30,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            ),
-                                                            Spacer(),
-                                                            InkWell(
-                                                                onTap: () {
-                                                                  _scaffoldKey
-                                                                      .currentState
-                                                                      .showSnackBar(
-                                                                          SnackBar(
-                                                                    duration: Duration(
-                                                                        seconds:
-                                                                            30),
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    content:
-                                                                        Container(
-                                                                      height:
-                                                                          145.0,
-                                                                      child:
-                                                                          Column(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Container(
-                                                                            decoration:
-                                                                                BoxDecoration(color: greyColor, borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                                                            height:
-                                                                                5.0,
-                                                                            width:
-                                                                                150.0,
-                                                                          ),
-                                                                          SizedBox(
-                                                                            height:
-                                                                                15.0,
-                                                                          ),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.symmetric(vertical: 10.0),
-                                                                            child:
-                                                                                Row(
-                                                                              children: <Widget>[
-                                                                                Icon(
-                                                                                  AmazingIcon.edit_2_line,
-                                                                                  size: 15.0,
-                                                                                  color: gradient1,
-                                                                                ),
-                                                                                InkWell(
-                                                                                  onTap: () {
-                                                                                    _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                                    _updateUser(_users[index]);
-                                                                                  },
-                                                                                  child: Padding(
-                                                                                    padding: const EdgeInsets.only(left: 20.0),
-                                                                                    child: Text(
-                                                                                      'Modifier',
-                                                                                      style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                    ),
-                                                                                  ),
-                                                                                )
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.symmetric(vertical: 10.0),
-                                                                            child:
-                                                                                Row(
-                                                                              children: <Widget>[
-                                                                                Icon(
-                                                                                  AmazingIcon.repeat_2_line,
-                                                                                  size: 15.0,
-                                                                                  color: gradient1,
-                                                                                ),
-                                                                                Padding(
-                                                                                  padding: const EdgeInsets.only(left: 20.0),
-                                                                                  child: Text(
-                                                                                    'Dupliquer',
-                                                                                    style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                  ),
-                                                                                )
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                              _deleteSite(index);
-                                                                            },
-                                                                            child:
-                                                                                Padding(
-                                                                              padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                                                              child: Row(
-                                                                                children: <Widget>[
-                                                                                  Icon(
-                                                                                    AmazingIcon.delete_bin_6_line,
-                                                                                    size: 15.0,
-                                                                                    color: redColor,
-                                                                                  ),
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(left: 20.0),
-                                                                                    child: Text(
-                                                                                      'Supprimer',
-                                                                                      style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                    ),
-                                                                                  )
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ));
-                                                                },
-                                                                child: Icon(
-                                                                  AmazingIcon
-                                                                      .more_2_fill,
-                                                                  size: 25.0,
-                                                                  color: Colors
-                                                                      .black54,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            screenSize(context)
-                                                                    .height /
-                                                                40.0,
-                                                      ),
-                                                      Row(
-                                                        children: <Widget>[
-                                                          Icon(
-                                                            AmazingIcon
-                                                                .map_pin_2_line,
-                                                          ),
-                                                          SizedBox(
-                                                            width: screenSize(
-                                                                        context)
-                                                                    .width /
-                                                                70,
-                                                          ),
-                                                          Text(
-                                                            '${_users[index].address}, Cameroun',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black54,
-                                                                fontSize: screenSize(
-                                                                            context)
-                                                                        .height /
-                                                                    38.0),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            screenSize(context)
-                                                                    .height /
-                                                                40.0,
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(
-                                                            left: screenSize(
-                                                                        context)
-                                                                    .width /
-                                                                80),
-                                                        child: Text(
-                                                          _userRole[index].name,
-                                                          style: TextStyle(
-                                                              color: gradient1,
-                                                              fontSize: screenSize(
-                                                                          context)
-                                                                      .height /
-                                                                  40.0),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )));
-                                    }),
-                              );
-                            }
-                            return Container(
-                              height: myHeight(context) * .86,
-                              color: Colors.transparent,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  valueColor:
-                                      new AlwaysStoppedAnimation(gradient1),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : FutureBuilder(
-                          future: _futureRoles,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              _roles = snapshot.data;
-                              return Container(
-                                width: myWidth(context),
-                                height: myHeight(context) * .86,
-                                child: _users.length == 0
-                                    ? Center(
-                                        child: Text('Aucun personnel'),
-                                      )
-                                    : ListView.builder(
-                                        itemCount: _users.length,
-                                        itemBuilder: (context, index) {
-                                          return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Container(
-                                                  height: screenSize(context)
-                                                          .height /
-                                                      5.2,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius
-                                                          .all(Radius
-                                                              .circular(10.0)),
-                                                      border: Border.all(
-                                                          color:
-                                                              textInverseModeColor
-                                                                  .withOpacity(
-                                                                      .38))),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 5.0),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10.0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: <Widget>[
-                                                          Padding(
-                                                            padding: EdgeInsets.only(
-                                                                left: screenSize(
-                                                                            context)
-                                                                        .width /
-                                                                    80),
-                                                            child: Row(
-                                                              children: <
-                                                                  Widget>[
-                                                                InkWell(
-                                                                  onTap: () => _showDetails(
-                                                                      _users[
-                                                                          index],
-                                                                      _userRole[
-                                                                          index]),
-                                                                  child: Text(
-                                                                    _users[index]
-                                                                        .name,
-                                                                    style: TextStyle(
-                                                                        fontSize: 
-                                                                            myHeight(context) /
-                                                                                30,
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
-                                                                ),
-                                                                Spacer(),
-                                                                InkWell(
-                                                                    onTap: () {
-                                                                      _scaffoldKey
-                                                                          .currentState
-                                                                          .showSnackBar(
-                                                                              SnackBar(
-                                                                        duration:
-                                                                            Duration(seconds: 30),
-                                                                        backgroundColor:
-                                                                            textSameModeColor,
-                                                                        content:
-                                                                            Container(
-                                                                          height:
-                                                                              145.0,
-                                                                          child:
-                                                                              Column(
-                                                                            children: <Widget>[
-                                                                              Container(
-                                                                                decoration: BoxDecoration(color: greyColor, borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                                                                                height: 5.0,
-                                                                                width: 150.0,
-                                                                              ),
-                                                                              SizedBox(
-                                                                                height: 15.0,
-                                                                              ),
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                                                                child: Row(
-                                                                                  children: <Widget>[
-                                                                                    Icon(
-                                                                                      AmazingIcon.edit_2_line,
-                                                                                      size: 15.0,
-                                                                                      color: gradient1,
-                                                                                    ),
-                                                                                    InkWell(
-                                                                                      onTap: () {
-                                                                                        _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                                        _updateUser(_users[index]);
-                                                                                      },
-                                                                                      child: Padding(
-                                                                                        padding: const EdgeInsets.only(left: 20.0),
-                                                                                        child: Text(
-                                                                                          'Modifier',
-                                                                                          style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                        ),
-                                                                                      ),
-                                                                                    )
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                                                                child: Row(
-                                                                                  children: <Widget>[
-                                                                                    Icon(
-                                                                                      AmazingIcon.repeat_2_line,
-                                                                                      size: 15.0,
-                                                                                      color: gradient1,
-                                                                                    ),
-                                                                                    Padding(
-                                                                                      padding: const EdgeInsets.only(left: 20.0),
-                                                                                      child: Text(
-                                                                                        'Dupliquer',
-                                                                                        style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                      ),
-                                                                                    )
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              InkWell(
-                                                                                onTap: () {
-                                                                                  _scaffoldKey.currentState.hideCurrentSnackBar();
-                                                                                  _deleteSite(index);
-                                                                                },
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                                                                  child: Row(
-                                                                                    children: <Widget>[
-                                                                                      Icon(
-                                                                                        AmazingIcon.delete_bin_6_line,
-                                                                                        size: 15.0,
-                                                                                        color: redColor,
-                                                                                      ),
-                                                                                      Padding(
-                                                                                        padding: const EdgeInsets.only(left: 20.0),
-                                                                                        child: Text(
-                                                                                          'Supprimer',
-                                                                                          style: TextStyle(fontFamily: 'Ubuntu', fontSize: 17.0, fontWeight: FontWeight.bold, color: textInverseModeColor),
-                                                                                        ),
-                                                                                      )
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ));
-                                                                    },
-                                                                    child: Icon(
-                                                                      AmazingIcon
-                                                                          .more_2_fill,
-                                                                      size:
-                                                                          25.0,
-                                                                      color: Colors
-                                                                          .black54,
-                                                                    ))
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            height: screenSize(
-                                                                        context)
-                                                                    .height /
-                                                                40.0,
-                                                          ),
-                                                          Row(
-                                                            children: <Widget>[
-                                                              Icon(
-                                                                AmazingIcon
-                                                                    .map_pin_2_line,
-                                                              ),
-                                                              SizedBox(
-                                                                width: screenSize(
-                                                                            context)
-                                                                        .width /
-                                                                    70,
-                                                              ),
-                                                              Text(
-                                                                '${_users[index].address}, Cameroun',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        screenSize(context).height /
-                                                                            38.0),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          SizedBox(
-                                                            height: screenSize(
-                                                                        context)
-                                                                    .height /
-                                                                40.0,
-                                                          ),
-                                                          Padding(
-                                                            padding: EdgeInsets.only(
-                                                                left: screenSize(
-                                                                            context)
-                                                                        .width /
-                                                                    80),
-                                                            child: Text(
-                                                              _userRole[index]
-                                                                  .name,
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      gradient1,
-                                                                  fontSize:
-                                                                      screenSize(context)
-                                                                              .height /
-                                                                          40.0),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  )));
-                                        }),
-                              );
-                            }
-                            return Container(
-                              height: myHeight(context) * .86,
-                              color: Colors.transparent,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  valueColor:
-                                      new AlwaysStoppedAnimation(gradient1),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                ],
-              ),
-              _isLoading
-                  ? Container(
-                      height: myHeight(context),
-                      color: textSameModeColor.withOpacity(.9),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation(gradient1),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      height: 0.0,
-                    )
-            ],
-          ),
-        ));
-  */
   }
 }

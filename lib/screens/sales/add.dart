@@ -44,6 +44,7 @@ class _AddSalesPageState extends State<AddSalesPage> {
         _isLoading = false;
       });
       sitesToShow = _fieldValues(value);
+      print(sitesToShow);
     });
   }
 
@@ -67,7 +68,6 @@ class _AddSalesPageState extends State<AddSalesPage> {
   }
 
   _attemptSave(List products, List quantities, int siteId) async {
-
     String order = '';
     for (var i = 0; i < products.length; i++) {
       order += products[i]['id'].toString() +
@@ -147,124 +147,259 @@ class _AddSalesPageState extends State<AddSalesPage> {
                           SizedBox(
                             height: myHeight(context) / 70.0,
                           ),
-                          Expanded(
-                              child: products == null || products.length == 0
-                                  ? Center(
-                                      child: currentSite == null
-                                          ? Text('Selectionner un site')
-                                          : Text('Aucun produit'),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: products.length,
-                                      itemBuilder: (context, index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              _productsOnOrder
-                                                  .add(products[index]);
-                                              total += products[index]['pivot']
-                                                  ['price'];
-                                              _quantities.add(1);
-                                              products.remove(products[index]);
-                                            });
-                                            this._overlay.remove();
-                                          },
-                                          child: Container(
-                                            margin: EdgeInsets.only(
-                                                bottom:
-                                                    myHeight(context) / 70.0),
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.black12),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        myHeight(context) /
-                                                            70.0)),
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      myWidth(context) / 30.0,
-                                                  vertical:
-                                                      myHeight(context) / 40.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
+                          user.isAdmin == 1
+                              ? Expanded(
+                                  child: sitesToShow == null ||
+                                          sitesToShow.length == 0
+                                      ? Center(
+                                          child: Text('Aucun produit'),
+                                        )
+                                      : ListView.builder(
+                                          itemCount: sitesToShow.length,
+                                          itemBuilder: (context, index) {
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  _productsOnOrder
+                                                      .add(sitesToShow[index]);
+                                                  total += sitesToShow[index]
+                                                      ['pivot']['price'];
+                                                  _quantities.add(1);
+                                                  sitesToShow.remove(
+                                                      sitesToShow[index]);
+                                                });
+                                                this._overlay.remove();
+                                              },
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                    bottom: myHeight(context) /
+                                                        70.0),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            myHeight(context) /
+                                                                70.0)),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          myWidth(context) /
+                                                              30.0,
+                                                      vertical:
+                                                          myHeight(context) /
+                                                              40.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
+                                                      Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                              width: myWidth(
+                                                                      context) /
+                                                                  2,
+                                                              child: Text(
+                                                                '${sitesToShow[index]["name"]}',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        myHeight(context) /
+                                                                            41.5,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              )),
+                                                          SizedBox(
+                                                            height: myHeight(
+                                                                    context) /
+                                                                200.0,
+                                                          ),
+                                                          Container(
+                                                            width: myWidth(
+                                                                    context) /
+                                                                4.0,
+                                                            child: Text(
+                                                              'x${sitesToShow[index]["pivot"]['qty']}',
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  fontSize:
+                                                                      myHeight(
+                                                                              context) /
+                                                                          45.0),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
                                                       Container(
+                                                          margin: EdgeInsets.only(
+                                                              top: myHeight(
+                                                                      context) /
+                                                                  300.0),
                                                           width:
                                                               myWidth(context) /
-                                                                  2,
+                                                                  4.0,
                                                           child: Text(
-                                                            '${products[index]["name"]}',
+                                                            '${sitesToShow[index]["pivot"]["price"]} FCFA',
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
                                                             style: TextStyle(
                                                                 fontSize: myHeight(
                                                                         context) /
-                                                                    41.5,
+                                                                    44.0,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w500),
                                                           )),
-                                                      SizedBox(
-                                                        height:
-                                                            myHeight(context) /
-                                                                200.0,
-                                                      ),
-                                                      Container(
-                                                        width:
-                                                            myWidth(context) /
-                                                                4.0,
-                                                        child: Text(
-                                                          'x${products[index]["pivot"]['qty']}',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                              color: Colors
-                                                                  .black54,
-                                                              fontSize: myHeight(
-                                                                      context) /
-                                                                  45.0),
-                                                        ),
-                                                      )
                                                     ],
                                                   ),
-                                                  Container(
-                                                      margin: EdgeInsets.only(
-                                                          top: myHeight(
-                                                                  context) /
-                                                              300.0),
-                                                      width: myWidth(context) /
-                                                          4.0,
-                                                      child: Text(
-                                                        '${products[index]["pivot"]["price"]} FCFA',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            fontSize: myHeight(
-                                                                    context) /
-                                                                44.0,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      )),
-                                                ],
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        );
-                                      }))
+                                            );
+                                          }))
+                              : Expanded(
+                                  child: products == null ||
+                                          products.length == 0
+                                      ? Center(
+                                          child: currentSite == null
+                                              ? Text('Selectionner un site')
+                                              : Text('Aucun produit'),
+                                        )
+                                      : ListView.builder(
+                                          itemCount: products.length,
+                                          itemBuilder: (context, index) {
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  _productsOnOrder
+                                                      .add(products[index]);
+                                                  total += products[index]
+                                                      ['pivot']['price'];
+                                                  _quantities.add(1);
+                                                  products
+                                                      .remove(products[index]);
+                                                });
+                                                this._overlay.remove();
+                                              },
+                                              child: Container(
+                                                margin: EdgeInsets.only(
+                                                    bottom: myHeight(context) /
+                                                        70.0),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            myHeight(context) /
+                                                                70.0)),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          myWidth(context) /
+                                                              30.0,
+                                                      vertical:
+                                                          myHeight(context) /
+                                                              40.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                              width: myWidth(
+                                                                      context) /
+                                                                  2,
+                                                              child: Text(
+                                                                '${products[index]["name"]}',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        myHeight(context) /
+                                                                            41.5,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              )),
+                                                          SizedBox(
+                                                            height: myHeight(
+                                                                    context) /
+                                                                200.0,
+                                                          ),
+                                                          Container(
+                                                            width: myWidth(
+                                                                    context) /
+                                                                4.0,
+                                                            child: Text(
+                                                              'x${products[index]["pivot"]['qty']}',
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  fontSize:
+                                                                      myHeight(
+                                                                              context) /
+                                                                          45.0),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                          margin: EdgeInsets.only(
+                                                              top: myHeight(
+                                                                      context) /
+                                                                  300.0),
+                                                          width:
+                                                              myWidth(context) /
+                                                                  4.0,
+                                                          child: Text(
+                                                            '${products[index]["pivot"]["price"]} FCFA',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                fontSize: myHeight(
+                                                                        context) /
+                                                                    44.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }))
                         ],
                       ),
                     ),
@@ -477,18 +612,38 @@ class _AddSalesPageState extends State<AddSalesPage> {
                                         InkWell(
                                           onTap: () {
                                             setState(() {
-                                              if (_quantities[index] == 1) {
-                                                products.add(
-                                                    _productsOnOrder[index]);
-                                                total -= _productsOnOrder[index]
-                                                    ['pivot']['price'];
-                                                _quantities.removeAt(index);
-                                                _productsOnOrder
-                                                    .removeAt(index);
+                                              if (user.isAdmin == 1) {
+                                                if (_quantities[index] == 1) {
+                                                  sitesToShow.add(
+                                                      _productsOnOrder[index]);
+                                                  total -=
+                                                      _productsOnOrder[index]
+                                                          ['pivot']['price'];
+                                                  _quantities.removeAt(index);
+                                                  _productsOnOrder
+                                                      .removeAt(index);
+                                                } else {
+                                                  --_quantities[index];
+                                                  total -=
+                                                      _productsOnOrder[index]
+                                                          ['pivot']['price'];
+                                                }
                                               } else {
-                                                --_quantities[index];
-                                                total -= _productsOnOrder[index]
-                                                    ['pivot']['price'];
+                                                if (_quantities[index] == 1) {
+                                                  products.add(
+                                                      _productsOnOrder[index]);
+                                                  total -=
+                                                      _productsOnOrder[index]
+                                                          ['pivot']['price'];
+                                                  _quantities.removeAt(index);
+                                                  _productsOnOrder
+                                                      .removeAt(index);
+                                                } else {
+                                                  --_quantities[index];
+                                                  total -=
+                                                      _productsOnOrder[index]
+                                                          ['pivot']['price'];
+                                                }
                                               }
                                             });
                                           },
@@ -538,15 +693,29 @@ class _AddSalesPageState extends State<AddSalesPage> {
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            setState(() {
-                                              products
-                                                  .add(_productsOnOrder[index]);
-                                              total -= _quantities[index] *
-                                                  _productsOnOrder[index]
-                                                      ['pivot']['price'];
-                                              _quantities.removeAt(index);
-                                              _productsOnOrder.removeAt(index);
-                                            });
+                                            if (user.isAdmin == 1) {
+                                              setState(() {
+                                                sitesToShow.add(
+                                                    _productsOnOrder[index]);
+                                                total -= _quantities[index] *
+                                                    _productsOnOrder[index]
+                                                        ['pivot']['price'];
+                                                _quantities.removeAt(index);
+                                                _productsOnOrder
+                                                    .removeAt(index);
+                                              });
+                                            } else {
+                                              setState(() {
+                                                products.add(
+                                                    _productsOnOrder[index]);
+                                                total -= _quantities[index] *
+                                                    _productsOnOrder[index]
+                                                        ['pivot']['price'];
+                                                _quantities.removeAt(index);
+                                                _productsOnOrder
+                                                    .removeAt(index);
+                                              });
+                                            }
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(

@@ -1256,11 +1256,11 @@ class _RegisterPageState extends State<RegisterPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                  height: 275.0,
                   child: errorStatusCode == 401
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             errorAlertIcon(context),
                             SizedBox(
@@ -1315,6 +1315,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 errorAlertIcon(context),
                                 SizedBox(
@@ -1368,6 +1369,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 errorAlertIcon(context),
                                 SizedBox(

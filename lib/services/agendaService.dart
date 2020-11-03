@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 Future fetchSitesOfUser() async {
   try {
-    final response = await http.get('$endPoint/sites',
+    final response = await http.get('$endPoint/userSites',
         headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
 
     if (response.statusCode == 200) {
@@ -15,9 +15,9 @@ Future fetchSitesOfUser() async {
     }
 
     throw Exception(
-        'Fetch Notifications of Snack exited with code ${response.statusCode}');
+        'Fetch sites of Snack exited with code ${response.body}');
   } catch (ex) {
-    throw Exception('Fetch Notifications of Snack with error $ex');
+    throw Exception('Fetch sites of Snack with error $ex');
   }
 }
 
@@ -34,7 +34,7 @@ Future fetchTeamsOfSites(int id) async {
     throw Exception(
         'Fetch Teams of Site $id exited with code ${response.statusCode}');
   } catch (ex) {
-    throw Exception('Fetch Notifications of Site $id with error $ex');
+    throw Exception('Fetch Teams of Site $id with error $ex');
   }
 }
 

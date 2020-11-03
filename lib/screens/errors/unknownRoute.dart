@@ -12,7 +12,7 @@ class _UnknownRouteState extends State<UnknownRoute> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Center(
-        child: Text('Route inconnue mon ami(e)'),
+        child: Text('Route inconnue'),
       ),
     );
   }

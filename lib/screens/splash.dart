@@ -34,13 +34,21 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _redirection() async {
+    print(_login);
     if (!_alreadyDone) {
       _alreadyDone = true;
-
-      if (_login) {
+      await getFirstConnexion().then((res) {
+        if (res) {
+          Navigator.pushNamed(context, '/welcome');
+        } else {
+          Navigator.pushNamed(context, '/login');
+        }
+      });
+      /*  if (_login) {
         String tokenExpireDate = await getTokenExpireDate();
         bool tokenAlreadyValid =
             DateTime.now().isBefore(DateTime.parse(tokenExpireDate));
+            print(tokenExpireDate);
         if (tokenAlreadyValid) {
           userToken = await getUserToken();
           user = User.fromJson(await getUser());
@@ -51,8 +59,7 @@ class _SplashPageState extends State<SplashPage> {
           if (user.isAdmin == 1) {
             site = Site.fromJson(await getUserSite());
           }
-          await fetchUserContacts();
-          await fetchSitesOfUserFunction();
+          
           await logUserOnFirebase();
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => MainPage()));
@@ -67,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
             Navigator.pushNamed(context, '/login');
           }
         });
-      }
+      } */
     }
   }
 

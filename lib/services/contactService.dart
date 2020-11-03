@@ -14,9 +14,8 @@ Future fetchContacts() async {
       return data['data'];
     }
 
-    throw Exception(
-        'Fetch Contacts exited with code ${response.statusCode}');
+    throw Exception('Fetch Contacts exited with code ${response.statusCode}');
   } catch (ex) {
-    throw Exception('Fetch Contacts with error $ex');
+    throw Exception('Fetch Contacts exited with code $ex');
   }
 }

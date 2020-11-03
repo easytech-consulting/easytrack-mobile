@@ -2,6 +2,7 @@ import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/show.dart';
+import 'package:easytrack/services/contactService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -21,12 +22,17 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
     super.initState();
     _controller = new TextEditingController();
     _node = FocusNode();
-    loadData();
+    initialization();
+
   }
 
-  loadData() {
-    dataToShow = allUserContacts;
-    allData = allUserContacts;
+  initialization() async {
+    await logUserOnFirebase();
+  }
+
+  loadData(contacts) {
+    dataToShow = contacts;
+    allData = contacts;
   }
 
   searchMethod(List items, filter) {
@@ -71,155 +77,78 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
   Widget build(BuildContext context) {
     return SafeArea(
         top: true,
-        child: Scaffold(
-          backgroundColor: backgroundColor,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                header2(context, 'Chat', () {}),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: dataToShow.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ShowDiscussion(
-                                      user: dataToShow[index]))),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    bottom:
-                                        BorderSide(color: Colors.black12))),
-                            height: myHeight(context) / 8,
-                            padding: EdgeInsets.symmetric(
-                              vertical: myHeight(context) / 30.0,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Container(
-                                  width: myHeight(context) / 15.0,
-                                  height: myHeight(context) / 15.0,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    dataToShow[index]['name']
-                                        .substring(0, 2)
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                        color: generateTextColor(index),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: myHeight(context) / 55),
-                                  ),
+        child: FutureBuilder(
+          future: fetchContacts(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (allData == null) {
+                loadData(snapshot.data);
+              }
+              return Scaffold(
+                backgroundColor: backgroundColor,
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      header2(context, 'Chat', () {}),
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: dataToShow.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ShowDiscussion(
+                                            user: dataToShow[index]))),
+                                child: Container(
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: generateBackgroundColor(index)),
-                                ),
-                                Padding(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: Colors.black12))),
+                                  height: myHeight(context) / 8,
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: myHeight(context) / 50.0),
-                                  child: Column(
+                                    vertical: myHeight(context) / 30.0,
+                                  ),
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Container(
-                                        width: myWidth(context) / 2,
+                                        width: myHeight(context) / 15.0,
+                                        height: myHeight(context) / 15.0,
+                                        alignment: Alignment.center,
                                         child: Text(
-                                          dataToShow[index]['name'],
-                                          overflow: TextOverflow.ellipsis,
+                                          dataToShow[index]['name']
+                                              .substring(0, 2)
+                                              .toUpperCase(),
                                           style: TextStyle(
-                                              fontSize:
-                                                  myHeight(context) / 45.0,
-                                              fontWeight: FontWeight.bold),
+                                              color: generateTextColor(index),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: myHeight(context) / 55),
                                         ),
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                generateBackgroundColor(index)),
                                       ),
-                                      Container(
-                                          width: myWidth(context) / 2,
-                                          child: Text(
-                                            'Demarrer la conversation',
-                                            overflow: TextOverflow.ellipsis,
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                                Spacer(),
-                                Text('10:30')
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-}
-
-/* GestureDetector(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ShowDiscussion(
-                                              user: dataToShow[index]))),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: myHeight(context) / 100.0,
-                                        horizontal: 20.0),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: myHeight(context) / 15.0,
-                                          height: myHeight(context) / 15.0,
-                                          alignment: Alignment.center,
-                                          child: dataToShow[index]['photo'] ==
-                                                  null
-                                              ? Text(
-                                                  dataToShow[index]['name']
-                                                      .substring(0, 2)
-                                                      .toUpperCase(),
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize:
-                                                          myHeight(context) /
-                                                              45),
-                                                )
-                                              : SizedBox(
-                                                  height: 0.0,
-                                                ),
-                                          decoration: dataToShow[index]
-                                                      ['photo'] ==
-                                                  null
-                                              ? BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: generateColor(index))
-                                              : BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          'img/persons/${dataToShow[index]['photo']}'),
-                                                      fit: BoxFit.cover)),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  myHeight(context) / 50.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                myHeight(context) / 50.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              width: myWidth(context) / 2,
+                                              child: Text(
                                                 dataToShow[index]['name'],
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     fontSize:
                                                         myHeight(context) /
@@ -227,138 +156,50 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 150.0,
-                                              ),
-                                              Container(
-                                                  child: Text(
-                                                      'Demarrer la conversation')),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                 */
-
-/* Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-          child: Container(
-              height: myHeight(context) * .89,
-              child: Stack(
-                children: [
-                  CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        title: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 20.0, bottom: 10.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Image.asset(
-                                      'img/logos/LogoWithText.png',
-                                      width: myHeight(context) / 6.0,
-                                    ),
-                                    Spacer(),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _searchMode = true;
-                                        });
-                                      },
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                myHeight(context) / 50.0),
-                                        child: Icon(AmazingIcon.search_2_line),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: myWidth(context) / 7.5,
-                                      height: myWidth(context) / 7.5,
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: textInverseModeColor
-                                                .withOpacity(.12),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '${user.name.substring(0, 2).toUpperCase()}',
-                                            style: TextStyle(
-                                                color: textSameModeColor,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 50.0),
-                                          ),
+                                            ),
+                                            Container(
+                                                width: myWidth(context) / 2,
+                                                child: Text(
+                                                  'Demarrer la conversation',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                )),
+                                          ],
                                         ),
                                       ),
-                                    )
-                                  ],
+                                      Spacer(),
+                                      Text('10:30')
+                                    ],
+                                  ),
                                 ),
-                              ),
-                        floating: true,
-                        primary: true,
-                        pinned: true,
-                        automaticallyImplyLeading: false,
-                        bottom: PreferredSize(
-                          preferredSize: Size.fromHeight(
-                            myHeight(context) / 10.0,
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(myHeight(context) / 33.0),
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                      child: Icon(
-                                        Icons.arrow_back,
-                                        size: myHeight(context) / 30.0,
-                                      ),
-                                      onTap: () => Navigator.pop(context)),
-                                  SizedBox(
-                                    width: myHeight(context) / 30.0,
-                                  ),
-                                  Text(
-                                    'Chats',
-                                    style: TextStyle(
-                                        fontSize: myHeight(context) / 30.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer(),
-                                  Icon(AmazingIcon.list_settings_fill)
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        expandedHeight: myHeight(context) / 5.5,
-                      ),
-                      SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => childCount: dataToShow.length,
-                              ),
-                            )
+                              );
+                            }),
+                      )
                     ],
                   ),
-                  dataToShow == null || dataToShow.length == 0
-                      ? Container(
-                          alignment: Alignment.center,
-                          child: Text('Aucun contact'),
-                        )
-                      : Container(
-                          height: 0.0,
-                        )
-                ],
-              ))),
-    ); */
+                ),
+              );
+            }
+
+            return Scaffold(
+              backgroundColor: backgroundColor,
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    header2(context, 'Chat', () {}),
+                    Expanded(
+                        child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(gradient1),
+                      ),
+                    ))
+                  ],
+                ),
+              ),
+            );
+          },
+        ));
+  }
+}

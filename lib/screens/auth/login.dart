@@ -62,7 +62,6 @@ class _LoginPageState extends State<LoginPage> {
         if (success) {
           await fetchUserDetails(userId).then((user) async {
             if (user != null) {
-              await fetchUserContacts();
               await logUserOnFirebase();
               user.isAdmin == 3
                   ? Navigator.pushReplacement(context,
@@ -90,11 +89,11 @@ class _LoginPageState extends State<LoginPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                  height: myHeight(context) / 2.5,
                   child: errorStatusCode == 401
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             errorAlertIcon(context),
                             SizedBox(
@@ -111,19 +110,19 @@ class _LoginPageState extends State<LoginPage> {
                               'Desole, nous n\'avons pas pu vous',
                               style: TextStyle(
                                   color: textInverseModeColor.withOpacity(.5),
-                                  fontSize: myWidth(context) / 25),
+                                  fontSize: myWidth(context) / 27),
                             ),
                             Text(
                               'identifier. Votre nom d\'utilisateur',
                               style: TextStyle(
                                   color: textInverseModeColor.withOpacity(.5),
-                                  fontSize: myWidth(context) / 25),
+                                  fontSize: myWidth(context) / 27),
                             ),
                             Text(
                               'ou mot de passe est incorrecte.',
                               style: TextStyle(
                                   color: textInverseModeColor.withOpacity(.5),
-                                  fontSize: myWidth(context) / 25),
+                                  fontSize: myWidth(context) / 27),
                             ),
                             SizedBox(
                               height: myHeight(context) / 40,
@@ -155,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 errorAlertIcon(context),
                                 SizedBox(
@@ -172,21 +172,21 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextStyle(
                                       color:
                                           textInverseModeColor.withOpacity(.5),
-                                      fontSize: myWidth(context) / 25),
+                                      fontSize: myWidth(context) / 27),
                                 ),
                                 Text(
                                   'identifier. Votre nom d\'utilisateur',
                                   style: TextStyle(
                                       color:
                                           textInverseModeColor.withOpacity(.5),
-                                      fontSize: myWidth(context) / 25),
+                                      fontSize: myWidth(context) / 27),
                                 ),
                                 Text(
                                   'n\'existe pas dans notre base.',
                                   style: TextStyle(
                                       color:
                                           textInverseModeColor.withOpacity(.5),
-                                      fontSize: myWidth(context) / 25),
+                                      fontSize: myWidth(context) / 27),
                                 ),
                                 SizedBox(
                                   height: myHeight(context) / 40,
@@ -218,6 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     errorAlertIcon(context),
                                     SizedBox(
@@ -235,21 +236,21 @@ class _LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     Text(
                                       'identifier car Notre serveur est',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     Text(
                                       'indisponible pour l\'instant',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     SizedBox(
                                       height: myHeight(context) / 40,
@@ -281,6 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     errorAlertIcon(context),
                                     SizedBox(
@@ -298,21 +300,21 @@ class _LoginPageState extends State<LoginPage> {
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     Text(
                                       'identifier. Verifier votre acces',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     Text(
                                       'internet.',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.5),
-                                          fontSize: myWidth(context) / 25),
+                                          fontSize: myWidth(context) / 27),
                                     ),
                                     SizedBox(
                                       height: myHeight(context) / 40,
@@ -372,19 +374,19 @@ class _LoginPageState extends State<LoginPage> {
                         'Desole, nous n\'avons pas pu vous',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 27),
                       ),
                       Text(
                         'recuperer toutes vos informations',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 27),
                       ),
                       Text(
                         'veuillez reessayer plus tard.',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 27),
                       ),
                       SizedBox(
                         height: myHeight(context) / 40,

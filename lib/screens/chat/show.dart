@@ -142,7 +142,8 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
       padding: index < datas.length - 1 &&
               DateTime.parse(datas[index + 1].data()['date'])
                       .difference(DateTime.parse(datas[index].data()['date'])) <
-                  Duration(minutes: 1)
+                  Duration(minutes: 1) &&
+              datas[index + 1].data()['idTo'] == datas[index].data()['idTo']
           ? EdgeInsets.zero
           : EdgeInsets.only(bottom: myHeight(context) / 100.0),
       child: Row(
@@ -167,14 +168,14 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                               message['idTo'] == user.id
                           ? Radius.circular(myHeight(context) / 100.0)
                           : Radius.circular(0.0),
-                      bottomLeft: message['idTo'] != user.id.toString() ||
-                              message['idTo'] != user.id
-                          ? Radius.circular(myHeight(context) / 100.0)
-                          : Radius.circular(0.0)),
+                      bottomLeft: message['idTo'] == user.id.toString() ||
+                              message['idTo'] == user.id
+                          ? Radius.circular(0.0)
+                          : Radius.circular(myHeight(context) / 100.0)),
                   color: message['idTo'] != user.id.toString() &&
                           message['idTo'] != user.id
-                      ? Color(0xff3E4859)
-                      : Color(0xff267FC9),
+                      ? Color(0xFFF5F5F5)
+                      : Color(0xFF3E4859).withOpacity(.5),
                 ),
                 width: myWidth(context) / 1.7,
                 child: Padding(
@@ -182,7 +183,10 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                   child: Text(
                     message['content'],
                     style: TextStyle(
-                        color: textSameModeColor,
+                        color: message['idTo'] != user.id.toString() &&
+                                message['idTo'] != user.id
+                            ? Colors.black
+                            : Colors.white,
                         fontSize: myHeight(context) / 50.0),
                   ),
                 ),
@@ -190,20 +194,13 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
               SizedBox(
                 height: myHeight(context) / 500,
               ),
-              index > 0 &&
-                      DateTime.parse(datas[index].data()['date']).difference(
-                              DateTime.parse(datas[index - 1].data()['date'])) <
-                          Duration(minutes: 1)
-                  ? Text(
-                      formatHour(DateTime.parse(message['date'])),
-                      style: TextStyle(
-                          color: textInverseModeColor.withOpacity(.38),
-                          fontWeight: FontWeight.bold,
-                          fontSize: myHeight(context) / 70),
-                    )
-                  : SizedBox(
-                      height: 0.0,
-                    )
+              Text(
+                formatHour(DateTime.parse(message['date'])),
+                style: TextStyle(
+                    color: textInverseModeColor.withOpacity(.38),
+                    fontWeight: FontWeight.bold,
+                    fontSize: myHeight(context) / 70),
+              )
             ],
           ),
         ],
@@ -354,161 +351,133 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
             ),
           ),
         ],
-        icon: Icon(Icons.more_vert, color: textInverseModeColor),
+        icon: Icon(Icons.more_vert, color: Colors.white),
       );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: PreferredSize(
-          child: SafeArea(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: PreferredSize(
             child: Container(
-              height: myHeight(context) / 5.0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [gradient1, gradient2])),
+              padding:
+                  EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      Container(
-                        width: myHeight(context) / 25.0,
-                        height: myHeight(context) / 25.0,
-                        alignment: Alignment.center,
-                        child: _peer['photo'] == null ||
-                                _peer['photo'] == 'null' ||
-                                _peer['photo'] == ''
-                            ? Padding(
-                                padding:
-                                    EdgeInsets.all(myHeight(context) / 200),
-                                child: Text(
-                                  _peer['name'].substring(0, 2).toUpperCase(),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: textSameModeColor,
-                                      fontSize: myHeight(context) / 60),
-                                ),
-                              )
-                            : SizedBox(
-                                height: 0.0,
-                              ),
-                        decoration: _peer['photo'] == null ||
-                                _peer['photo'] == 'null' ||
-                                _peer['photo'] == ''
-                            ? BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xff3E4859))
-                            : BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    image: AssetImage(
-                                        'img/persons/${_peer['photo']}'),
-                                    fit: BoxFit.cover)),
-                      ),
-                      SizedBox(
-                        width: myHeight(context) / 50.0,
-                      ),
-                      Text(
-                        _peer['name'],
-                        style: TextStyle(
-                            fontSize: myHeight(context) / 40.0,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Spacer(),
-                      _offsetPopup()
-                    ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: myWidth(context) / 20.0),
-                    child: Divider(
-                      thickness: 1.5,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: Colors.white24),
+                      child: Padding(
+                        padding: EdgeInsets.all(myHeight(context) / 75),
+                        child: Text(
+                          _peer['name'].substring(0, 2).toUpperCase(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: myHeight(context) / 60),
+                        ),
+                      )),
+                  SizedBox(
+                    width: myWidth(context) / 30.0,
+                  ),
+                  Container(
+                    width: myWidth(context) / 2.5,
+                    child: Text(
+                      capitalize(_peer['name']),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: myHeight(context) / 40.0,
+                          color: Colors.white),
                     ),
-                  )
+                  ),
+                  Spacer(),
+                  IconButton(
+                      icon: Icon(
+                        AmazingIcon.search_2_line,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {}),
+                  _offsetPopup()
                 ],
               ),
             ),
-          ),
-          preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: myWidth(context) / 50.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('messages')
-                    .doc(groupChatId)
-                    .collection(groupChatId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Text('Chargement de la discussion'),
+            preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
+        body: Padding(
+          padding: EdgeInsets.only(
+              left: myWidth(context) / 30.0,
+              right: myWidth(context) / 30.0,
+              top: myWidth(context) / 30.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('messages')
+                      .doc(groupChatId)
+                      .collection(groupChatId)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text('Chargement de la discussion'),
+                      );
+                    }
+                    return Container(
+                      height: myHeight(context) * .77,
+                      child: ListView.builder(
+                          itemCount: snapshot.data.docs.length,
+                          itemBuilder: (context, index) {
+                            return buildMessage(snapshot.data.docs[index],
+                                index, snapshot.data.docs);
+                          }),
                     );
-                  }
-                  return Container(
-                    height: myHeight(context) * .77,
-                    child: ListView.builder(
-                        itemCount: snapshot.data.docs.length,
-                        itemBuilder: (context, index) {
-                          return buildMessage(snapshot.data.docs[index], index,
-                              snapshot.data.docs);
-                        }),
-                  );
-                },
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                color: textSameModeColor,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Divider(
-                      thickness: 1.5,
-                    ),
-                    TextFormField(
-                      controller: _controller,
-                      focusNode: _node,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(0.0),
-                          hintStyle: TextStyle(
-                              color: textInverseModeColor.withOpacity(.12)),
-                          hintText: 'Ecrire un message',
-                          suffixIcon: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                AmazingIcon.attachment_line,
+                  },
+                ),
+                Container(
+                  width: double.infinity,
+                  color: textSameModeColor,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Divider(
+                        thickness: 1.5,
+                      ),
+                      TextFormField(
+                        controller: _controller,
+                        focusNode: _node,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(0.0),
+                            hintStyle: TextStyle(
+                                color: textInverseModeColor.withOpacity(.12)),
+                            hintText: 'Ecrire un message',
+                            suffixIcon: GestureDetector(
+                              onTap: () => onSendMessage(_controller.text),
+                              child: Icon(
+                                AmazingIcon.send_plane_fill,
                                 color: textInverseModeColor,
                               ),
-                              SizedBox(
-                                width: myWidth(context) / 30,
-                              ),
-                              GestureDetector(
-                                onTap: () => onSendMessage(_controller.text),
-                                child: Icon(
-                                  AmazingIcon.send_plane_fill,
-                                  color: textInverseModeColor,
-                                ),
-                              )
-                            ],
-                          ),
-                          border:
-                              OutlineInputBorder(borderSide: BorderSide.none)),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide.none)),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

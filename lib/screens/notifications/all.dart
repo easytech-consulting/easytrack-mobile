@@ -12,6 +12,7 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationsPage> {
   bool loading = false;
+  int index = 1;
 
   var notificationGradient = [
     LinearGradient(
@@ -108,7 +109,6 @@ class _NotificationPageState extends State<NotificationsPage> {
                     _attemptUpdate(notification['id']);
                   },
                   child: Container(
-                      height: myHeight(context) / 20.0,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
                         gradient: LinearGradient(
@@ -133,8 +133,15 @@ class _NotificationPageState extends State<NotificationsPage> {
         ));
   }
 
-  loadData(datas, multiplicator) {
-    return datas;
+  loadData(List datas, int multiplicator) {
+    List result = [];
+    if (datas.length <= 5 * multiplicator) {
+      return datas;
+    }
+    for (var i = 0; i < 5 * multiplicator; i++) {
+      result.add(datas[i]);
+    }
+    return result;
   }
 
   List dataShow, allData;
@@ -181,7 +188,7 @@ class _NotificationPageState extends State<NotificationsPage> {
                       if (snapshot.hasData) {
                         if (allData == null) {
                           allData = snapshot.data;
-                          dataShow = loadData(allData, 1);
+                          dataShow = loadData(allData, index);
                         }
                         return dataShow == null || dataShow.length == 0
                             ? Center(
@@ -285,7 +292,11 @@ class _NotificationPageState extends State<NotificationsPage> {
                           padding: EdgeInsets.symmetric(
                               vertical: myHeight(context) / 50),
                           child: FlatButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  dataShow = loadData(allData, ++index);
+                                });
+                              },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                       myHeight(context) / 10.0)),

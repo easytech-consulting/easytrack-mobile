@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/commons/gradientIcon.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,6 @@ class FilePage extends StatefulWidget {
 }
 
 class _FilePageState extends State<FilePage> {
-  final _controller = new TextEditingController();
-  bool _searchMode = false;
-
   @override
   Widget build(BuildContext context) {
     Widget _offsetPopup() => PopupMenuButton<int>(
@@ -81,197 +79,139 @@ class _FilePageState extends State<FilePage> {
               ),
             ),
           ],
-          icon: Icon(Icons.more_vert, color: textInverseModeColor),
+          icon: Icon(
+            Icons.more_vert,
+            color: Colors.white,
+          ),
         );
 
-    return Scaffold(
-        backgroundColor: backgroundColor,
-        appBar: PreferredSize(
-            child: SafeArea(
+    return SafeArea(
+      child: Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: PreferredSize(
               child: Container(
-                height: myHeight(context) / 5.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [gradient1, gradient2])),
+                padding:
+                    EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
+                child: Row(
                   children: [
-                    _searchMode
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Hero(
-                              tag: 'search',
-                              child: Container(
-                                height: myHeight(context) / 17.0,
-                                child: TextFormField(
-                                  onFieldSubmitted: (_) {
-                                    setState(() {
-                                      _searchMode = false;
-                                    });
-                                  },
-                                  controller: _controller,
-                                  textInputAction: TextInputAction.done,
-                                  style: TextStyle(
-                                      color: textInverseModeColor,
-                                      fontWeight: FontWeight.w700),
-                                  decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.only(
-                                          top: 10.0, left: 50.0),
-                                      prefixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  _searchMode = false;
-                                                });
-                                              },
-                                              icon: Icon(Icons.arrow_back,
-                                                  color: textInverseModeColor,
-                                                  size: myHeight(context) /
-                                                      30.0)),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                right:
-                                                    myHeight(context) / 50.0),
-                                            child: Icon(
-                                                AmazingIcon.search_2_line,
-                                                color: textInverseModeColor,
-                                                size: myHeight(context) / 37.0),
-                                          ),
-                                        ],
-                                      ),
-                                      suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _searchMode = false;
-                                            });
-                                          },
-                                          icon: Icon(AmazingIcon.close_fill,
-                                              color: textInverseModeColor,
-                                              size: myHeight(context) / 37.0)),
-                                      hintText: 'Recherche...',
-                                      hintStyle: TextStyle(
-                                          color: textInverseModeColor
-                                              .withOpacity(.35),
-                                          fontSize: 18.0),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      )),
-                                ),
-                              ),
-                            ),
-                          )
-                        : Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.arrow_back),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                              Text(
-                                'Mes fichiers',
-                                style: TextStyle(
-                                    fontSize: myHeight(context) / 40.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Spacer(),
-                              IconButton(
-                                  icon: Icon(AmazingIcon.search_2_line),
-                                  onPressed: () {
-                                    setState(() {
-                                      _searchMode = true;
-                                    });
-                                  }),
-                              _offsetPopup()
-                            ],
-                          ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: myWidth(context) / 20.0),
-                      child: Divider(
-                        thickness: 1.5,
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
                       ),
-                    )
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Text(
+                      'Mes fichiers',
+                      style: TextStyle(
+                          fontSize: myHeight(context) / 40.0,
+                          color: Colors.white),
+                    ),
+                    Spacer(),
+                    IconButton(
+                        icon: Icon(
+                          AmazingIcon.search_2_line,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {}),
+                    _offsetPopup()
                   ],
                 ),
               ),
-            ),
-            preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
-        body: ListView.builder(
-            itemCount: datas.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: myHeight(context) / 40.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+              preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
+          body: Padding(
+            padding: EdgeInsets.only(top: myHeight(context) / 50.0),
+            child: ListView.builder(
+                itemCount: datas.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: myHeight(context) / 40.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          AmazingIcon.file_2_line,
-                          size: myHeight(context) / 20.0,
-                        ),
-                        SizedBox(
-                          width: myHeight(context) / 40.0,
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text(
-                              datas[index].title.length <=
-                                      myHeight(context) ~/ 20.0
-                                  ? datas[index].title
-                                  : '${datas[index].title.substring(0, myHeight(context) ~/ 20.0)}...',
-                              style: TextStyle(fontWeight: FontWeight.w800),
-                            ),
+                            GradientIcon(
+                                AmazingIcon.file_2_line,
+                                myHeight(context) / 20.0,
+                                LinearGradient(colors: [gradient1, gradient2])),
                             SizedBox(
-                              height: myHeight(context) / 200.0,
+                              width: myHeight(context) / 40.0,
                             ),
-                            RichText(
-                                text: TextSpan(
-                                    text: datas[index].hour,
-                                    style: TextStyle(
-                                        color: textInverseModeColor.withOpacity(.54),
-                                        fontSize: myHeight(context) / 60),
-                                    children: [
-                                  TextSpan(
-                                      text: datas[index].sender
-                                          ? ' - Envoye par moi'
-                                          : datas[index].senderName.length <=
-                                                  myHeight(context) ~/ 40.0
-                                              ? datas[index].senderName
-                                              : ' - Envoye par ${datas[index].senderName.substring(0, myHeight(context) ~/ 40.0)}...',
-                                      style: TextStyle(
-                                          fontSize: myHeight(context) / 70.0))
-                                ]))
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: myWidth(context) / 1.7,
+                                  child: Text(
+                                    datas[index].title.length <=
+                                            myHeight(context) ~/ 20.0
+                                        ? datas[index].title
+                                        : '${datas[index].title.substring(0, myHeight(context) ~/ 20.0)}...',
+                                    overflow: TextOverflow.ellipsis,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: myHeight(context) / 200.0,
+                                ),
+                                RichText(
+                                    text: TextSpan(
+                                        text: datas[index].hour,
+                                        style: TextStyle(
+                                            color: textInverseModeColor
+                                                .withOpacity(.54),
+                                            fontSize: myHeight(context) / 60),
+                                        children: [
+                                      TextSpan(
+                                          text: datas[index].sender
+                                              ? ' - Envoye par moi'
+                                              : datas[index]
+                                                          .senderName
+                                                          .length <=
+                                                      myHeight(context) ~/ 40.0
+                                                  ? datas[index].senderName
+                                                  : ' - Envoye par ${datas[index].senderName.substring(0, myHeight(context) ~/ 40.0)}...',
+                                          style: TextStyle(
+                                              fontSize:
+                                                  myHeight(context) / 70.0))
+                                    ]))
+                              ],
+                            ),
+                            Spacer(),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                AmazingIcon.delete_bin_6_line,
+                                size: myHeight(context) / 30.0,
+                                color: redColor,
+                              ),
+                            )
                           ],
                         ),
-                        Spacer(),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            AmazingIcon.delete_bin_6_line,
-                            size: myHeight(context) / 30.0,
-                            color: redColor,
-                          ),
-                        )
+                        index < datas.length - 1
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: myHeight(context) / 100.0),
+                                child: Divider(
+                                  thickness: 1.5,
+                                ),
+                              )
+                            : Container(
+                                height: 0.0,
+                              )
                       ],
                     ),
-                    index < datas.length - 1
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: myHeight(context) / 100.0),
-                            child: Divider(
-                              thickness: 1.5,
-                            ),
-                          )
-                        : Container(
-                            height: 0.0,
-                          )
-                  ],
-                ),
-              );
-            }));
+                  );
+                }),
+          )),
+    );
   }
 }
 

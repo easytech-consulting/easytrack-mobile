@@ -229,7 +229,7 @@ Widget sliverHeader(BuildContext context, String title, String subtitle,
                     height: 0.0,
                   )
                 : Row(
-                  mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
                         width: myWidth(context) / 50.0,
@@ -243,6 +243,70 @@ Widget sliverHeader(BuildContext context, String title, String subtitle,
                           )),
                     ],
                   )
+          ],
+        ),
+      ),
+      preferredSize: Size.fromHeight(myHeight(context) / 20.0),
+    ),
+  );
+}
+
+Widget sliverHeader2(
+  BuildContext context,
+  String title,
+  String subtitle,
+) {
+  return SliverAppBar(
+    pinned: true,
+    primary: true,
+    backgroundColor: Colors.white,
+    flexibleSpace: Container(
+      color: Colors.transparent,
+    ),
+    automaticallyImplyLeading: false,
+    title: Row(
+      children: [
+        InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Icon(
+            Icons.arrow_back,
+            size: myHeight(context) / 35.0,
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(
+          width: myHeight(context) / 50.0,
+        ),
+        Text(
+          title,
+          style: TextStyle(
+              color: Colors.black, fontSize: myHeight(context) / 40.0),
+        )
+      ],
+    ),
+    bottom: PreferredSize(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(myHeight(context) / 36.0, 0.0,
+            myHeight(context) / 36.0, myHeight(context) / 50.0),
+        child: Row(
+          children: [
+            Text(
+              subtitle,
+              style: TextStyle(
+                  color: Colors.black, fontSize: myHeight(context) / 28.0),
+            ),
+            Spacer(),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Search())),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Icon(
+                  AmazingIcon.search_2_line,
+                  color: Colors.black,
+                ),
+              ),
+            ),
           ],
         ),
       ),
