@@ -375,21 +375,18 @@ class _CalendarPageState extends State<CalendarPage> {
                                   itemCount: 7,
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
-                                      /* onTap: () => Navigator.push(
+                                      onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ShowAgendaDayPage(
-                                                    siteId: siteMap['id'],
-                                                      day: getDay(DateTime.now().add(
-                                                          Duration(
-                                                              days: index - 1))),
-                                                      id: identication(getDay(
-                                                          DateTime.now().add(
-                                                              Duration(
-                                                                  days: index -
-                                                                      1))))))),
-                                      */
+                                              builder: (context) => ShowAgendaDayPage(
+                                                  siteId: siteMap['id'],
+                                                  day: getDay(DateTime.now()
+                                                      .add(Duration(
+                                                          days: index - 1))),
+                                                  id: identication(getDay(
+                                                      DateTime.now().add(Duration(
+                                                          days:
+                                                              index - 1))))))),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           border:

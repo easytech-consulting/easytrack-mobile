@@ -1,6 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
-import 'package:easytrack/commons/layouts.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/customer_with_id.dart';
 import 'package:easytrack/models/sale.dart';
@@ -8,7 +7,6 @@ import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/models/user_with_id.dart';
 import 'package:easytrack/screens/auth/login.dart';
 import 'package:easytrack/screens/notifications/all.dart';
-import 'package:easytrack/screens/sales/manage.dart';
 import 'package:easytrack/services/authService.dart';
 import 'package:easytrack/services/homerService.dart';
 import 'package:easytrack/services/saleService.dart';
@@ -29,8 +27,6 @@ class _StatEmployeeState extends State<StatEmployee> {
   Future _futureSales;
   List _sales, _customers, _initiators, _validators, _sites, _productsOnSales;
   List allSalesData;
-
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   void initState() {

@@ -47,7 +47,7 @@ Future<bool> register(params) async {
     if (res.statusCode == 201) {
       response = true;
     }
-
+    print(res.body);
     errorStatusCode = res.statusCode;
     return response;
   } catch (e) {

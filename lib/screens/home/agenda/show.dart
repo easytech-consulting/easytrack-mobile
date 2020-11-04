@@ -3,6 +3,7 @@ import 'package:easytrack/commons/gradientIcon.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/role.dart';
 import 'package:easytrack/models/user.dart';
+import 'package:easytrack/services/agendaService.dart';
 import 'package:easytrack/services/siteService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -31,15 +32,16 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
       allRoles;
   OverlayEntry _entry;
   int selectedIndex;
+  Future _futureTeams;
 
-  _show(index) {
+  _show(team) {
     setState(() {
-      this._entry = this._createEntry(index);
+      this._entry = this._createEntry(team);
       Overlay.of(context).insert(this._entry);
     });
   }
 
-  OverlayEntry _createEntry(index) {
+  OverlayEntry _createEntry(team) {
     return OverlayEntry(
         builder: (context) => Positioned(
             bottom: 0.0,
@@ -86,7 +88,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                             InkWell(
                               onTap: () {
                                 this._entry.remove();
-                                _showTeam(0);
+                                _showTeam(team);
                               },
                               child: Padding(
                                 padding:
@@ -114,10 +116,10 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                               ),
                             ),
                             InkWell(
-                              onTap: () {
+                              /* onTap: () {
                                 this._entry.remove();
-                                this._editTeam(0);
-                              },
+                                this._editTeam(team);
+                              }, */
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 10.0),
@@ -180,7 +182,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
             )));
   }
 
-  _showTeam(int id) {
+  _showTeam(team) {
     showDialog(
         context: context,
         child: Dialog(
@@ -220,7 +222,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                     Container(
                       width: double.infinity,
                       child: Text(
-                        '10:30',
+                        team['start'],
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: myHeight(context) / 15,
@@ -243,7 +245,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                     Container(
                       width: double.infinity,
                       child: Text(
-                        '18:30',
+                        team['end'],
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: myHeight(context) / 15,
@@ -253,8 +255,10 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                     SizedBox(
                       height: myHeight(context) / 38.0,
                     ),
-                    Expanded(child: Container(
+                    Expanded(
+                        child: Container(
                       child: ListView.builder(
+                        itemCount: team['users'].length,
                         itemBuilder: (context, index) {
                           return Container(
                             padding: EdgeInsets.symmetric(
@@ -272,7 +276,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                     padding: EdgeInsets.all(
                                         myHeight(context) / 60.0),
                                     child: Text(
-                                      '${user.name.substring(0, 2).toUpperCase()}',
+                                      '${team["users"][index]["name"].substring(0, 2).toUpperCase()}',
                                       style: TextStyle(
                                           color: gradient1,
                                           fontWeight: FontWeight.w600,
@@ -291,7 +295,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                     Container(
                                       width: myWidth(context) / 2.5,
                                       child: Text(
-                                        'Carel Essama',
+                                        team['users'][index]['name'],
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             color: textInverseModeColor,
@@ -301,7 +305,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                     Container(
                                       width: myWidth(context) / 2.5,
                                       child: Text(
-                                        'Gerant',
+                                        'Employee',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             color: textInverseModeColor
@@ -509,7 +513,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
         ));
   }
 
-  _editTeam(id) {
+  _editTeam(team) {
     showDialog(
         context: context,
         child: Dialog(
@@ -565,7 +569,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                 color: Colors.black,
                                 size: myHeight(context) / 32.0,
                               ),
-                              hintText: "10:30",
+                              hintText: team['start'],
                               hintStyle:
                                   TextStyle(fontSize: myHeight(context) / 42.0),
                               contentPadding: EdgeInsets.only(
@@ -591,7 +595,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                 color: Colors.black,
                                 size: myHeight(context) / 32.0,
                               ),
-                              hintText: '18:30',
+                              hintText: team['end'],
                               hintStyle:
                                   TextStyle(fontSize: myHeight(context) / 42.0),
                               contentPadding: EdgeInsets.only(
@@ -640,6 +644,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                         margin: EdgeInsets.symmetric(
                             vertical: myHeight(context) / 50.0),
                         child: ListView.builder(
+                          itemCount: team['users'].length,
                           itemBuilder: (context, index) {
                             return Container(
                               padding: EdgeInsets.symmetric(
@@ -658,7 +663,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                       padding: EdgeInsets.all(
                                           myHeight(context) / 60.0),
                                       child: Text(
-                                        '${user.name.substring(0, 2).toUpperCase()}',
+                                        '${team["users"][index]["name"].substring(0, 2).toUpperCase()}',
                                         style: TextStyle(
                                             color: gradient1,
                                             fontWeight: FontWeight.w600,
@@ -678,7 +683,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                       Container(
                                         width: myWidth(context) / 2.5,
                                         child: Text(
-                                          'Carel Essama',
+                                          team['users'][index]['name'],
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                               color: textInverseModeColor,
@@ -689,7 +694,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                       Container(
                                         width: myWidth(context) / 2.5,
                                         child: Text(
-                                          'Gerant',
+                                          'Employee',
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                               color: textInverseModeColor
@@ -701,10 +706,12 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                     ],
                                   ),
                                   Spacer(),
-                                  Icon(
-                                    AmazingIcon.delete_bin_6_line,
-                                    size: myHeight(context) / 30.0,
-                                    color: Colors.red,
+                                  GestureDetector(
+                                    child: Icon(
+                                      AmazingIcon.delete_bin_6_line,
+                                      size: myHeight(context) / 30.0,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1024,6 +1031,7 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
     _scaffoldKey = GlobalKey<ScaffoldState>();
     _formKey = GlobalKey<FormState>();
     _isLoading = false;
+    _futureTeams = fetchTeamsDay(widget.id, widget.siteId);
   }
 
   @override
@@ -1036,12 +1044,330 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
             body: Stack(
               children: [
                 FutureBuilder(
+                  future: _futureTeams,
                   builder: (context, snapshot) {
+                    _teams = snapshot.data;
                     if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData)
-                      return Container(
-                        child: Text('Donnees'),
+                        snapshot.hasData) {
+                      return CustomScrollView(
+                        slivers: [
+                          SliverAppBar(
+                            pinned: true,
+                            primary: true,
+                            backgroundColor: gradient1,
+                            flexibleSpace: Container(
+                              height: 100.0,
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                      colors: [gradient1, gradient2],
+                                      begin: Alignment.center,
+                                      end: Alignment.bottomRight)),
+                            ),
+                            automaticallyImplyLeading: false,
+                            title: Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    size: myHeight(context) / 35.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: myHeight(context) / 50.0,
+                                ),
+                                Text(
+                                  widget.day,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: myHeight(context) / 40.0),
+                                )
+                              ],
+                            ),
+                            bottom: PreferredSize(
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    myHeight(context) / 36.0,
+                                    0.0,
+                                    myHeight(context) / 36.0,
+                                    myHeight(context) / 50.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Agenda',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: myHeight(context) / 28.0),
+                                    ),
+                                    Spacer(),
+                                    GestureDetector(
+                                        /* onTap: () => employees == null
+                                            ? _fetchEmployee(widget.siteId)
+                                            : _createTeam(),
+                                         */child: Icon(
+                                          Icons.add,
+                                          size: myHeight(context) / 24.0,
+                                          color: Colors.white,
+                                        ))
+                                  ],
+                                ),
+                              ),
+                              preferredSize:
+                                  Size.fromHeight(myHeight(context) / 20.0),
+                            ),
+                          ),
+                          _teams == null || _teams.length == 0
+                              ? SliverList(
+                                  delegate: SliverChildListDelegate.fixed([
+                                    Container(
+                                      height: myHeight(context) / 1.5,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Aucune equipe',
+                                        style: TextStyle(
+                                            fontSize: myHeight(context) / 50.0),
+                                      ),
+                                    )
+                                  ]),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return Container(
+                                      margin: EdgeInsets.fromLTRB(
+                                          myHeight(context) / 30.0,
+                                          0,
+                                          myHeight(context) / 30.0,
+                                          0),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: myHeight(context) / 50.0),
+                                      height: myHeight(context) / 6.2,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.black
+                                                      .withOpacity(.1)))),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Stack(
+                                              children: [
+                                                ListView.builder(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount: _teams[index]
+                                                                  ['users']
+                                                              .length >
+                                                          5
+                                                      ? 5
+                                                      : _teams[index]['users']
+                                                          .length,
+                                                  itemBuilder:
+                                                      (context, indexUser) {
+                                                    return index < 5
+                                                        ? Container(
+                                                            margin: EdgeInsets.only(
+                                                                right: myWidth(
+                                                                        context) /
+                                                                    50.0),
+                                                            decoration: BoxDecoration(
+                                                                color: gradient1
+                                                                    .withOpacity(
+                                                                        .1),
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .all(myHeight(
+                                                                          context) /
+                                                                      50.0),
+                                                              child: Text(
+                                                                '${_teams[index]["users"][indexUser]["name"].substring(0, 2).toUpperCase()}',
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        gradient1,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        myHeight(context) /
+                                                                            45.0),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            padding: EdgeInsets.only(
+                                                                right: myWidth(
+                                                                        context) /
+                                                                    80.0),
+                                                            decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        .05),
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .all(myHeight(
+                                                                          context) /
+                                                                      50.0),
+                                                              child: Text(
+                                                                '+${_teams[index]["users"].length - 4}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black45,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        myHeight(context) /
+                                                                            45.0),
+                                                              ),
+                                                            ),
+                                                          );
+                                                  },
+                                                  /* children: [
+                                                    
+                                                    /* Container(
+                                                      decoration: BoxDecoration(
+                                                          color: gradient1
+                                                              .withOpacity(.1),
+                                                          shape: BoxShape.circle),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(
+                                                            myHeight(context) / 50.0),
+                                                        child: Text(
+                                                          '${user.name.substring(0, 2).toUpperCase()}',
+                                                          style: TextStyle(
+                                                              color: gradient1,
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              fontSize:
+                                                                  myHeight(context) /
+                                                                      45.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: myWidth(context) / 80.0,
+                                                    ),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          color: gradient1
+                                                              .withOpacity(.1),
+                                                          shape: BoxShape.circle),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(
+                                                            myHeight(context) / 50.0),
+                                                        child: Text(
+                                                          '${user.name.substring(0, 2).toUpperCase()}',
+                                                          style: TextStyle(
+                                                              color: gradient1,
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              fontSize:
+                                                                  myHeight(context) /
+                                                                      45.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: myWidth(context) / 80.0,
+                                                    ),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          color: gradient1
+                                                              .withOpacity(.1),
+                                                          shape: BoxShape.circle),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(
+                                                            myHeight(context) / 50.0),
+                                                        child: Text(
+                                                          '${user.name.substring(0, 2).toUpperCase()}',
+                                                          style: TextStyle(
+                                                              color: gradient1,
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              fontSize:
+                                                                  myHeight(context) /
+                                                                      45.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: myWidth(context) / 80.0,
+                                                    ),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          color: Colors.black
+                                                              .withOpacity(.05),
+                                                          shape: BoxShape.circle),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(
+                                                            myHeight(context) / 50.0),
+                                                        child: Text(
+                                                          '+5',
+                                                          style: TextStyle(
+                                                              color: Colors.black45,
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              fontSize:
+                                                                  myHeight(context) /
+                                                                      45.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: myWidth(context) / 80.0,
+                                                    ),
+                                                    Spacer(),
+                                                    GestureDetector(
+                                                        onTap: () => _show(0),
+                                                        child: Icon(
+                                                            AmazingIcon.more_2_fill))
+                                                   */
+                                                  ],
+                                                 */
+                                                ),
+                                                Positioned(
+                                                  right: 0,
+                                                  top: 0,
+                                                  bottom: 0,
+                                                  child: GestureDetector(
+                                                      onTap: () =>
+                                                          _show(_teams[index]),
+                                                      child: Icon(AmazingIcon
+                                                          .more_2_fill)),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: myHeight(context) / 50.0,
+                                          ),
+                                          Text(
+                                            '${_teams[index]["start"]} - ${_teams[index]["end"]}',
+                                            style: TextStyle(
+                                                fontSize:
+                                                    myHeight(context) / 41.0),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }, childCount: _teams.length),
+                                )
+                        ],
                       );
+                    }
                     return CustomScrollView(
                       slivers: [
                         SliverAppBar(
@@ -1095,14 +1421,11 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                   ),
                                   Spacer(),
                                   GestureDetector(
-                                      onTap: () => employees == null
-                                          ? _fetchEmployee(widget.siteId)
-                                          : _createTeam(),
                                       child: Icon(
-                                        Icons.add,
-                                        size: myHeight(context) / 24.0,
-                                        color: Colors.white,
-                                      ))
+                                    Icons.add,
+                                    size: myHeight(context) / 24.0,
+                                    color: Colors.white,
+                                  ))
                                 ],
                               ),
                             ),
@@ -1110,163 +1433,16 @@ class _ShowAgendaDayPageState extends State<ShowAgendaDayPage> {
                                 Size.fromHeight(myHeight(context) / 20.0),
                           ),
                         ),
-                        /*  _teams == null || _teams.length == 0
-                            ? SliverList(
-                                delegate: SliverChildListDelegate.fixed([
-                                  Container(
-                                    height: myHeight(context) / 1.5,
-                                    width: double.infinity,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Aucune equipe',
-                                      style: TextStyle(
-                                          fontSize: myHeight(context) / 50.0),
-                                    ),
-                                  )
-                                ]),
-                              )
-                            :  */
                         SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
-                            return Container(
-                              margin: EdgeInsets.fromLTRB(
-                                  myHeight(context) / 30.0,
-                                  myHeight(context) / 50.0,
-                                  myHeight(context) / 30.0,
-                                  myHeight(context) / 80.0),
-                              padding: EdgeInsets.only(
-                                  top: myHeight(context) / 50.0,
-                                  bottom: myHeight(context) / 50.0),
-                              height: myHeight(context) / 6.2,
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color:
-                                              Colors.black.withOpacity(.1)))),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: gradient1.withOpacity(.1),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '${user.name.substring(0, 2).toUpperCase()}',
-                                            style: TextStyle(
-                                                color: gradient1,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 45.0),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: myWidth(context) / 80.0,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: gradient1.withOpacity(.1),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '${user.name.substring(0, 2).toUpperCase()}',
-                                            style: TextStyle(
-                                                color: gradient1,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 45.0),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: myWidth(context) / 80.0,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: gradient1.withOpacity(.1),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '${user.name.substring(0, 2).toUpperCase()}',
-                                            style: TextStyle(
-                                                color: gradient1,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 45.0),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: myWidth(context) / 80.0,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: gradient1.withOpacity(.1),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '${user.name.substring(0, 2).toUpperCase()}',
-                                            style: TextStyle(
-                                                color: gradient1,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 45.0),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: myWidth(context) / 80.0,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(.05),
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(
-                                              myHeight(context) / 50.0),
-                                          child: Text(
-                                            '+5',
-                                            style: TextStyle(
-                                                color: Colors.black45,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize:
-                                                    myHeight(context) / 45.0),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: myWidth(context) / 80.0,
-                                      ),
-                                      Spacer(),
-                                      GestureDetector(
-                                          onTap: () => _show(0),
-                                          child: Icon(AmazingIcon.more_2_fill))
-                                    ],
-                                  ),
-                                  Text(
-                                    '10:30 - 18:30',
-                                    style: TextStyle(
-                                        fontSize: myHeight(context) / 41.0),
-                                  )
-                                ],
-                              ),
-                            );
-                          }, childCount: 10),
+                          delegate: SliverChildListDelegate.fixed([
+                            Container(
+                                height: myHeight(context) / 1.5,
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(gradient1),
+                                ))
+                          ]),
                         )
                       ],
                     );

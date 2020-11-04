@@ -16,6 +16,7 @@ class _AddSalesPageState extends State<AddSalesPage> {
   String labelOfPaymentMode;
   bool selectionMode = false;
   bool selectedItem = false;
+  TextEditingController _priceController;
 
   Map product, currentSite;
   List sitesToShow, _productsOnOrder, _quantities, products;
@@ -33,6 +34,7 @@ class _AddSalesPageState extends State<AddSalesPage> {
     total = 0;
     _isLoading = true;
     fetchData();
+    _priceController = new TextEditingController();
   }
 
   fetchData() async {
@@ -57,6 +59,131 @@ class _AddSalesPageState extends State<AddSalesPage> {
     }
 
     return result;
+  }
+
+  showDifferenceDialog(context, products, qties, id) {
+    _showPrice(context, products, qties, id);
+  }
+
+  remboursementDialog(amount, context, products, qties, id) {
+    int price = int.tryParse(amount);
+    return showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(
+              builder: (BuildContext context, setState) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(myHeight(context) / 50.0)),
+                  backgroundColor: Colors.white,
+                  actions: [
+                    InkWell(
+                      onTap: _priceController.text.isEmpty
+                          ? null
+                          : () {
+                              Navigator.pop(context);
+                              _attemptSave(products, qties, id);
+                            },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: myWidth(context) / 20.0),
+                          height: myHeight(context) / 22.0,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(30.0)),
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [gradient1, gradient2]),
+                          ),
+                          child: Text(
+                            'Suivant',
+                            style: TextStyle(
+                                color: textSameModeColor,
+                                fontSize: myHeight(context) / 40.0),
+                          )),
+                    )
+                  ],
+                  content: Text(
+                    price == null
+                        ? 'Entrer un nombre valide'
+                        : price < total
+                            ? 'Montant inferieur'
+                            : 'Remboursement: ${int.parse(amount) - total} FCFA',
+                    style: TextStyle(fontSize: myHeight(context) / 45.0),
+                  ),
+                );
+              },
+            ));
+  }
+
+  _showPrice(context, products, qties, id) {
+    _priceController.clear();
+    showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(
+              builder: (BuildContext context, setState) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(myHeight(context) / 50.0)),
+                  backgroundColor: Colors.white,
+                  actions: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        remboursementDialog(_priceController.text, context,
+                            products, qties, id);
+                      },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: myWidth(context) / 20.0),
+                          height: myHeight(context) / 22.0,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(30.0)),
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [gradient1, gradient2]),
+                          ),
+                          child: Text(
+                            'Suivant',
+                            style: TextStyle(
+                                color: textSameModeColor,
+                                fontSize: myHeight(context) / 40.0),
+                          )),
+                    )
+                  ],
+                  content: Container(
+                    height: myHeight(context) / 17.0,
+                    decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius:
+                            BorderRadius.circular(myHeight(context) / 10.0)),
+                    child: TextFormField(
+                      controller: _priceController,
+                      style: TextStyle(fontSize: myHeight(context) / 42.0),
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            AmazingIcon.money_dollar_circle_line,
+                            color: Colors.black,
+                            size: myHeight(context) / 32.0,
+                          ),
+                          hintText: 'Montant',
+                          hintStyle:
+                              TextStyle(fontSize: myHeight(context) / 42.0),
+                          contentPadding:
+                              EdgeInsets.only(left: myHeight(context) / 30.0),
+                          border:
+                              OutlineInputBorder(borderSide: BorderSide.none)),
+                    ),
+                  ),
+                );
+              },
+            ));
   }
 
   calculTotal(List datas) {
@@ -878,10 +1005,10 @@ class _AddSalesPageState extends State<AddSalesPage> {
                     height: myHeight(context) / 30.0,
                   ),
                   InkWell(
-                    onTap: () {
-                      _attemptSave(
-                          _productsOnOrder, _quantities, currentSite['id']);
-                    },
+                    onTap: _productsOnOrder == null || _productsOnOrder.isEmpty
+                        ? null
+                        : () => showDifferenceDialog(context, _productsOnOrder,
+                            _quantities, currentSite['id']),
                     child: Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: myWidth(context) / 20.0),
@@ -890,10 +1017,16 @@ class _AddSalesPageState extends State<AddSalesPage> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                          gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [gradient1, gradient2]),
+                          gradient: _productsOnOrder == null ||
+                                  _productsOnOrder.isEmpty
+                              ? LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [Colors.grey, Colors.grey])
+                              : LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [gradient1, gradient2]),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

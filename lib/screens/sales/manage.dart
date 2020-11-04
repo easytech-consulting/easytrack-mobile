@@ -1,6 +1,7 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site_with_id.dart';
+import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/screens/sales/add.dart';
 import 'package:easytrack/screens/sales/update.dart';
 import 'package:easytrack/services/externalService.dart';
@@ -23,13 +24,7 @@ class _ManageSalesState extends State<ManageSales> {
 
   Future _companySales;
   Map product, currentSite;
-  List _sales,
-      _sites,
-      _salesToShow,
-      sitesToShow,
-      _productsOnOrder,
-      _quantities,
-      products;
+  List _sales, _sites, _salesToShow, sitesToShow, products;
   List allSalesData;
   bool _isLoading;
   int _currentIndex;
@@ -219,7 +214,6 @@ class _ManageSalesState extends State<ManageSales> {
                                         _salesToShow[currentIndex]['initiator'],
                                         validator: _salesToShow[currentIndex]
                                             ['validator']);
-                                           
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -414,8 +408,6 @@ class _ManageSalesState extends State<ManageSales> {
     _companySales = fetchSales();
     _salesAlreadyLoad = false;
     _salesToShow = [];
-    _quantities = [];
-    _productsOnOrder = [];
     _sites = [];
     _currentIndex = 0;
     _scaffoldKey = GlobalKey();
@@ -701,8 +693,7 @@ class _ManageSalesState extends State<ManageSales> {
                     color: Colors.blueGrey.withOpacity(.3),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: myHeight(context) / 100.0,
-                          horizontal: 1.0),
+                          vertical: myHeight(context) / 100.0, horizontal: 1.0),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -718,7 +709,8 @@ class _ManageSalesState extends State<ManageSales> {
                     height: myHeight(context) / 40.0,
                   ),
                   InkWell(
-                    onTap: () => launchWhatsApp(phone: '+237694589535', message: ''),
+                    onTap: () =>
+                        launchWhatsApp(phone: '+237694589535', message: ''),
                     child: Container(
                       width: double.infinity,
                       height: myHeight(context) / 20.0,
@@ -741,7 +733,12 @@ class _ManageSalesState extends State<ManageSales> {
                     height: myHeight(context) / 100.0,
                   ),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MainPage(
+                                  index: 1,
+                                ))),
                     child: Container(
                       width: double.infinity,
                       height: myHeight(context) / 20.0,
@@ -776,12 +773,6 @@ class _ManageSalesState extends State<ManageSales> {
     return result == null ? [] : result['products'];
   }
 
-  _cancelMode(GlobalKey<ScaffoldState> _key) {
-    setState(() {
-      selectionMode = false;
-    });
-  }
-
   loadDesireSales(datas, {int filter = 0}) {
     _salesToShow.clear();
     _salesAlreadyLoad = true;
@@ -790,428 +781,6 @@ class _ManageSalesState extends State<ManageSales> {
         _salesToShow.add(data);
       }
     }
-  }
-
-  updateSales(sale, List products, productsAlreadyInOrder) {
-    _quantities = [];
-    _productsOnOrder = [];
-    List allProducts = [];
-    int total = 0;
-    for (var product in products) {
-      if (!allProducts.contains(product)) {
-        allProducts.add(product);
-      }
-    }
-    for (var product in productsAlreadyInOrder) {
-      _quantities.add(product['pivot']['qty']);
-      _productsOnOrder.add(allProducts.firstWhere(
-          (element) => element['id'] == product['id'],
-          orElse: () => print('Pas de correspondance.')));
-      total += product['pivot']['qty'] * product['pivot']['price'];
-    }
-    showDialog(
-        context: context,
-        builder: (context) =>
-            StatefulBuilder(builder: (context, StateSetter setState) {
-              return ListView(
-                children: <Widget>[
-                  AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                    content: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: myHeight(context) / 60,
-                          horizontal: myHeight(context) / 100),
-                      child: Form(
-                        key: _formKey,
-                        child: Container(
-                          height: myHeight(context) * .8,
-                          width: myWidth(context),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Text(
-                                    'Modifier',
-                                    style: TextStyle(
-                                        fontSize: myHeight(context) / 28.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                      onTap: () {
-                                        for (var product in _productsOnOrder) {
-                                          allProducts.add(product);
-                                        }
-                                        Navigator.pop(context);
-                                      },
-                                      child: Icon(AmazingIcon.close_line)),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 20.0,
-                              ),
-                              Stack(
-                                children: <Widget>[
-                                  Container(
-                                    height: myHeight(context) / 15.0,
-                                    decoration: buildTextFormFieldContainer(
-                                        decorationColor),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0),
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      underline: Text(''),
-                                      icon: Icon(AmazingIcon.arrow_down_s_line,
-                                          color: textInverseModeColor),
-                                      items: allProducts
-                                          .map((product) => DropdownMenuItem(
-                                                child: Text(product['name']),
-                                                value: product,
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        if (_productsOnOrder.contains(value)) {
-                                          setState(() {
-                                            total += value['pivot']['price'];
-                                            _quantities[_productsOnOrder
-                                                .indexOf(value)]++;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            allProducts.remove(value);
-                                            _productsOnOrder.add(value);
-                                            total += value['pivot']['price'];
-
-                                            _quantities.add(1);
-                                          });
-                                        }
-                                      },
-                                      hint: Text('Ajouter un produit'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10.0,
-                              ),
-                              Expanded(
-                                child:
-                                    _productsOnOrder.isEmpty ||
-                                            _productsOnOrder == null
-                                        ? Center(child: Text('Aucun produit'))
-                                        : ListView.builder(
-                                            itemCount: _productsOnOrder.length,
-                                            itemBuilder: (context, int index) {
-                                              return Padding(
-                                                padding: EdgeInsets.only(
-                                                    bottom: myHeight(context) /
-                                                        100),
-                                                child: Container(
-                                                  height:
-                                                      myHeight(context) / 7.0,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      border: Border.all(
-                                                          color:
-                                                              textInverseModeColor
-                                                                  .withOpacity(
-                                                                      .12))),
-                                                  child: Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: myHeight(
-                                                                    context) /
-                                                                50.0,
-                                                            vertical: 8.0),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: <Widget>[
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                Text(
-                                                                  '${_productsOnOrder[index]['name'].length > 7 ? _productsOnOrder[index]['name'].substring(0, 7) + '...' : _productsOnOrder[index]['name']}',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w900,
-                                                                    fontSize:
-                                                                        myHeight(context) /
-                                                                            36.0,
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 8.0,
-                                                                ),
-                                                                Text(
-                                                                    '${_productsOnOrder[index]['pivot']['price']} FCFA',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          myHeight(context) /
-                                                                              43.0,
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                            Container(
-                                                              height: 35.0,
-                                                              child:
-                                                                  VerticalDivider(
-                                                                thickness: 1.0,
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              child: Row(
-                                                                children: <
-                                                                    Widget>[
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      setState(
-                                                                          () {
-                                                                        total -=
-                                                                            _productsOnOrder[index]['pivot']['price'];
-                                                                      });
-                                                                      if (_quantities[
-                                                                              index] ==
-                                                                          1) {
-                                                                        setState(
-                                                                            () {
-                                                                          allProducts
-                                                                              .add(_productsOnOrder[index]);
-                                                                          _productsOnOrder
-                                                                              .removeAt(index);
-                                                                          _quantities
-                                                                              .removeAt(index);
-                                                                        });
-                                                                      } else {
-                                                                        setState(
-                                                                            () {
-                                                                          _quantities[
-                                                                              index]--;
-                                                                        });
-                                                                      }
-                                                                    },
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .remove),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 10.0,
-                                                                  ),
-                                                                  Text(
-                                                                    '${_quantities[index]}',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            myHeight(context) /
-                                                                                28.0,
-                                                                        fontWeight:
-                                                                            FontWeight.w800),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 10.0,
-                                                                  ),
-                                                                  GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        if (_productsOnOrder[index]['pivot']['qty'] >
-                                                                            _quantities[index]) {
-                                                                          setState(
-                                                                              () {
-                                                                            total +=
-                                                                                _productsOnOrder[index]['pivot']['price'];
-                                                                            _quantities[index]++;
-                                                                          });
-                                                                        }
-                                                                      },
-                                                                      child: Icon(
-                                                                          Icons
-                                                                              .add)),
-                                                                ],
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        Spacer(),
-                                                        Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .end,
-                                                          children: <Widget>[
-                                                            RichText(
-                                                              text: TextSpan(
-                                                                  text:
-                                                                      'SOUS TOTAL',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        myHeight(context) /
-                                                                            65.0,
-                                                                  ),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text:
-                                                                          '  ${_quantities[index] * _productsOnOrder[index]['pivot']['price']} FCFA',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontSize:
-                                                                            myHeight(context) /
-                                                                                55.0,
-                                                                      ),
-                                                                    ),
-                                                                  ]),
-                                                            ),
-                                                            Spacer(),
-                                                            InkWell(
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  total -= _quantities[
-                                                                          index] *
-                                                                      _productsOnOrder[index]
-                                                                              [
-                                                                              'pivot']
-                                                                          [
-                                                                          'price'];
-                                                                  allProducts.add(
-                                                                      _productsOnOrder[
-                                                                          index]);
-                                                                  _quantities
-                                                                      .removeAt(
-                                                                          index);
-                                                                  _productsOnOrder
-                                                                      .removeAt(
-                                                                          index);
-                                                                });
-                                                              },
-                                                              child: Icon(
-                                                                AmazingIcon
-                                                                    .delete_bin_6_line,
-                                                                color:
-                                                                    Colors.red,
-                                                                size: myHeight(
-                                                                        context) /
-                                                                    40.0,
-                                                              ),
-                                                            )
-                                                          ],
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                              ),
-                              SizedBox(
-                                height: 20.0,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Text('TOTAL:',
-                                      style: TextStyle(
-                                        fontSize: myHeight(context) / 55.0,
-                                      )),
-                                  SizedBox(
-                                    width: 10.0,
-                                  ),
-                                  Text('$total FCFA',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: myHeight(context) / 45.0,
-                                      ))
-                                ],
-                              ),
-                              SizedBox(
-                                height: 20.0,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _attemptUpdate(
-                                      sale, _productsOnOrder, _quantities);
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 40.0,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          colors: [gradient1, gradient2]),
-                                      borderRadius:
-                                          BorderRadius.circular(40.0)),
-                                  child: Text(
-                                    'Mettre a jour',
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      color: textSameModeColor,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }));
-  }
-
-  _attemptUpdate(sale, List products, List quantities) async {
-    Navigator.pop(context);
-
-    String order = '';
-    for (var i = 0; i < products.length; i++) {
-      order += products[i]['id'].toString() +
-          ';' +
-          quantities[i].toString() +
-          ';' +
-          products[i]['pivot']['price'].toString() +
-          '|';
-    }
-
-    Map<String, dynamic> params = Map();
-    params['order'] = order;
-    params['customer_id'] = sale['customer_id'].toString();
-    params['site_id'] = sale['site_id'].toString();
-    params['status'] = sale['status'].toString();
-    params['paying_method'] = sale['paying_method'].toString();
-    params['sale_note'] = '';
-    print(params);
-    setState(() {
-      _isLoading = true;
-    });
-    await updateSale(params, sale['id']).then((response) {
-      setState(() {
-        _isLoading = false;
-        _salesAlreadyLoad = false;
-        _currentIndex = 0;
-        _companySales = fetchSales();
-      });
-    });
   }
 
   List _checkAllSales(datas) {
@@ -1337,13 +906,11 @@ class _ManageSalesState extends State<ManageSales> {
                           if (snapshot.connectionState ==
                                   ConnectionState.done &&
                               snapshot.hasData) {
-                            if (_sales == null) {
+                            if (!_salesAlreadyLoad) {
                               allSalesData = snapshot.data;
                               _sales = _checkAllSales(allSalesData);
                               _salesForSearch = _sales;
-                              if (!_salesAlreadyLoad) {
-                                loadDesireSales(_sales);
-                              }
+                              loadDesireSales(_sales);
                             }
                             return PageView(
                               controller: _pageController,
@@ -1384,8 +951,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                   ),
                                                   Spacer(),
                                                   GestureDetector(
-                                                    onTap: () =>
-                                                        Navigator.pop(context),
+                                                    onTap: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    MainPage(
+                                                                      index: 1,
+                                                                    ))),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -1728,8 +1301,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                   ),
                                                   Spacer(),
                                                   GestureDetector(
-                                                    onTap: () =>
-                                                        Navigator.pop(context),
+                                                    onTap: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    MainPage(
+                                                                      index: 1,
+                                                                    ))),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -2071,8 +1650,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                   ),
                                                   Spacer(),
                                                   GestureDetector(
-                                                    onTap: () =>
-                                                        Navigator.pop(context),
+                                                    onTap: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    MainPage(
+                                                                      index: 1,
+                                                                    ))),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -2352,8 +1937,14 @@ class _ManageSalesState extends State<ManageSales> {
                                                   ),
                                                   Spacer(),
                                                   GestureDetector(
-                                                    onTap: () =>
-                                                        Navigator.pop(context),
+                                                    onTap: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    MainPage(
+                                                                      index: 1,
+                                                                    ))),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -2627,7 +2218,12 @@ class _ManageSalesState extends State<ManageSales> {
                                   ),
                                   Spacer(),
                                   GestureDetector(
-                                    onTap: () => Navigator.pop(context),
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MainPage(
+                                                  index: 1,
+                                                ))),
                                     child: Padding(
                                       padding:
                                           const EdgeInsets.only(right: 8.0),
