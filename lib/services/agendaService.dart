@@ -53,3 +53,20 @@ Future fetchTeamsDay(int id, int siteId) async {
     throw Exception('Fetch Teams  of day $id of Site $id with error $ex');
   }
 }
+
+Future deleteTeam(int id) async {
+  try {
+    final response = await http.post('$endPoint/teams/$id/destroy',
+        headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['data'];
+    }
+
+    throw Exception(
+        'Delete Teams of day $id exited with code ${response.statusCode}');
+  } catch (ex) {
+    throw Exception('Delete Teams  of day $id  with error $ex');
+  }
+}

@@ -27,6 +27,7 @@ class _CustomerPageState extends State<CustomerPage> {
     name = widget.sitename;
     _customers =
         widget.data.map((customer) => Customer.fromJson(customer)).toList();
+    globalClients = _customers;
   }
 
   @override

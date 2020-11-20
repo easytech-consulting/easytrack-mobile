@@ -34,8 +34,26 @@ Future updateEmployee(params, int id) async {
       return data['data'];
     }
 
-    throw Exception('Update Site $id exited with code ${response.statusCode}');
+    throw Exception(
+        'Update Employee $id exited with code ${response.statusCode}');
   } catch (ex) {
-    throw Exception('Update Site $id exited with error $ex');
+    throw Exception('Update Employee $id exited with error $ex');
+  }
+}
+
+Future deleteEmployee(int id) async {
+  try {
+    bool result = false;
+    final response = await http.post('$endPoint/users/$id/destroy',
+        headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
+
+    if (response.statusCode == 200) {
+      result = true;
+    }
+    print(id);
+    print(response.statusCode);
+    return result;
+  } catch (ex) {
+    throw Exception('Delete Employees $id exited with error $ex');
   }
 }

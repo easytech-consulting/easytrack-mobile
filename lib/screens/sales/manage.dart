@@ -28,7 +28,6 @@ class _ManageSalesState extends State<ManageSales> {
   List allSalesData;
   bool _isLoading;
   int _currentIndex;
-  GlobalKey<FormState> _formKey;
   GlobalKey<ScaffoldState> _scaffoldKey;
   PageController _pageController;
 
@@ -71,6 +70,91 @@ class _ManageSalesState extends State<ManageSales> {
     return filter == '' ? items : result;
   }
 
+  _deleteFunction(int id) async {
+    Navigator.pop(context);
+    setState(() {
+      _isLoading = true;
+    });
+    await deleteSales(id).then((site) {
+      setState(() {
+        _isLoading = false;
+        _salesAlreadyLoad = false;
+        _companySales = fetchSales();
+      });
+    });
+  }
+
+  _showConfirmationMessage(int index) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
+              content: Container(
+                  height: myHeight(context) / 2.5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      errorAlertIcon(context),
+                      SizedBox(
+                        height: myHeight(context) / 40,
+                      ),
+                      Text(
+                        'Operation de suppression',
+                        style: TextStyle(
+                            color: textInverseModeColor,
+                            fontSize: myWidth(context) / 22),
+                      ),
+                      SizedBox(height: myHeight(context) / 80),
+                      Text(
+                        'Vous allez supprimer le site ${index + 1}.',
+                        style: TextStyle(
+                            color: textInverseModeColor.withOpacity(.5),
+                            fontSize: myWidth(context) / 25),
+                      ),
+                      Text(
+                        'Attention cette operation',
+                        style: TextStyle(
+                            color: textInverseModeColor.withOpacity(.5),
+                            fontSize: myWidth(context) / 25),
+                      ),
+                      Text(
+                        'est irreversible.',
+                        style: TextStyle(
+                            color: textInverseModeColor.withOpacity(.5),
+                            fontSize: myWidth(context) / 25),
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 40,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: OutlineButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              borderSide:
+                                  BorderSide(color: textInverseModeColor),
+                              onPressed: () => _deleteFunction(index),
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  height: 40.0,
+                                  child: Text('Supprimer')),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+            ));
+  }
+
+  _deleteSite(int index) {
+    _showConfirmationMessage(index);
+  }
+
   OverlayEntry _overlay;
   _show(GlobalKey<ScaffoldState> _key, int status, int saleId, currentIndex) {
     setState(() {
@@ -106,9 +190,11 @@ class _ManageSalesState extends State<ManageSales> {
                         ? _salesToShow[currentIndex]['validator'] == null ||
                                 _salesToShow[currentIndex]['validator']['id'] !=
                                     user.id
-                            ? myHeight(context) * 2.5 / 15
-                            : myHeight(context) * 3.5 / 15
-                        : myHeight(context) * 4 / 15,
+                            ? myHeight(context) * 2 / 15
+                            : myHeight(context) * 3 / 15
+                        : status == 1
+                            ? myHeight(context) * 3 / 15
+                            : myHeight(context) * 4.5 / 15,
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.vertical(
@@ -318,7 +404,7 @@ class _ManageSalesState extends State<ManageSales> {
                                     ),
                                   ),
                                 ),
-                          status == 2
+                          status != 0
                               ? Container(
                                   height: 0.0,
                                 )
@@ -364,35 +450,41 @@ class _ManageSalesState extends State<ManageSales> {
                                     ],
                                   ),
                                 ),
-                          InkWell(
-                            onTap: () {
-                              this._overlay.remove();
-                            },
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    AmazingIcon.delete_bin_6_line,
-                                    size: 15.0,
-                                    color: redColor,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    child: Text(
-                                      'Supprimer',
-                                      style: TextStyle(
-                                          fontFamily: 'Ubuntu',
-                                          fontSize: 17.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: textInverseModeColor),
+                          status != 0
+                              ? Container(
+                                  height: 0.0,
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    this._overlay.remove();
+                                    _deleteSite(saleId);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          AmazingIcon.delete_bin_6_line,
+                                          size: 15.0,
+                                          color: redColor,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 20.0),
+                                          child: Text(
+                                            'Supprimer',
+                                            style: TextStyle(
+                                                fontFamily: 'Ubuntu',
+                                                fontSize: 17.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: textInverseModeColor),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                                  ),
+                                ),
                         ],
                       ),
                     ),
@@ -411,7 +503,6 @@ class _ManageSalesState extends State<ManageSales> {
     _sites = [];
     _currentIndex = 0;
     _scaffoldKey = GlobalKey();
-    _formKey = GlobalKey();
     _isLoading = false;
     _pageController = new PageController();
   }
@@ -477,286 +568,290 @@ class _ManageSalesState extends State<ManageSales> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             child: Form(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(
-                    'img/logos/LogoWhiteWithText.png',
-                    color: textInverseModeColor,
-                    height: myHeight(context) / 20.0,
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Recu bon de vente',
-                    style: TextStyle(
-                        fontSize: myHeight(context) / 40.0,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  company == null
-                      ? Container(
-                          height: 0.0,
-                        )
-                      : Column(
-                          children: [
-                            Text(
-                              'Snack: ${company.name}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            Text(
-                              'Telephone: ${company.tel1}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            Text(
-                              '${company.town}, ${company.street}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            SizedBox(
-                              height: myHeight(context) / 50.0,
-                            ),
-                          ],
-                        ),
-                  Text(
-                    'Site: ${_site.name}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'img/logos/LogoWhiteWithText.png',
+                      color: textInverseModeColor,
+                      height: myHeight(context) / 20.0,
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    '${_site.street}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
                     ),
-                  ),
-                  _site.tel1 != null
-                      ? Text(
-                          '${_site.tel1}',
-                          style: TextStyle(
-                            fontSize: myHeight(context) / 50.0,
-                          ),
-                        )
-                      : _site["tel2"] != null
-                          ? Text(
-                              '${_site["tel2"]}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            )
-                          : Container(
-                              height: 0.0,
-                            ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Client: ${capitalize(_customer)}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    Text(
+                      'Recu bon de vente',
+                      style: TextStyle(
+                          fontSize: myHeight(context) / 40.0,
+                          fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Date: ${_sale["createdAt"]}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
                     ),
-                  ),
-                  Text(
-                    'Reference: S0-${_sale["code"]}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Initie par: ${_initiator["name"]}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
-                    ),
-                  ),
-                  validator == null
-                      ? Container(
-                          height: 0.0,
-                        )
-                      : Text(
-                          'Valide par: ${validator["name"]}',
-                          style: TextStyle(
-                            fontSize: myHeight(context) / 50.0,
-                          ),
-                        ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _products.length,
-                      itemBuilder: (context, index) => Column(
-                        children: <Widget>[
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                '${_products[index]['name']}',
-                                style: TextStyle(
-                                  fontSize: myHeight(context) / 50.0,
-                                ),
-                              )),
-                          SizedBox(
-                            height: myHeight(context) / 100.0,
-                          ),
-                          Row(
-                            children: <Widget>[
+                    company == null
+                        ? Container(
+                            height: 0.0,
+                          )
+                        : Column(
+                            children: [
                               Text(
-                                '${_products[index]['pivot']['qty']} x ${_products[index]['pivot']['price']}',
+                                'Snack: ${company.name}',
                                 style: TextStyle(
                                   fontSize: myHeight(context) / 50.0,
                                 ),
                               ),
-                              Spacer(),
                               Text(
-                                '${_products[index]['pivot']['qty'] * _products[index]['pivot']['price']}',
+                                'Telephone: ${company.tel1}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                              Text(
+                                '${company.town}, ${company.street}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                              SizedBox(
+                                height: myHeight(context) / 50.0,
+                              ),
+                            ],
+                          ),
+                    Text(
+                      'Site: ${_site.name}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      '${_site.street}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    _site.tel1 != null
+                        ? Text(
+                            '${_site.tel1}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          )
+                        : _site["tel2"] != null
+                            ? Text(
+                                '${_site["tel2"]}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              )
+                            : Container(
+                                height: 0.0,
+                              ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      'Client: ${capitalize(_customer)}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                  Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: myHeight(context) / 50.0,
+                              ),
+                              Text(
+                                'Date: ${_sale["created_at"]}',
                                 style: TextStyle(
                                   fontSize: myHeight(context) / 50.0,
                                 ),
                               ),
                             ],
                           ),
-                          Divider(),
-                          SizedBox(
-                            height: myHeight(context) / 100.0,
-                          ),
-                        ],
+                    Text(
+                      'Reference: S0-${_sale["code"]}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        'Sous total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      'Initie par: ${_initiator["name"]}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    validator == null
+                        ? Container(
+                            height: 0.0,
+                          )
+                        : Text(
+                            'Valide par: ${validator["name"]}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Container(
+                      height: myHeight(context) / 12.0 * _products.length,
+                      child: ListView.builder(
+                        physics: null,
+                        itemCount: _products.length,
+                        itemBuilder: (context, index) => Column(
+                          children: <Widget>[
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '${_products[index]['name']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                )),
+                            SizedBox(
+                              height: myHeight(context) / 100.0,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  '${_products[index]['pivot']['qty']} x ${_products[index]['pivot']['price']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  '${_products[index]['pivot']['qty'] * _products[index]['pivot']['price']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Divider(),
+                            SizedBox(
+                              height: myHeight(context) / 100.0,
+                            ),
+                          ],
                         ),
                       ),
-                      Spacer(),
-                      Text(
-                        '$total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Divider(),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        '$total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Container(
-                    color: Colors.blueGrey.withOpacity(.3),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: myHeight(context) / 100.0, horizontal: 1.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Paye par: ${_sale["paying_method"].toUpperCase()}',
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          'Sous total',
                           style: TextStyle(
                             fontSize: myHeight(context) / 50.0,
                           ),
                         ),
+                        Spacer(),
+                        Text(
+                          '$total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          'Total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          '$total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Container(
+                      color: Colors.blueGrey.withOpacity(.3),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: myHeight(context) / 100.0,
+                            horizontal: 1.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Paye par: ${_sale["paying_method"].toUpperCase()}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 40.0,
-                  ),
-                  InkWell(
-                    onTap: () =>
-                        launchWhatsApp(phone: '+237694589535', message: ''),
-                    child: Container(
-                      width: double.infinity,
-                      height: myHeight(context) / 20.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
+                    SizedBox(
+                      height: myHeight(context) / 40.0,
+                    ),
+                    InkWell(
+                      onTap: () => launchWhatsApp(phone: '', message: ''),
+                      child: Container(
+                        width: double.infinity,
+                        height: myHeight(context) / 20.0,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(myHeight(context) / 20.0),
+                            gradient:
+                                LinearGradient(colors: [gradient1, gradient2])),
+                        child: Text(
+                          'Envoyer au client',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: textSameModeColor,
+                              fontSize: myHeight(context) / 50.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: double.infinity,
+                        height: myHeight(context) / 20.0,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: textInverseModeColor),
                           borderRadius:
                               BorderRadius.circular(myHeight(context) / 20.0),
-                          gradient:
-                              LinearGradient(colors: [gradient1, gradient2])),
-                      child: Text(
-                        'Envoyer au client',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: textSameModeColor,
-                            fontSize: myHeight(context) / 50.0),
+                        ),
+                        child: Text(
+                          'Retour',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: myHeight(context) / 50.0),
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainPage(
-                                  index: 1,
-                                ))),
-                    child: Container(
-                      width: double.infinity,
-                      height: myHeight(context) / 20.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: textInverseModeColor),
-                        borderRadius:
-                            BorderRadius.circular(myHeight(context) / 20.0),
-                      ),
-                      child: Text(
-                        'Retour',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: myHeight(context) / 50.0),
-                      ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -787,7 +882,7 @@ class _ManageSalesState extends State<ManageSales> {
     List result = [];
     if (user.isAdmin == 1) {
       for (var sale in datas) {
-        _sites.add(site);
+        _sites.add(site); 
         result.add(sale);
       }
     } else {
@@ -899,6 +994,146 @@ class _ManageSalesState extends State<ManageSales> {
                   myHeight(context) / 50.0, myWidth(context) / 30.0, 0.0),
               child: Column(
                 children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.brightness_1,
+                        color: _currentIndex == 0
+                            ? gradient1
+                            : _currentIndex == 1 ? Colors.orange : Colors.green,
+                        size: myWidth(context) / 15.0,
+                      ),
+                      SizedBox(width: myWidth(context) / 30.0),
+                      Text(
+                        _currentIndex == 0
+                            ? 'En attente'
+                            : _currentIndex == 1 ? 'Servie' : 'Paye',
+                        style: TextStyle(
+                            fontSize: myHeight(context) / 40.0,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage(
+                                      index: 1,
+                                    ))),
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Icon(
+                            AmazingIcon.arrow_down_s_line,
+                            size: myHeight(context) / 20.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Stack(
+                          children: <Widget>[
+                            Container(
+                              height: 46.0,
+                              decoration:
+                                  buildTextFormFieldContainer(decorationColor),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Container(
+                                height: 46.0,
+                                child: TextFormField(
+                                  textInputAction: TextInputAction.done,
+                                  style: TextStyle(
+                                      color: textInverseModeColor
+                                          .withOpacity(.87)),
+                                  controller: _searchController,
+                                  focusNode: _searchNode,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _sales =
+                                          searchMethod(_salesForSearch, value);
+                                      loadDesireSales(_sales);
+                                    });
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    setState(() {
+                                      _sales =
+                                          searchMethod(_salesForSearch, value);
+                                      loadDesireSales(_sales);
+                                      _searchController.text = '';
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                      contentPadding:
+                                          const EdgeInsets.only(left: 50.0),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          _searchController.text = '';
+                                          _searchNode.unfocus();
+                                          _sales = _salesForSearch;
+                                          loadDesireSales(_sales);
+                                        },
+                                        child: Icon(AmazingIcon.close_fill,
+                                            color: textInverseModeColor),
+                                      ),
+                                      hintText: 'Recherche...',
+                                      prefixIcon: Icon(
+                                          AmazingIcon.search_2_line,
+                                          color: textInverseModeColor),
+                                      hintStyle: TextStyle(
+                                          color: textInverseModeColor
+                                              .withOpacity(.35),
+                                          fontSize: 18.0),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                      )),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _currentIndex == 0
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: myWidth(context) / 30.0,
+                                ),
+                                InkWell(
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AddSalesPage())),
+                                  child: Container(
+                                    padding: EdgeInsets.all(
+                                        myHeight(context) / 70.0),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: gradient1.withOpacity(.2)),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: gradient1,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          : Container()
+                    ],
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 100.0,
+                  ),
                   Expanded(
                     child: FutureBuilder(
                         future: _companySales,
@@ -909,6 +1144,7 @@ class _ManageSalesState extends State<ManageSales> {
                             if (!_salesAlreadyLoad) {
                               allSalesData = snapshot.data;
                               _sales = _checkAllSales(allSalesData);
+                              globalSales = allSalesData;
                               _salesForSearch = _sales;
                               loadDesireSales(_sales);
                             }
@@ -927,190 +1163,6 @@ class _ManageSalesState extends State<ManageSales> {
                                           /* Serveuse */
                                           Column(
                                             children: <Widget>[
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.brightness_1,
-                                                    color: gradient1,
-                                                    size:
-                                                        myWidth(context) / 15.0,
-                                                  ),
-                                                  SizedBox(
-                                                      width: myWidth(context) /
-                                                          30.0),
-                                                  Text(
-                                                    'En attente',
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                40.0,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                  Spacer(),
-                                                  GestureDetector(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    MainPage(
-                                                                      index: 1,
-                                                                    ))),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Icon(
-                                                        AmazingIcon
-                                                            .arrow_down_s_line,
-                                                        size:
-                                                            myHeight(context) /
-                                                                20.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 50.0,
-                                              ),
-                                              Row(
-                                                children: <Widget>[
-                                                  Expanded(
-                                                    child: Stack(
-                                                      children: <Widget>[
-                                                        Container(
-                                                          height: 46.0,
-                                                          decoration:
-                                                              buildTextFormFieldContainer(
-                                                                  decorationColor),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      10.0),
-                                                          child: Container(
-                                                            height: 46.0,
-                                                            child:
-                                                                TextFormField(
-                                                              textInputAction:
-                                                                  TextInputAction
-                                                                      .done,
-                                                              style: TextStyle(
-                                                                  color: textInverseModeColor
-                                                                      .withOpacity(
-                                                                          .87)),
-                                                              controller:
-                                                                  _searchController,
-                                                              focusNode:
-                                                                  _searchNode,
-                                                              onChanged:
-                                                                  (value) {
-                                                                setState(() {
-                                                                  _sales = searchMethod(
-                                                                      _salesForSearch,
-                                                                      value);
-                                                                  loadDesireSales(
-                                                                      _sales);
-                                                                });
-                                                              },
-                                                              onFieldSubmitted:
-                                                                  (value) {
-                                                                setState(() {
-                                                                  _sales = searchMethod(
-                                                                      _salesForSearch,
-                                                                      value);
-                                                                  loadDesireSales(
-                                                                      _sales);
-                                                                  _searchController
-                                                                      .text = '';
-                                                                });
-                                                              },
-                                                              decoration:
-                                                                  InputDecoration(
-                                                                      contentPadding: const EdgeInsets
-                                                                              .only(
-                                                                          left:
-                                                                              50.0),
-                                                                      suffixIcon:
-                                                                          GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          _searchController.text =
-                                                                              '';
-                                                                          _searchNode
-                                                                              .unfocus();
-                                                                          _sales =
-                                                                              _salesForSearch;
-                                                                          loadDesireSales(
-                                                                              _sales);
-                                                                        },
-                                                                        child: Icon(
-                                                                            AmazingIcon
-                                                                                .close_fill,
-                                                                            color:
-                                                                                textInverseModeColor),
-                                                                      ),
-                                                                      hintText:
-                                                                          'Recherche...',
-                                                                      prefixIcon: Icon(
-                                                                          AmazingIcon
-                                                                              .search_2_line,
-                                                                          color:
-                                                                              textInverseModeColor),
-                                                                      hintStyle: TextStyle(
-                                                                          color: textInverseModeColor.withOpacity(
-                                                                              .35),
-                                                                          fontSize:
-                                                                              18.0),
-                                                                      border:
-                                                                          OutlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide.none,
-                                                                      )),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        myWidth(context) / 30.0,
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                AddSalesPage())),
-                                                    child: Container(
-                                                      padding: EdgeInsets.all(
-                                                          myHeight(context) /
-                                                              70.0),
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: gradient1
-                                                              .withOpacity(.2)),
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        color: gradient1,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 100.0,
-                                              ),
                                               Expanded(
                                                   child:
                                                       _salesToShow == null ||
@@ -1277,190 +1329,6 @@ class _ManageSalesState extends State<ManageSales> {
                                           /* Premiere */
                                           Column(
                                             children: <Widget>[
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.brightness_1,
-                                                    color: gradient1,
-                                                    size:
-                                                        myWidth(context) / 15.0,
-                                                  ),
-                                                  SizedBox(
-                                                      width: myWidth(context) /
-                                                          30.0),
-                                                  Text(
-                                                    'En attente',
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                40.0,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                  Spacer(),
-                                                  GestureDetector(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    MainPage(
-                                                                      index: 1,
-                                                                    ))),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Icon(
-                                                        AmazingIcon
-                                                            .arrow_down_s_line,
-                                                        size:
-                                                            myHeight(context) /
-                                                                20.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 50.0,
-                                              ),
-                                              Row(
-                                                children: <Widget>[
-                                                  Expanded(
-                                                    child: Stack(
-                                                      children: <Widget>[
-                                                        Container(
-                                                          height: 46.0,
-                                                          decoration:
-                                                              buildTextFormFieldContainer(
-                                                                  decorationColor),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      10.0),
-                                                          child: Container(
-                                                            height: 46.0,
-                                                            child:
-                                                                TextFormField(
-                                                              textInputAction:
-                                                                  TextInputAction
-                                                                      .done,
-                                                              style: TextStyle(
-                                                                  color: textInverseModeColor
-                                                                      .withOpacity(
-                                                                          .87)),
-                                                              controller:
-                                                                  _searchController,
-                                                              focusNode:
-                                                                  _searchNode,
-                                                              onChanged:
-                                                                  (value) {
-                                                                setState(() {
-                                                                  _sales = searchMethod(
-                                                                      _salesForSearch,
-                                                                      value);
-                                                                  loadDesireSales(
-                                                                      _sales);
-                                                                });
-                                                              },
-                                                              onFieldSubmitted:
-                                                                  (value) {
-                                                                setState(() {
-                                                                  _sales = searchMethod(
-                                                                      _salesForSearch,
-                                                                      value);
-                                                                  loadDesireSales(
-                                                                      _sales);
-                                                                  _searchController
-                                                                      .text = '';
-                                                                });
-                                                              },
-                                                              decoration:
-                                                                  InputDecoration(
-                                                                      contentPadding: const EdgeInsets
-                                                                              .only(
-                                                                          left:
-                                                                              50.0),
-                                                                      suffixIcon:
-                                                                          GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          _searchController.text =
-                                                                              '';
-                                                                          _searchNode
-                                                                              .unfocus();
-                                                                          _sales =
-                                                                              _salesForSearch;
-                                                                          loadDesireSales(
-                                                                              _sales);
-                                                                        },
-                                                                        child: Icon(
-                                                                            AmazingIcon
-                                                                                .close_fill,
-                                                                            color:
-                                                                                textInverseModeColor),
-                                                                      ),
-                                                                      hintText:
-                                                                          'Recherche...',
-                                                                      prefixIcon: Icon(
-                                                                          AmazingIcon
-                                                                              .search_2_line,
-                                                                          color:
-                                                                              textInverseModeColor),
-                                                                      hintStyle: TextStyle(
-                                                                          color: textInverseModeColor.withOpacity(
-                                                                              .35),
-                                                                          fontSize:
-                                                                              18.0),
-                                                                      border:
-                                                                          OutlineInputBorder(
-                                                                        borderSide:
-                                                                            BorderSide.none,
-                                                                      )),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        myWidth(context) / 30.0,
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                AddSalesPage())),
-                                                    child: Container(
-                                                      padding: EdgeInsets.all(
-                                                          myHeight(context) /
-                                                              70.0),
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: gradient1
-                                                              .withOpacity(.2)),
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        color: gradient1,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 100.0,
-                                              ),
                                               Expanded(
                                                   child:
                                                       _salesToShow == null ||
@@ -1626,157 +1494,6 @@ class _ManageSalesState extends State<ManageSales> {
                                           /* Deuxieme */
                                           Column(
                                             children: <Widget>[
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.brightness_1,
-                                                    color: Colors.orange,
-                                                    size:
-                                                        myWidth(context) / 15.0,
-                                                  ),
-                                                  SizedBox(
-                                                      width: myWidth(context) /
-                                                          30.0),
-                                                  Text(
-                                                    'Servie',
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                40.0,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                  Spacer(),
-                                                  GestureDetector(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    MainPage(
-                                                                      index: 1,
-                                                                    ))),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Icon(
-                                                        AmazingIcon
-                                                            .arrow_down_s_line,
-                                                        size:
-                                                            myHeight(context) /
-                                                                20.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 50.0,
-                                              ),
-                                              Stack(
-                                                children: <Widget>[
-                                                  Container(
-                                                    height: 46.0,
-                                                    decoration:
-                                                        buildTextFormFieldContainer(
-                                                            decorationColor),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0),
-                                                    child: Container(
-                                                      height: 46.0,
-                                                      child: TextFormField(
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .done,
-                                                        style: TextStyle(
-                                                            color:
-                                                                textInverseModeColor
-                                                                    .withOpacity(
-                                                                        .87)),
-                                                        controller:
-                                                            _searchController,
-                                                        focusNode: _searchNode,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _sales = searchMethod(
-                                                                _salesForSearch,
-                                                                value);
-                                                            loadDesireSales(
-                                                                _sales);
-                                                          });
-                                                        },
-                                                        onFieldSubmitted:
-                                                            (value) {
-                                                          setState(() {
-                                                            _sales = searchMethod(
-                                                                _salesForSearch,
-                                                                value);
-                                                            loadDesireSales(
-                                                                _sales);
-                                                            _searchController
-                                                                .text = '';
-                                                          });
-                                                        },
-                                                        decoration:
-                                                            InputDecoration(
-                                                                contentPadding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        left:
-                                                                            50.0),
-                                                                suffixIcon:
-                                                                    GestureDetector(
-                                                                  onTap: () {
-                                                                    _searchController
-                                                                        .text = '';
-                                                                    _searchNode
-                                                                        .unfocus();
-                                                                    _sales =
-                                                                        _salesForSearch;
-                                                                    loadDesireSales(
-                                                                        _sales);
-                                                                  },
-                                                                  child: Icon(
-                                                                      AmazingIcon
-                                                                          .close_fill,
-                                                                      color:
-                                                                          textInverseModeColor),
-                                                                ),
-                                                                hintText:
-                                                                    'Recherche...',
-                                                                prefixIcon: Icon(
-                                                                    AmazingIcon
-                                                                        .search_2_line,
-                                                                    color:
-                                                                        textInverseModeColor),
-                                                                hintStyle: TextStyle(
-                                                                    color: textInverseModeColor
-                                                                        .withOpacity(
-                                                                            .35),
-                                                                    fontSize:
-                                                                        18.0),
-                                                                border:
-                                                                    OutlineInputBorder(
-                                                                  borderSide:
-                                                                      BorderSide
-                                                                          .none,
-                                                                )),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 100.0,
-                                              ),
                                               Expanded(
                                                   child:
                                                       _salesToShow == null ||
@@ -1913,157 +1630,6 @@ class _ManageSalesState extends State<ManageSales> {
                                           /* Troisieme */
                                           Column(
                                             children: <Widget>[
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.brightness_1,
-                                                    color: Colors.green,
-                                                    size:
-                                                        myWidth(context) / 15.0,
-                                                  ),
-                                                  SizedBox(
-                                                      width: myWidth(context) /
-                                                          30.0),
-                                                  Text(
-                                                    'Paye',
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                40.0,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                  Spacer(),
-                                                  GestureDetector(
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    MainPage(
-                                                                      index: 1,
-                                                                    ))),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Icon(
-                                                        AmazingIcon
-                                                            .arrow_down_s_line,
-                                                        size:
-                                                            myHeight(context) /
-                                                                20.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 50.0,
-                                              ),
-                                              Stack(
-                                                children: <Widget>[
-                                                  Container(
-                                                    height: 46.0,
-                                                    decoration:
-                                                        buildTextFormFieldContainer(
-                                                            decorationColor),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0),
-                                                    child: Container(
-                                                      height: 46.0,
-                                                      child: TextFormField(
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .done,
-                                                        style: TextStyle(
-                                                            color:
-                                                                textInverseModeColor
-                                                                    .withOpacity(
-                                                                        .87)),
-                                                        controller:
-                                                            _searchController,
-                                                        focusNode: _searchNode,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _sales = searchMethod(
-                                                                _salesForSearch,
-                                                                value);
-                                                            loadDesireSales(
-                                                                _sales);
-                                                          });
-                                                        },
-                                                        onFieldSubmitted:
-                                                            (value) {
-                                                          setState(() {
-                                                            _sales = searchMethod(
-                                                                _salesForSearch,
-                                                                value);
-                                                            loadDesireSales(
-                                                                _sales);
-                                                            _searchController
-                                                                .text = '';
-                                                          });
-                                                        },
-                                                        decoration:
-                                                            InputDecoration(
-                                                                contentPadding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        left:
-                                                                            50.0),
-                                                                suffixIcon:
-                                                                    GestureDetector(
-                                                                  onTap: () {
-                                                                    _searchController
-                                                                        .text = '';
-                                                                    _searchNode
-                                                                        .unfocus();
-                                                                    _sales =
-                                                                        _salesForSearch;
-                                                                    loadDesireSales(
-                                                                        _sales);
-                                                                  },
-                                                                  child: Icon(
-                                                                      AmazingIcon
-                                                                          .close_fill,
-                                                                      color:
-                                                                          textInverseModeColor),
-                                                                ),
-                                                                hintText:
-                                                                    'Recherche...',
-                                                                prefixIcon: Icon(
-                                                                    AmazingIcon
-                                                                        .search_2_line,
-                                                                    color:
-                                                                        textInverseModeColor),
-                                                                hintStyle: TextStyle(
-                                                                    color: textInverseModeColor
-                                                                        .withOpacity(
-                                                                            .35),
-                                                                    fontSize:
-                                                                        18.0),
-                                                                border:
-                                                                    OutlineInputBorder(
-                                                                  borderSide:
-                                                                      BorderSide
-                                                                          .none,
-                                                                )),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height:
-                                                    myHeight(context) / 100.0,
-                                              ),
                                               Expanded(
                                                   child:
                                                       _salesToShow == null ||
@@ -2201,40 +1767,6 @@ class _ManageSalesState extends State<ManageSales> {
                           }
                           return Column(
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.brightness_1,
-                                    color: gradient1,
-                                    size: myWidth(context) / 15.0,
-                                  ),
-                                  SizedBox(width: myWidth(context) / 30.0),
-                                  Text(
-                                    'En attente',
-                                    style: TextStyle(
-                                        fontSize: myHeight(context) / 40.0,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                    onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => MainPage(
-                                                  index: 1,
-                                                ))),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: Icon(
-                                        AmazingIcon.arrow_down_s_line,
-                                        size: myHeight(context) / 20.0,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
                               Expanded(
                                 child: Center(
                                   child: CircularProgressIndicator(

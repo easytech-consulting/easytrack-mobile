@@ -26,6 +26,7 @@ class _SupplierPageState extends State<SupplierPage> {
     name = widget.sitename;
     _isLoading = false;
     _suppliers = widget.data.map((data) => Supplier.fromJson(data)).toList();
+    globalSuppliers = _suppliers;
   }
 
   @override

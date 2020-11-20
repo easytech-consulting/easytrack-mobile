@@ -24,7 +24,6 @@ class _PurchasePageState extends State<PurchasePage> {
   List _suppliers;
   bool _isLoading;
   GlobalKey<ScaffoldState> _scaffoldKey;
-  TextEditingController _controller;
 
   @override
   void initState() {
@@ -34,7 +33,6 @@ class _PurchasePageState extends State<PurchasePage> {
     _initiators = [];
     _validators = [];
     _companyPurchases = fetchPurchases();
-    _controller = new TextEditingController();
     _scaffoldKey = GlobalKey();
     _isLoading = false;
   }
@@ -267,6 +265,8 @@ class _PurchasePageState extends State<PurchasePage> {
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData) {
                       allPurchasesData = snapshot.data;
+
+                      globalPurchases = allPurchasesData;
                       _purchases = _checkAllPurchases(allPurchasesData)
                           .map((sale) => Purchase.fromJson(sale))
                           .toList();
@@ -420,50 +420,15 @@ class _PurchasePageState extends State<PurchasePage> {
                           'Mes achats',
                         ),
                         SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
-                            return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: index == 0
-                                        ? myHeight(context) / 50.0
-                                        : myHeight(context) / 100.0,
-                                    horizontal: myHeight(context) / 40.0),
-                                child: Container(
-                                    height: myHeight(context) / 6.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                myHeight(context) / 70.0)),
-                                        border:
-                                            Border.all(color: Colors.black12)),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(
-                                          myHeight(context) / 60.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            height: myHeight(context) / 30.0,
-                                            width: myWidth(context) / 2,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 1.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 3.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                        ],
-                                      ),
-                                    )));
-                          }),
+                          delegate: SliverChildListDelegate([
+                            Container(
+                              alignment: Alignment.center,
+                              height: myHeight(context) / 1.5,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(gradient1),
+                              ),
+                            )
+                          ]),
                         )
                       ],
                     );

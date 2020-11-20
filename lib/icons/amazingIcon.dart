@@ -23,6 +23,8 @@ class AmazingIcon {
 
   static const IconData delete_bin_6_line = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData message_2_line = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData secure_payment_line = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData user_star_line = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData checkbox_circle_line = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData at_line = IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData phone_line = IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -52,7 +54,12 @@ class AmazingIcon {
   static const IconData check_fill = IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData alert_line = IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData user_6_line = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData file_shred_line = IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData file_shield_2_line = IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chat_new_line = IconData(0xe823, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData followers = IconData(0xe824, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData group_line = IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData user_received_line = IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData building_2_line = IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData play_list_add_fill = IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData list_check = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);

@@ -1,6 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
-import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/sale.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/models/user_with_id.dart';
@@ -77,281 +76,290 @@ class _SalePageState extends State<SalePage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             child: Form(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(
-                    'img/logos/LogoWhiteWithText.png',
-                    color: textInverseModeColor,
-                    height: myHeight(context) / 20.0,
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Recu bon de vente',
-                    style: TextStyle(
-                        fontSize: myHeight(context) / 40.0,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  company == null
-                      ? Container(
-                          height: 0.0,
-                        )
-                      : Column(
-                          children: [
-                            Text(
-                              'Snack: ${company.name}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            Text(
-                              'Telephone: ${company.tel1}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            Text(
-                              '${company.town}, ${company.street}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            ),
-                            SizedBox(
-                              height: myHeight(context) / 50.0,
-                            ),
-                          ],
-                        ),
-                  Text(
-                    'Site: ${_site.name}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'img/logos/LogoWhiteWithText.png',
+                      color: textInverseModeColor,
+                      height: myHeight(context) / 20.0,
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    '${_site.street}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
                     ),
-                  ),
-                  _site.tel1 != null
-                      ? Text(
-                          '${_site.tel1}',
-                          style: TextStyle(
-                            fontSize: myHeight(context) / 50.0,
-                          ),
-                        )
-                      : _site.tel2 != null
-                          ? Text(
-                              '${_site.tel2}',
-                              style: TextStyle(
-                                fontSize: myHeight(context) / 50.0,
-                              ),
-                            )
-                          : Container(
-                              height: 0.0,
-                            ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Client: ${capitalize(_customer)}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    Text(
+                      'Recu bon de vente',
+                      style: TextStyle(
+                          fontSize: myHeight(context) / 40.0,
+                          fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Date: ${_sale.createdAt}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
                     ),
-                  ),
-                  Text(
-                    'Reference: S0-${_sale.code}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Text(
-                    'Initie par: ${_initiator.name}',
-                    style: TextStyle(
-                      fontSize: myHeight(context) / 50.0,
-                    ),
-                  ),
-                  validator == null
-                      ? Container(
-                          height: 0.0,
-                        )
-                      : Text(
-                          'Valide par: ${validator.name}',
-                          style: TextStyle(
-                            fontSize: myHeight(context) / 50.0,
-                          ),
-                        ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _products.length,
-                      itemBuilder: (context, index) => Column(
-                        children: <Widget>[
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                '${_products[index]['name']}',
-                                style: TextStyle(
-                                  fontSize: myHeight(context) / 50.0,
-                                ),
-                              )),
-                          SizedBox(
-                            height: myHeight(context) / 100.0,
-                          ),
-                          Row(
-                            children: <Widget>[
+                    company == null
+                        ? Container(
+                            height: 0.0,
+                          )
+                        : Column(
+                            children: [
                               Text(
-                                '${_products[index]['pivot']['qty']} x ${_products[index]['pivot']['price']}',
+                                'Snack: ${company.name}',
                                 style: TextStyle(
                                   fontSize: myHeight(context) / 50.0,
                                 ),
                               ),
-                              Spacer(),
                               Text(
-                                '${_products[index]['pivot']['qty'] * _products[index]['pivot']['price']}',
+                                'Telephone: ${company.tel1}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                              Text(
+                                '${company.town}, ${company.street}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                              SizedBox(
+                                height: myHeight(context) / 50.0,
+                              ),
+                            ],
+                          ),
+                    Text(
+                      'Site: ${_site.name}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      '${_site.street}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    _site.tel1 != null
+                        ? Text(
+                            '${_site.tel1}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          )
+                        : _site["tel2"] != null
+                            ? Text(
+                                '${_site["tel2"]}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              )
+                            : Container(
+                                height: 0.0,
+                              ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      'Client: ${capitalize(_customer)}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: myHeight(context) / 50.0,
+                              ),
+                              Text(
+                                'Date: ${_sale["created_at"]}',
                                 style: TextStyle(
                                   fontSize: myHeight(context) / 50.0,
                                 ),
                               ),
                             ],
                           ),
-                          Divider(),
-                          SizedBox(
-                            height: myHeight(context) / 100.0,
-                          ),
-                        ],
+                    Text(
+                      'Reference: S0-${_sale["code"]}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        'Sous total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Text(
+                      'Initie par: ${_initiator["name"]}',
+                      style: TextStyle(
+                        fontSize: myHeight(context) / 50.0,
+                      ),
+                    ),
+                    validator == null
+                        ? Container(
+                            height: 0.0,
+                          )
+                        : Text(
+                            'Valide par: ${validator["name"]}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Container(
+                      height: myHeight(context) / 12.0 * _products.length,
+                      child: ListView.builder(
+                        physics: null,
+                        itemCount: _products.length,
+                        itemBuilder: (context, index) => Column(
+                          children: <Widget>[
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '${_products[index]['name']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                )),
+                            SizedBox(
+                              height: myHeight(context) / 100.0,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  '${_products[index]['pivot']['qty']} x ${_products[index]['pivot']['price']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  '${_products[index]['pivot']['qty'] * _products[index]['pivot']['price']}',
+                                  style: TextStyle(
+                                    fontSize: myHeight(context) / 50.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Divider(),
+                            SizedBox(
+                              height: myHeight(context) / 100.0,
+                            ),
+                          ],
                         ),
                       ),
-                      Spacer(),
-                      Text(
-                        '$total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Divider(),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        '$total',
-                        style: TextStyle(
-                          fontSize: myHeight(context) / 50.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 50.0,
-                  ),
-                  Container(
-                    color: Colors.blueGrey.withOpacity(.3),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: myHeight(context) / 100.0, horizontal: 1.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Paye par: ${_sale.payingMethod.toUpperCase()}',
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          'Sous total',
                           style: TextStyle(
                             fontSize: myHeight(context) / 50.0,
                           ),
                         ),
+                        Spacer(),
+                        Text(
+                          '$total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          'Total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          '$total',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 50.0,
+                    ),
+                    Container(
+                      color: Colors.blueGrey.withOpacity(.3),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: myHeight(context) / 100.0,
+                            horizontal: 1.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Paye par: ${_sale["paying_method"].toUpperCase()}',
+                            style: TextStyle(
+                              fontSize: myHeight(context) / 50.0,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 40.0,
-                  ),
-                  InkWell(
-                    onTap: () =>
-                        launchWhatsApp(phone: '+237694589535', message: ''),
-                    child: Container(
-                      width: double.infinity,
-                      height: myHeight(context) / 20.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
+                    SizedBox(
+                      height: myHeight(context) / 40.0,
+                    ),
+                    InkWell(
+                      onTap: () => launchWhatsApp(phone: '', message: ''),
+                      child: Container(
+                        width: double.infinity,
+                        height: myHeight(context) / 20.0,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(myHeight(context) / 20.0),
+                            gradient:
+                                LinearGradient(colors: [gradient1, gradient2])),
+                        child: Text(
+                          'Envoyer au client',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: textSameModeColor,
+                              fontSize: myHeight(context) / 50.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: myHeight(context) / 100.0,
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: double.infinity,
+                        height: myHeight(context) / 20.0,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: textInverseModeColor),
                           borderRadius:
                               BorderRadius.circular(myHeight(context) / 20.0),
-                          gradient:
-                              LinearGradient(colors: [gradient1, gradient2])),
-                      child: Text(
-                        'Envoyer au client',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: textSameModeColor,
-                            fontSize: myHeight(context) / 50.0),
+                        ),
+                        child: Text(
+                          'Retour',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: myHeight(context) / 50.0),
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: myHeight(context) / 100.0,
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: double.infinity,
-                      height: myHeight(context) / 20.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: textInverseModeColor),
-                        borderRadius:
-                            BorderRadius.circular(myHeight(context) / 20.0),
-                      ),
-                      child: Text(
-                        'Retour',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: myHeight(context) / 50.0),
-                      ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -409,6 +417,7 @@ class _SalePageState extends State<SalePage> {
                     snapshot.hasData) {
                   if (_sales == null) {
                     allSalesData = snapshot.data;
+                    globalSales = allSalesData;
                     _sales = _checkAllSales(allSalesData)
                         .map((sale) => Sale.fromJson(sale))
                         .toList();
@@ -495,7 +504,8 @@ class _SalePageState extends State<SalePage> {
                                                   )
                                                 ],
                                               ),
-                                             Spacer(), Expanded(
+                                              Spacer(),
+                                              Expanded(
                                                 child: Container(
                                                   width: myWidth(context),
                                                   child: ListView.builder(
@@ -534,7 +544,8 @@ class _SalePageState extends State<SalePage> {
                                                       }),
                                                 ),
                                               ),
-                                           Spacer(),   Row(
+                                              Spacer(),
+                                              Row(
                                                 children: <Widget>[
                                                   Text(
                                                     _sales[index].status == 2
@@ -587,48 +598,15 @@ class _SalePageState extends State<SalePage> {
                       'Mes ventes',
                     ),
                     SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: index == 0
-                                    ? myHeight(context) / 50.0
-                                    : myHeight(context) / 100.0,
-                                horizontal: myHeight(context) / 40.0),
-                            child: Container(
-                                height: myHeight(context) / 6.5,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            myHeight(context) / 70.0)),
-                                    border: Border.all(color: Colors.black12)),
-                                child: Padding(
-                                  padding:
-                                      EdgeInsets.all(myHeight(context) / 60.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Container(
-                                        color: Color(0xFFE4E4E4),
-                                        height: myHeight(context) / 30.0,
-                                        width: myWidth(context) / 2,
-                                      ),
-                                      Container(
-                                        color: Color(0xFFE4E4E4),
-                                        width: myWidth(context) / 1.5,
-                                        height: myHeight(context) / 30.0,
-                                      ),
-                                      Container(
-                                        color: Color(0xFFE4E4E4),
-                                        width: myWidth(context) / 3.5,
-                                        height: myHeight(context) / 30.0,
-                                      ),
-                                    ],
-                                  ),
-                                )));
-                      }),
+                      delegate: SliverChildListDelegate([
+                        Container(
+                          alignment: Alignment.center,
+                          height: myHeight(context) / 1.5,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(gradient1),
+                          ),
+                        )
+                      ]),
                     )
                   ],
                 );

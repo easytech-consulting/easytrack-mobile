@@ -1,7 +1,6 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/sales/manage.dart';
-import 'package:easytrack/services/productService.dart';
 import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';

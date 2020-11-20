@@ -1131,7 +1131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Row(
                       children: <Widget>[
                         Icon(
-                          AmazingIcon.community_line,
+                          AmazingIcon.file_shield_2_line,
                           color: textInverseModeColor,
                         ),
                         SizedBox(

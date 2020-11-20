@@ -78,7 +78,7 @@ Future updateSite(params, int id) async {
 Future deleteSite(int id) async {
   try {
     bool result = false;
-    final response = await http.delete('$endPoint/sites/$id',
+    final response = await http.post('$endPoint/sites/$id/destroy',
         headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
 
     if (response.statusCode == 200) {

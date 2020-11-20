@@ -1,6 +1,7 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/gradientIcon.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
+import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/services/notificationService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +50,9 @@ class _NotificationPageState extends State<NotificationsPage> {
     await closeNotifications(id).then((value) {
       setState(() {
         loading = false;
-        futureNotifications = fetchNotifications();
       });
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => NotificationsPage()));
     });
   }
 
@@ -174,11 +176,15 @@ class _NotificationPageState extends State<NotificationsPage> {
                             fontSize: myWidth(context) / 17),
                       ),
                       IconButton(
-                          icon: Icon(
-                            AmazingIcon.close_fill,
-                            size: myWidth(context) / 13,
-                          ),
-                          onPressed: () => Navigator.pop(context))
+                        icon: Icon(
+                          AmazingIcon.close_fill,
+                          size: myWidth(context) / 13,
+                        ),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage())),
+                      )
                     ],
                   ),
                   Expanded(
@@ -188,6 +194,7 @@ class _NotificationPageState extends State<NotificationsPage> {
                       if (snapshot.hasData) {
                         if (allData == null) {
                           allData = snapshot.data;
+                          globalNotifications = allData;
                           dataShow = loadData(allData, index);
                         }
                         return dataShow == null || dataShow.length == 0
@@ -210,7 +217,7 @@ class _NotificationPageState extends State<NotificationsPage> {
                                           children: [
                                             GradientIcon(
                                                 AmazingIcon.message_2_line,
-                                                myHeight(context) / 20,
+                                                myHeight(context) / 22,
                                                 notificationGradient[
                                                     index % 5]),
                                             SizedBox(

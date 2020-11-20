@@ -102,7 +102,7 @@ class _WelcomPageState extends State<WelcomPage> {
               ),
               SizedBox(height: myHeight(context) / 20),
               InkWell(
-                  onTap: launchNDA,
+                  onTap: () => launchURL(url: 'https://google.com'),
                   child: Center(
                     child: Text(
                       'voir notre politique de confidentialite',

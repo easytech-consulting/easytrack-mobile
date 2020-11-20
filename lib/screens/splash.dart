@@ -4,7 +4,6 @@ import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
 import 'package:easytrack/screens/home/home.dart';
-import 'package:easytrack/services/agendaService.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -24,6 +23,7 @@ class _SplashPageState extends State<SplashPage> {
     _login = false;
     _alreadyDone = false;
     _fetchMode();
+    oneSignalInitialisation();
   }
 
   _fetchMode() async {
@@ -37,14 +37,14 @@ class _SplashPageState extends State<SplashPage> {
     print(_login);
     if (!_alreadyDone) {
       _alreadyDone = true;
-      await getFirstConnexion().then((res) {
+      /* await getFirstConnexion().then((res) {
         if (res) {
           Navigator.pushNamed(context, '/welcome');
         } else {
           Navigator.pushNamed(context, '/login');
         }
-      });
-      /*  if (_login) {
+      }); */
+       if (_login) {
         String tokenExpireDate = await getTokenExpireDate();
         bool tokenAlreadyValid =
             DateTime.now().isBefore(DateTime.parse(tokenExpireDate));
@@ -59,8 +59,8 @@ class _SplashPageState extends State<SplashPage> {
           if (user.isAdmin == 1) {
             site = Site.fromJson(await getUserSite());
           }
-          
-          await logUserOnFirebase();
+          /* 
+          await logUserOnFirebase(); */
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => MainPage()));
         } else {
@@ -74,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
             Navigator.pushNamed(context, '/login');
           }
         });
-      } */
+      }
     }
   }
 

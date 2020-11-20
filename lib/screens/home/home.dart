@@ -22,84 +22,8 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.index == null ? 0 : widget.index;
+    _currentIndex = widget.index ?? 0;
     _pageController = new PageController(initialPage: _currentIndex);
-  }
-
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30.0))),
-                content: Container(
-                    height: myHeight(context) / 2.5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        errorAlertIcon(context),
-                        SizedBox(
-                          height: myHeight(context) / 40,
-                        ),
-                        Text(
-                          'Quitter l\'application',
-                          style: TextStyle(
-                              color: Color(0xff000000),
-                              fontSize: myWidth(context) / 22),
-                        ),
-                        SizedBox(height: myHeight(context) / 80),
-                        Text(
-                          'Vous allez sortir de l\'application',
-                          style: TextStyle(
-                              color: Color(0xff000000).withOpacity(.5),
-                              fontSize: myWidth(context) / 25),
-                        ),
-                        SizedBox(
-                          height: myHeight(context) / 40,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: FlatButton(
-                                color: gradient1,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(30.0))),
-                                onPressed: () => true,
-                                child: Container(
-                                    alignment: Alignment.center,
-                                    height: 40.0,
-                                    child: Text(
-                                      'Continuer',
-                                      style:
-                                          TextStyle(color: textSameModeColor),
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: OutlineButton(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(30.0))),
-                                borderSide:
-                                    BorderSide(color: Color(0xff000000)),
-                                onPressed: () => false,
-                                child: Container(
-                                    alignment: Alignment.center,
-                                    height: 40.0,
-                                    child: Text('Fermer')),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ))))) ??
-        false;
   }
 
   @override
@@ -128,24 +52,24 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop: () => onWillPop(context),
       child: Scaffold(
         bottomNavigationBar: Container(
           height: myHeight(context) / 10.0,
           decoration: BoxDecoration(
               gradient: LinearGradient(
-            colors: [gradient1, gradient2],
-            begin: Alignment.center,
-            end: Alignment.centerRight,
-            stops: [0.0, 0.8]
-          )),
+                  colors: [gradient1, gradient2],
+                  begin: Alignment.center,
+                  end: Alignment.centerRight,
+                  stops: [0.0, 0.8])),
           child: BottomNavigationBar(
               backgroundColor: Colors.transparent,
               elevation: 0.0,
               showSelectedLabels: false,
               showUnselectedLabels: false,
               type: BottomNavigationBarType.fixed,
-              unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(.4)),
+              unselectedIconTheme:
+                  IconThemeData(color: Colors.white.withOpacity(.4)),
               iconSize: myHeight(context) / 35,
               onTap: (int index) {
                 if (_pageController.hasClients) {
@@ -174,7 +98,7 @@ class _MainPageState extends State<MainPage> {
               }
             },
             scrollDirection: Axis.horizontal,
-            children: _items,
+            children: [_items[_currentIndex]],
           ),
         ),
       ),

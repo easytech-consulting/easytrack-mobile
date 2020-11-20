@@ -107,3 +107,21 @@ Future invalidateSale(id) async {
     throw Exception('Set Sale Status to $id with error $ex');
   }
 }
+
+Future deleteSales(int id) async {
+  try {
+    bool result = false;
+    final response = await http.post('$endPoint/sales/$id/destroy',
+        headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
+
+    if (response.statusCode == 200) {
+      result = true;
+    }
+
+    print(id);
+    print(response.statusCode);
+    return result;
+  } catch (ex) {
+    throw Exception('Delete Sales $id exited with error $ex');
+  }
+}

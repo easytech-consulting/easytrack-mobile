@@ -61,8 +61,8 @@ class _AddSalesPageState extends State<AddSalesPage> {
     return result;
   }
 
-  showDifferenceDialog(context, products, qties, id) {
-    _showPrice(context, products, qties, id);
+  showDifferenceDialog(products, qties, id) {
+    _showPrice(products, qties, id);
   }
 
   remboursementDialog(amount, context, products, qties, id) {
@@ -76,49 +76,82 @@ class _AddSalesPageState extends State<AddSalesPage> {
                       borderRadius:
                           BorderRadius.circular(myHeight(context) / 50.0)),
                   backgroundColor: Colors.white,
-                  actions: [
-                    InkWell(
-                      onTap: _priceController.text.isEmpty
-                          ? null
-                          : () {
-                              Navigator.pop(context);
-                              _attemptSave(products, qties, id);
-                            },
-                      child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: myWidth(context) / 20.0),
-                          height: myHeight(context) / 22.0,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30.0)),
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [gradient1, gradient2]),
-                          ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                          width: myWidth(context) / 2,
                           child: Text(
-                            'Suivant',
-                            style: TextStyle(
-                                color: textSameModeColor,
-                                fontSize: myHeight(context) / 40.0),
+                            'Modalites de remboursement',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           )),
-                    )
-                  ],
-                  content: Text(
-                    price == null
-                        ? 'Entrer un nombre valide'
-                        : price < total
-                            ? 'Montant inferieur'
-                            : 'Remboursement: ${int.parse(amount) - total} FCFA',
-                    style: TextStyle(fontSize: myHeight(context) / 45.0),
+                      InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(
+                            AmazingIcon.close_fill,
+                            size: myHeight(context) / 30.0,
+                          ))
+                    ],
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        price == null
+                            ? 'Entrer un nombre valide'
+                            : price < total
+                                ? 'Montant inferieur'
+                                : 'Remboursement: ${int.parse(amount) - total} FCFA',
+                        style: TextStyle(fontSize: myHeight(context) / 45.0),
+                      ),
+                      SizedBox(height: myHeight(context) / 50.0),
+                      InkWell(
+                        onTap: price == null
+                            ? () {
+                                Navigator.pop(context);
+                                _showPrice(products, qties, id);
+                              }
+                            : price < total
+                                ? () {
+                                    Navigator.pop(context);
+                                    _showPrice(products, qties, id);
+                                  }
+                                : () {
+                                    Navigator.pop(context);
+                                    _attemptSave(products, qties, id);
+                                  },
+                        child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: myWidth(context) / 20.0),
+                            height: myHeight(context) / 22.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [gradient1, gradient2]),
+                            ),
+                            child: Text(
+                              price == null
+                                  ? 'Retour'
+                                  : price < total ? 'Retour' : 'Suivant',
+                              style: TextStyle(
+                                  color: textSameModeColor,
+                                  fontSize: myHeight(context) / 40.0),
+                            )),
+                      )
+                    ],
                   ),
                 );
               },
             ));
   }
 
-  _showPrice(context, products, qties, id) {
+  _showPrice(products, qties, id) {
     _priceController.clear();
     showDialog(
         context: context,
@@ -129,57 +162,79 @@ class _AddSalesPageState extends State<AddSalesPage> {
                       borderRadius:
                           BorderRadius.circular(myHeight(context) / 50.0)),
                   backgroundColor: Colors.white,
-                  actions: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        remboursementDialog(_priceController.text, context,
-                            products, qties, id);
-                      },
-                      child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: myWidth(context) / 20.0),
-                          height: myHeight(context) / 22.0,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30.0)),
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [gradient1, gradient2]),
-                          ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                          width: myWidth(context) / 2,
                           child: Text(
-                            'Suivant',
-                            style: TextStyle(
-                                color: textSameModeColor,
-                                fontSize: myHeight(context) / 40.0),
+                            'Modalites de remboursement',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           )),
-                    )
-                  ],
-                  content: Container(
-                    height: myHeight(context) / 17.0,
-                    decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius:
-                            BorderRadius.circular(myHeight(context) / 10.0)),
-                    child: TextFormField(
-                      controller: _priceController,
-                      style: TextStyle(fontSize: myHeight(context) / 42.0),
-                      decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            AmazingIcon.money_dollar_circle_line,
-                            color: Colors.black,
-                            size: myHeight(context) / 32.0,
-                          ),
-                          hintText: 'Montant',
-                          hintStyle:
-                              TextStyle(fontSize: myHeight(context) / 42.0),
-                          contentPadding:
-                              EdgeInsets.only(left: myHeight(context) / 30.0),
-                          border:
-                              OutlineInputBorder(borderSide: BorderSide.none)),
-                    ),
+                      InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(
+                            AmazingIcon.close_fill,
+                            size: myHeight(context) / 30.0,
+                          ))
+                    ],
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: myHeight(context) / 17.0,
+                        decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(
+                                myHeight(context) / 10.0)),
+                        child: TextFormField(
+                          controller: _priceController,
+                          style: TextStyle(fontSize: myHeight(context) / 42.0),
+                          decoration: InputDecoration(
+                              prefixIcon: Icon(
+                                AmazingIcon.money_dollar_circle_line,
+                                color: Colors.black,
+                                size: myHeight(context) / 32.0,
+                              ),
+                              hintText: 'Montant',
+                              hintStyle:
+                                  TextStyle(fontSize: myHeight(context) / 42.0),
+                              contentPadding: EdgeInsets.only(
+                                  left: myHeight(context) / 30.0),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none)),
+                        ),
+                      ),
+                      SizedBox(height: myHeight(context) / 50.0),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          remboursementDialog(_priceController.text, context,
+                              products, qties, id);
+                        },
+                        child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: myWidth(context) / 20.0),
+                            height: myHeight(context) / 17.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [gradient1, gradient2]),
+                            ),
+                            child: Text(
+                              'Suivant',
+                              style: TextStyle(
+                                  color: textSameModeColor,
+                                  fontSize: myHeight(context) / 40.0),
+                            )),
+                      )
+                    ],
                   ),
                 );
               },
@@ -1007,8 +1062,8 @@ class _AddSalesPageState extends State<AddSalesPage> {
                   InkWell(
                     onTap: _productsOnOrder == null || _productsOnOrder.isEmpty
                         ? null
-                        : () => showDifferenceDialog(context, _productsOnOrder,
-                            _quantities, currentSite['id']),
+                        : () => showDifferenceDialog(
+                            _productsOnOrder, _quantities, currentSite['id']),
                     child: Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: myWidth(context) / 20.0),

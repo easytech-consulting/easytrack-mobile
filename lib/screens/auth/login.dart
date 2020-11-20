@@ -419,254 +419,260 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: true,
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        body: Stack(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Form(
-                  key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Container(
-                      height: myHeight(context),
-                      width: myWidth(context),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: myHeight(context) / 15.0,
-                          ),
-                          Hero(
-                            tag: 'logo',
-                            child: Image.asset(
-                              'img/Logo.png',
-                              width: myHeight(context) / 13,
+    return WillPopScope(
+      onWillPop: () => onWillPop(context),
+      child: SafeArea(
+        top: true,
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          body: Stack(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Container(
+                        height: myHeight(context),
+                        width: myWidth(context),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: myHeight(context) / 15.0,
                             ),
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 30.0,
-                          ),
-                          Text('Connexion',
+                            Hero(
+                              tag: 'logo',
+                              child: Image.asset(
+                                'img/Logo.png',
+                                width: myHeight(context) / 13,
+                              ),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 30.0,
+                            ),
+                            Text('Connexion',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontSize: myHeight(context) / 20)),
+                            SizedBox(height: myHeight(context) / 80.0),
+                            Text(
+                              'Authentifiez-vous pour acceder',
                               style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontSize: myHeight(context) / 20)),
-                          SizedBox(height: myHeight(context) / 80.0),
-                          Text(
-                            'Authentifiez-vous pour acceder',
-                            style: TextStyle(
-                                color: textInverseModeColor.withOpacity(.7),
-                                fontSize: myHeight(context) / 39),
-                          ),
-                          Text(
-                            'a la plate-forme',
-                            style: TextStyle(
-                                color: textInverseModeColor.withOpacity(.7),
-                                fontSize: myHeight(context) / 39),
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 18,
-                          ),
-                          Stack(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Container(
-                                    height: 48.0,
-                                    decoration: buildTextFormFieldContainer(
-                                        decorationColor)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: TextFormField(
-                                  controller: _loginController,
-                                  focusNode: _loginNode,
-                                  textInputAction: TextInputAction.next,
-                                  onFieldSubmitted: (_) => nextNode(
-                                      context, _loginNode, _passwordNode),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return 'Champs obligatoire';
-                                    }
-                                    return null;
-                                  },
-                                  style: TextStyle(color: textInverseModeColor),
-                                  decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                      prefixIcon: Icon(AmazingIcon.user_6_line,
-                                          color: textInverseModeColor,
-                                          size: 15.0),
-                                      hintText: 'Nom d\'utilisateur',
-                                      hintStyle: TextStyle(
-                                          color: textInverseModeColor
-                                              .withOpacity(.35),
-                                          fontSize: 18.0),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      )),
+                                  color: textInverseModeColor.withOpacity(.7),
+                                  fontSize: myHeight(context) / 39),
+                            ),
+                            Text(
+                              'a la plate-forme',
+                              style: TextStyle(
+                                  color: textInverseModeColor.withOpacity(.7),
+                                  fontSize: myHeight(context) / 39),
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 18,
+                            ),
+                            Stack(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Container(
+                                      height: 48.0,
+                                      decoration: buildTextFormFieldContainer(
+                                          decorationColor)),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 31.0,
-                          ),
-                          Stack(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.5),
-                                child: Container(
-                                    height: 48.0,
-                                    decoration: buildTextFormFieldContainer(
-                                        decorationColor)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: TextFormField(
-                                  obscureText: _obscureText,
-                                  controller: _passwordController,
-                                  focusNode: _passwordNode,
-                                  textInputAction: TextInputAction.done,
-                                  onFieldSubmitted: (_) {
-                                    _passwordNode.unfocus();
-                                  },
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return 'Champs obligatoire';
-                                    }
-                                    return null;
-                                  },
-                                  style: TextStyle(color: textInverseModeColor),
-                                  decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                      prefixIcon: Icon(
-                                          AmazingIcon.lock_password_line,
-                                          color: textInverseModeColor,
-                                          size: 15.0),
-                                      hintText: 'Mot de passe',
-                                      fillColor: textInverseModeColor,
-                                      hintStyle: TextStyle(
-                                          color: textInverseModeColor
-                                              .withOpacity(.35),
-                                          fontSize: 18.0),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      suffixIcon: InkWell(
-                                        onTap: () => _toggle(),
-                                        child: Icon(
-                                            _obscureText
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: TextFormField(
+                                    controller: _loginController,
+                                    focusNode: _loginNode,
+                                    textInputAction: TextInputAction.next,
+                                    onFieldSubmitted: (_) => nextNode(
+                                        context, _loginNode, _passwordNode),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Champs obligatoire';
+                                      }
+                                      return null;
+                                    },
+                                    style:
+                                        TextStyle(color: textInverseModeColor),
+                                    decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 50.0),
+                                        prefixIcon: Icon(
+                                            AmazingIcon.user_6_line,
                                             color: textInverseModeColor,
                                             size: 15.0),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      )),
+                                        hintText: 'Nom d\'utilisateur',
+                                        hintStyle: TextStyle(
+                                            color: textInverseModeColor
+                                                .withOpacity(.35),
+                                            fontSize: 18.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        )),
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: myHeight(context) / 31.0,
-                          ),
-                          InkWell(
-                            onTap: () => _connectionAttempt(),
-                            child: Container(
-                                height: 48.0,
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30.0)),
-                                    gradient: LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [gradient1, gradient2])),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Center(
-                                    child: Text(
-                                      'Se connecter',
-                                      style: TextStyle(
-                                          color: textSameModeColor,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                                10.0, 0.0, 10.0, 10.0),
-                            child: Container(
-                              height: myHeight(context) / 10,
-                              child: Row(
-                                children: <Widget>[
-                                  InkWell(
-                                    onTap: () => Navigator.pushNamed(
-                                        context, '/register'),
-                                    child: Container(
-                                        child: Text('Inscription',
-                                            style: TextStyle(
-                                                color: textInverseModeColor,
-                                                fontSize:
-                                                    myHeight(context) / 43))),
-                                  ),
-                                  Spacer(),
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        appThemeMode =
-                                            appThemeMode == ThemeMode.dark
-                                                ? ThemeMode.light
-                                                : ThemeMode.dark;
-                                        loadModeColor(appThemeMode);
-                                      });
-                                      changeMode(appThemeMode == ThemeMode.dark
-                                          ? true
-                                          : false);
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 31.0,
+                            ),
+                            Stack(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.5),
+                                  child: Container(
+                                      height: 48.0,
+                                      decoration: buildTextFormFieldContainer(
+                                          decorationColor)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: TextFormField(
+                                    obscureText: _obscureText,
+                                    controller: _passwordController,
+                                    focusNode: _passwordNode,
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (_) {
+                                      _passwordNode.unfocus();
                                     },
-                                    /* onTap: () => Navigator.pushNamed(
-                                        context, '/recover'),
-                                     */
-                                    child: Text('Mot de passe oublie',
-                                        style: TextStyle(
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Champs obligatoire';
+                                      }
+                                      return null;
+                                    },
+                                    style:
+                                        TextStyle(color: textInverseModeColor),
+                                    decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 50.0),
+                                        prefixIcon: Icon(
+                                            AmazingIcon.lock_password_line,
                                             color: textInverseModeColor,
-                                            fontSize: myHeight(context) / 43)),
-                                  )
-                                ],
+                                            size: 15.0),
+                                        hintText: 'Mot de passe',
+                                        fillColor: textInverseModeColor,
+                                        hintStyle: TextStyle(
+                                            color: textInverseModeColor
+                                                .withOpacity(.35),
+                                            fontSize: 18.0),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        suffixIcon: InkWell(
+                                          onTap: () => _toggle(),
+                                          child: Icon(
+                                              _obscureText
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                              color: textInverseModeColor,
+                                              size: 15.0),
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        )),
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: myHeight(context) / 31.0,
+                            ),
+                            InkWell(
+                              onTap: () => _connectionAttempt(),
+                              child: Container(
+                                  height: 48.0,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30.0)),
+                                      gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [gradient1, gradient2])),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Center(
+                                      child: Text(
+                                        'Se connecter',
+                                        style: TextStyle(
+                                            color: textSameModeColor,
+                                            fontSize: 18),
+                                      ),
+                                    ),
+                                  )),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  10.0, 0.0, 10.0, 10.0),
+                              child: Container(
+                                height: myHeight(context) / 10,
+                                child: Row(
+                                  children: <Widget>[
+                                    InkWell(
+                                      onTap: () => Navigator.pushNamed(
+                                          context, '/register'),
+                                      child: Container(
+                                          child: Text('Inscription',
+                                              style: TextStyle(
+                                                  color: textInverseModeColor,
+                                                  fontSize:
+                                                      myHeight(context) / 43))),
+                                    ),
+                                    Spacer(),
+                                    InkWell(
+                                      /*  onTap: () {
+                                        setState(() {
+                                          appThemeMode =
+                                              appThemeMode == ThemeMode.dark
+                                                  ? ThemeMode.light
+                                                  : ThemeMode.dark;
+                                          loadModeColor(appThemeMode);
+                                        });
+                                        changeMode(appThemeMode == ThemeMode.dark
+                                            ? true
+                                            : false);
+                                      }, */
+                                      onTap: () => Navigator.pushNamed(
+                                          context, '/recover'),
+                                      child: Text('Mot de passe oublie',
+                                          style: TextStyle(
+                                              color: textInverseModeColor,
+                                              fontSize:
+                                                  myHeight(context) / 43)),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  )),
-            ),
-            _isLoading
-                ? Container(
-                    width: myWidth(context),
-                    height: myHeight(context),
-                    color: textSameModeColor.withOpacity(.89),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(gradient1),
-                      ),
-                    ))
-                : Container(),
-          ],
+                    )),
+              ),
+              _isLoading
+                  ? Container(
+                      width: myWidth(context),
+                      height: myHeight(context),
+                      color: textSameModeColor.withOpacity(.89),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              new AlwaysStoppedAnimation<Color>(gradient1),
+                        ),
+                      ))
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );

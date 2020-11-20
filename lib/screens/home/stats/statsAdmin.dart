@@ -12,6 +12,7 @@ import 'package:easytrack/screens/purchases/all.dart';
 import 'package:easytrack/screens/sales/add.dart';
 import 'package:easytrack/screens/site/all.dart';
 import 'package:easytrack/services/authService.dart';
+import 'package:easytrack/services/externalService.dart';
 import 'package:easytrack/services/homerService.dart';
 import 'package:easytrack/services/saleService.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,8 @@ class StatsAdminPage extends StatefulWidget {
   _StatsAdminPageState createState() => _StatsAdminPageState();
 }
 
-class _StatsAdminPageState extends State<StatsAdminPage> {
+class _StatsAdminPageState extends State<StatsAdminPage>
+    with SingleTickerProviderStateMixin {
   bool searchMode;
   bool _isLoading;
   Future stats;
@@ -33,9 +35,13 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
   Future _futureSales;
   List _sales, _customers, _initiators, _validators, _sites, _productsOnSales;
   List allSalesData;
-
+  AnimationController controller;
+  CurvedAnimation curvedAnimation;
+  Animation<Offset> _translationAnim;
+  Animation<double> _scaleAnim;
+  Animation<Offset> _moveAnim;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-
+  List list;
   @override
   void initState() {
     super.initState();
@@ -50,6 +56,41 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
     _sales = [];
     _sites = [];
     _futureSales = fetchSales();
+    _indexOfCurrentCard = 0;
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 150),
+    );
+    curvedAnimation =
+        CurvedAnimation(parent: controller, curve: Curves.easeOut);
+    _translationAnim = Tween(begin: Offset(0.0, 0.0), end: Offset(-1000.0, 0.0))
+        .animate(controller)
+          ..addListener(() {
+            setState(() {});
+          });
+    _scaleAnim = Tween(begin: 0.965, end: 1.0).animate(curvedAnimation);
+    _moveAnim = Tween(begin: Offset(0.0, 0.05), end: Offset(0.0, 0.0))
+        .animate(curvedAnimation);
+    list = [
+      StatCards(
+        index: 1,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'VENTES',
+      ),
+      StatCards(
+        index: 2,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'ACHATS GLOBAUX',
+      ),
+      StatCards(
+        index: 3,
+        parentContext: context,
+        scaffoldKey: _scaffoldKey,
+        name: 'BENEFICE GLOBAL',
+      ),
+    ];
   }
 
   OverlayEntry _overlaySales;
@@ -59,6 +100,208 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
       this._overlaySales = this._createOverlayEntrySalesMenu();
       Overlay.of(context).insert(this._overlaySales);
     });
+  }
+
+  _showAbonnement() {
+    this._overlayEntry.remove();
+    showDialog(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+                vertical: myHeight(context) / 30,
+                horizontal: myHeight(context) / 25),
+            height: myHeight(context) * .65,
+            width: myWidth(context) * .9,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: myWidth(context) / 1.5,
+                      child: Text(
+                        'Mon Abonnement',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: myHeight(context) / 30,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Spacer(),
+                    InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(AmazingIcon.close_line))
+                  ],
+                ),
+                SizedBox(
+                  height: myHeight(context) / 40.0,
+                ),
+                Row(
+                  children: [
+                    Icon(AmazingIcon.secure_payment_line, color: gradient1),
+                    SizedBox(
+                      width: myHeight(context) / 40.0,
+                    ),
+                    Container(
+                        width: myWidth(context) / 2,
+                        child: Text(
+                          'Version d\'essaie',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: myHeight(context) / 40.0),
+                        ))
+                  ],
+                ),
+                SizedBox(
+                  height: myHeight(context) / 40.0,
+                ),
+                Text('Nov 02, 2020 / Jan 31, 2021'),
+                SizedBox(
+                  height: myHeight(context) / 60.0,
+                ),
+                LinearProgressIndicator(
+                    value: 0.3,
+                    backgroundColor: Color(0xffEEEEEE),
+                    minHeight: 5,
+                    valueColor: AlwaysStoppedAnimation(gradient1)),
+                SizedBox(
+                  height: myHeight(context) / 80.0,
+                ),
+                OutlineButton(
+                    onPressed: () => launchURL(url: websiteUrl),
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(color: gradient1),
+                        borderRadius:
+                            BorderRadius.circular(myHeight(context) / 70)),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: myHeight(context) / 70.0),
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Payer une nouvelle licence',
+                        style: TextStyle(
+                            color: gradient1,
+                            fontSize: myHeight(context) / 48.0),
+                      ),
+                    )),
+                SizedBox(
+                  height: myHeight(context) / 40.0,
+                ),
+                Text('Historique',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: myHeight(context) / 40.0)),
+                SizedBox(
+                  height: myHeight(context) / 40.0,
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
+                  decoration: BoxDecoration(
+                      color: Color(0xffEEEEEE).withOpacity(.6),
+                      border:
+                          Border(bottom: BorderSide(color: Colors.black54))),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text('Abonnement',
+                            style:
+                                TextStyle(fontSize: myHeight(context) / 47.0),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      Container(
+                        width: myWidth(context) / 6,
+                        child: Text('Prix',
+                            style:
+                                TextStyle(fontSize: myHeight(context) / 47.0),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      Container(
+                        width: myWidth(context) / 5,
+                        child: Text('Date',
+                            style:
+                                TextStyle(fontSize: myHeight(context) / 47.0),
+                            overflow: TextOverflow.ellipsis),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: myHeight(context) / 80.0,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Version d\'essaie',
+                        style: TextStyle(fontSize: myHeight(context) / 51.0),
+                      ),
+                    ),
+                    Container(
+                      width: myWidth(context) / 6,
+                      child: Text('0 XFA',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    ),
+                    Container(
+                      width: myWidth(context) / 5,
+                      child: Text('15 Aout 2020',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: myHeight(context) / 80.0,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text('Silver',
+                            style:
+                                TextStyle(fontSize: myHeight(context) / 51.0))),
+                    Container(
+                        width: myWidth(context) / 6,
+                        child: Text('30000 XFA',
+                            style:
+                                TextStyle(fontSize: myHeight(context) / 51.0))),
+                    Container(
+                      width: myWidth(context) / 5,
+                      child: Text('20 Septembre 2020',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: myHeight(context) / 80.0,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Gold',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    ),
+                    Container(
+                      width: myWidth(context) / 6,
+                      child: Text('50000 XFA',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    ),
+                    Container(
+                      width: myWidth(context) / 5,
+                      child: Text('30 Octobre 2020',
+                          style: TextStyle(fontSize: myHeight(context) / 51.0)),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ));
   }
 
   OverlayEntry _createOverlayEntrySalesMenu() {
@@ -358,24 +601,27 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
                             SizedBox(
                               height: myHeight(context) / 30.0,
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  AmazingIcon.bar_chart_line,
-                                  color: textInverseModeColor,
-                                  size: myHeight(context) / 35.0,
-                                ),
-                                SizedBox(
-                                  width: myWidth(context) / 10.0,
-                                ),
-                                Text(
-                                  'Rapports',
-                                  style: TextStyle(
-                                      color: textInverseModeColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: myHeight(context) / 45.0),
-                                ),
-                              ],
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    AmazingIcon.bar_chart_line,
+                                    color: textInverseModeColor,
+                                    size: myHeight(context) / 35.0,
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Rapports',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 30.0,
@@ -402,24 +648,27 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
                             SizedBox(
                               height: myHeight(context) / 30.0,
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  AmazingIcon.money_dollar_circle_line,
-                                  color: textInverseModeColor,
-                                  size: myHeight(context) / 35.0,
-                                ),
-                                SizedBox(
-                                  width: myWidth(context) / 10.0,
-                                ),
-                                Text(
-                                  'Abonnement',
-                                  style: TextStyle(
-                                      color: textInverseModeColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: myHeight(context) / 45.0),
-                                ),
-                              ],
+                            GestureDetector(
+                              onTap: _showAbonnement,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    AmazingIcon.money_dollar_circle_line,
+                                    color: textInverseModeColor,
+                                    size: myHeight(context) / 35.0,
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Abonnement',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 20.0,
@@ -434,42 +683,54 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
                             SizedBox(
                               height: myHeight(context) / 35.0,
                             ),
-                            Text(
-                              'Politique de confidentialite',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Politique de confidentialite',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'Termes et conditions',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Termes et conditions',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'A Propos',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'A Propos',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'Aide',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Aide',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             Spacer(),
                             Padding(
@@ -584,28 +845,47 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
         context, MaterialPageRoute(builder: (context) => LoginPage())));
   }
 
-  Widget getCard(int index) {
-    var list = [
-      StatCards(
-        index: 1,
-        parentContext: context,
-        scaffoldKey: _scaffoldKey,
-        name: 'VENTES',
-      ),
-      StatCards(
-        index: 2,
-        parentContext: context,
-        scaffoldKey: _scaffoldKey,
-        name: 'ACHATS GLOBAUX',
-      ),
-      StatCards(
-        index: 3,
-        parentContext: context,
-        scaffoldKey: _scaffoldKey,
-        name: 'BENEFICE GLOBAL',
-      ),
-    ];
-    return list[index % 3];
+//Animation on Card
+  Offset _getStackedCardOffset(StatCards card) {
+    int diff = card.index - _indexOfCurrentCard;
+    if (card.index == _indexOfCurrentCard + 1) {
+      return _moveAnim.value;
+    } else if (diff > 0 && diff <= 2) {
+      return Offset(0.0, -0.005 * diff);
+    } else {
+      return Offset(0.0, 0.0);
+    }
+  }
+
+  double _getStackedCardScale(StatCards card) {
+    int diff = card.index - _indexOfCurrentCard;
+    if (card.index == _indexOfCurrentCard) {
+      return 1.0;
+    } else if (card.index == _indexOfCurrentCard + 1) {
+      return _scaleAnim.value;
+    } else {
+      return (1 - (0.035 * diff.abs()));
+    }
+  }
+
+  Offset _getFlickTransformOffset(StatCards card) {
+    if (card.index == _indexOfCurrentCard) {
+      return _translationAnim.value;
+    }
+    return Offset(0.0, 0.0);
+  }
+
+  void _horizontalDragEnd(DragEndDetails details) {
+    if (details.primaryVelocity < 0) {
+      controller.forward().whenComplete(() {
+        setState(() {
+          controller.reset();
+          StatCards removedCard = list.removeAt(0);
+          list.add(removedCard);
+          _indexOfCurrentCard = list[0].index;
+        });
+      });
+    }
   }
 
   @override
@@ -645,13 +925,29 @@ class _StatsAdminPageState extends State<StatsAdminPage> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                  onHorizontalDragUpdate: (details) {
-                                    setState(() {
-                                      _indexOfCurrentCard++;
-                                    });
-                                  },
-                                  child: getCard(_indexOfCurrentCard)),
+                              Stack(
+                                  overflow: Overflow.visible,
+                                  children: list.reversed.map((card) {
+                                    if (list.indexOf(card) <= 2) {
+                                      return GestureDetector(
+                                        onHorizontalDragEnd: _horizontalDragEnd,
+                                        child: Transform.translate(
+                                          offset:
+                                              _getFlickTransformOffset(card),
+                                          child: FractionalTranslation(
+                                            translation:
+                                                _getStackedCardOffset(card),
+                                            child: Transform.scale(
+                                                scale:
+                                                    _getStackedCardScale(card),
+                                                child: card),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Container();
+                                    }
+                                  }).toList()),
                               SizedBox(
                                 height: myHeight(context) / 30.0,
                               ),
@@ -1022,7 +1318,7 @@ class _StatsCardsState extends State<StatCards> {
       padding: EdgeInsets.symmetric(horizontal: myHeight(context) / 30.0),
       child: Column(
         children: [
-          Container(
+          /*   Container(
             width: myWidth(context) * .75,
             height: myHeight(context) / 80,
             child: Card(
@@ -1048,6 +1344,7 @@ class _StatsCardsState extends State<StatCards> {
                       BorderRadius.vertical(top: Radius.circular(10.0))),
             ),
           ),
+         */
           Container(
             height: myHeight(context) / 4.5,
             child: Card(

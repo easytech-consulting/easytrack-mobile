@@ -8,6 +8,7 @@ import 'package:easytrack/models/user_with_id.dart';
 import 'package:easytrack/screens/auth/login.dart';
 import 'package:easytrack/screens/notifications/all.dart';
 import 'package:easytrack/services/authService.dart';
+import 'package:easytrack/services/externalService.dart';
 import 'package:easytrack/services/homerService.dart';
 import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
@@ -191,24 +192,27 @@ class _StatEmployeeState extends State<StatEmployee> {
                             SizedBox(
                               height: myHeight(context) / 30.0,
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  AmazingIcon.bar_chart_line,
-                                  color: textInverseModeColor,
-                                  size: myHeight(context) / 35.0,
-                                ),
-                                SizedBox(
-                                  width: myWidth(context) / 10.0,
-                                ),
-                                Text(
-                                  'Rapports',
-                                  style: TextStyle(
-                                      color: textInverseModeColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: myHeight(context) / 45.0),
-                                ),
-                              ],
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    AmazingIcon.bar_chart_line,
+                                    color: textInverseModeColor,
+                                    size: myHeight(context) / 35.0,
+                                  ),
+                                  SizedBox(
+                                    width: myWidth(context) / 10.0,
+                                  ),
+                                  Text(
+                                    'Rapports',
+                                    style: TextStyle(
+                                        color: textInverseModeColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: myHeight(context) / 45.0),
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 30.0,
@@ -245,42 +249,54 @@ class _StatEmployeeState extends State<StatEmployee> {
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'Politique de confidentialite',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Politique de confidentialite',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'Termes et conditions',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Termes et conditions',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'A Propos',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'A Propos',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             SizedBox(
                               height: myHeight(context) / 55.0,
                             ),
-                            Text(
-                              'Aide',
-                              style: TextStyle(
-                                  color: textInverseModeColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: myHeight(context) / 45.0),
+                            GestureDetector(
+                              onTap: () => launchURL(url: websiteUrl),
+                              child: Text(
+                                'Aide',
+                                style: TextStyle(
+                                    color: textInverseModeColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: myHeight(context) / 45.0),
+                              ),
                             ),
                             Spacer(),
                             Padding(

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/file.dart';
+import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ShowDiscussion extends StatefulWidget {
   final Map user;
-
-  const ShowDiscussion({Key key, this.user}) : super(key: key);
+  final String bgcolor, textColor;
+  const ShowDiscussion(
+      {Key key, this.user, @required this.bgcolor, @required this.textColor})
+      : super(key: key);
 
   @override
   _ShowDiscussionState createState() => _ShowDiscussionState();
@@ -21,17 +23,25 @@ class ShowDiscussion extends StatefulWidget {
 
 class _ShowDiscussionState extends State<ShowDiscussion> {
   Map _peer;
-  bool _searchMode;
-  String groupChatId;
+  bool _searchMode, _messageIsSelected;
+  int _messageIndex;
+  String newLastMessage = '';
+
+  String groupChatId, _messageCode;
   TextEditingController _controller;
   FocusNode _node;
+  String bgcolor, textColor;
   ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _messageIsSelected = false;
     _peer = widget.user;
+    logPeerOnFireCloud(_peer);
     initChatRoom();
+    bgcolor = widget.bgcolor;
+    textColor = widget.textColor;
     registerNotification();
     configLocalNotification();
     _node = FocusNode();
@@ -41,13 +51,15 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
     _scrollController = ScrollController();
   }
 
+  logPeerOnFireCloud(_peer) async {
+    await logPeerOnFirebase(_peer);
+  }
+
   initChatRoom() {
-    if (user.id.toString().hashCode <= _peer['id'].toString().hashCode) {
-      groupChatId =
-          '${user.id.toString().hashCode}-${_peer['id'].toString().hashCode}';
+    if (int.parse(user.id.toString()) <= int.parse(_peer['id'].toString())) {
+      groupChatId = '${user.id}-${_peer['id']}';
     } else {
-      groupChatId =
-          '${_peer['id'].toString().hashCode}-${user.id.toString().hashCode}';
+      groupChatId = '${_peer['id']}-${user.id}';
     }
   }
 
@@ -136,101 +148,119 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
+  _selectedMessage(String code, int index, String last) {
+    setState(() {
+      _messageIsSelected = true;
+      _messageIndex = index;
+      _messageCode = code;
+      newLastMessage = last;
+    });
+  }
+
+  _deleteMessage(String code) {
+    setState(() {
+      _messageIsSelected = false;
+    });
+    print(newLastMessage);
+    FirebaseFirestore.instance
+        .collection('messages')
+        .doc(groupChatId)
+        .collection(groupChatId)
+        .doc(code)
+        .update({'delete': 1});
+
+    FirebaseFirestore.instance
+        .collection('messages')
+        .doc(groupChatId)
+        .update({'lastmessage': newLastMessage});
+  }
+
   buildMessage(QueryDocumentSnapshot messageQuery, int index, datas) {
     Map message = messageQuery.data();
-    return Padding(
-      padding: index < datas.length - 1 &&
-              DateTime.parse(datas[index + 1].data()['date'])
-                      .difference(DateTime.parse(datas[index].data()['date'])) <
-                  Duration(minutes: 1) &&
-              datas[index + 1].data()['idTo'] == datas[index].data()['idTo']
-          ? EdgeInsets.zero
-          : EdgeInsets.only(bottom: myHeight(context) / 100.0),
-      child: Row(
-        mainAxisAlignment:
-            message['idTo'] == user.id.toString() || message['idTo'] == user.id
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.end,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: message['idTo'] == user.id.toString() ||
-                    message['idTo'] == user.id
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.end,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(myHeight(context) / 100.0),
-                      topRight: Radius.circular(myHeight(context) / 100.0),
-                      bottomRight: message['idTo'] == user.id.toString() ||
-                              message['idTo'] == user.id
-                          ? Radius.circular(myHeight(context) / 100.0)
-                          : Radius.circular(0.0),
-                      bottomLeft: message['idTo'] == user.id.toString() ||
-                              message['idTo'] == user.id
-                          ? Radius.circular(0.0)
-                          : Radius.circular(myHeight(context) / 100.0)),
+    return Row(
+      mainAxisAlignment:
+          message['idTo'] == user.id.toString() || message['idTo'] == user.id
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.end,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(myHeight(context) / 100.0),
+                topRight: Radius.circular(myHeight(context) / 100.0),
+                bottomRight: message['idTo'] == user.id.toString() ||
+                        message['idTo'] == user.id
+                    ? Radius.circular(myHeight(context) / 100.0)
+                    : Radius.circular(0.0),
+                bottomLeft: message['idTo'] == user.id.toString() ||
+                        message['idTo'] == user.id
+                    ? Radius.circular(0.0)
+                    : Radius.circular(myHeight(context) / 100.0)),
+            color: message['idTo'] != user.id.toString() &&
+                    message['idTo'] != user.id
+                ? Color(0xFFF5F5F5)
+                : Color(0xFF3E4859).withOpacity(.5),
+          ),
+          width: myWidth(context) / 1.7,
+          child: Padding(
+            padding: EdgeInsets.all(myHeight(context) / 100.0),
+            child: Text(
+              message['content'],
+              style: TextStyle(
                   color: message['idTo'] != user.id.toString() &&
                           message['idTo'] != user.id
-                      ? Color(0xFFF5F5F5)
-                      : Color(0xFF3E4859).withOpacity(.5),
-                ),
-                width: myWidth(context) / 1.7,
-                child: Padding(
-                  padding: EdgeInsets.all(myHeight(context) / 100.0),
-                  child: Text(
-                    message['content'],
-                    style: TextStyle(
-                        color: message['idTo'] != user.id.toString() &&
-                                message['idTo'] != user.id
-                            ? Colors.black
-                            : Colors.white,
-                        fontSize: myHeight(context) / 50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: myHeight(context) / 500,
-              ),
-              Text(
-                formatHour(DateTime.parse(message['date'])),
-                style: TextStyle(
-                    color: textInverseModeColor.withOpacity(.38),
-                    fontWeight: FontWeight.bold,
-                    fontSize: myHeight(context) / 70),
-              )
-            ],
+                      ? Colors.black
+                      : Colors.white,
+                  fontSize: myHeight(context) / 50.0),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   void onSendMessage(String content) {
     if (content.trim() != '') {
       _controller.clear();
-
       var documentReference = FirebaseFirestore.instance
           .collection('messages')
           .doc(groupChatId)
           .collection(groupChatId)
-          .doc(DateTime.now().millisecondsSinceEpoch.toString());
-
+          .doc();
       FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.set(
           documentReference,
           {
-            'idFrom': user.id.toString(),
-            'idTo': _peer['id'],
-            'date': DateTime.now().toString(),
-            'content': content
+            'idFrom': user.id,
+            'idTo': _peer['id'].runtimeType.toString() == 'int'
+                ? _peer['id']
+                : int.parse(_peer['id']),
+            'date': Timestamp.now().microsecondsSinceEpoch,
+            'content': content,
+            'delete': 0
           },
         );
       });
-      _scrollController.animateTo(0.0,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.set(
+          FirebaseFirestore.instance.collection('messages').doc(groupChatId),
+          {
+            'date': Timestamp.now().microsecondsSinceEpoch,
+            'users': [
+              user.id,
+              _peer['id'].runtimeType.toString() == 'int'
+                  ? _peer['id']
+                  : int.parse(_peer['id']),
+            ],
+            'delete': 0,
+            'colors': [
+              bgcolor,
+              textColor,
+            ],
+            'lastmessage': content
+          },
+        );
+      });
     }
   }
 
@@ -242,7 +272,7 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
             setState(() {
               _searchMode = true;
             });
-          } else if (value == 1) {
+          } else {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => FilePage()));
           }
@@ -270,7 +300,6 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
           ),
           PopupMenuItem(
             value: 1,
-            height: kMinInteractiveDimension / 2,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
@@ -289,161 +318,246 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
               ],
             ),
           ),
-          PopupMenuItem(
-            value: 2,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Icon(
-                  AmazingIcon.chat_delete_line,
-                  color: Color(0xff267FC9),
-                  size: myHeight(context) / 40.0,
-                ),
-                SizedBox(width: 16.0),
-                Text(
-                  "Effacer les messages",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: myHeight(context) / 50.0),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: 3,
-            height: kMinInteractiveDimension / 2,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Icon(
-                  AmazingIcon.chat_off_line,
-                  color: Color(0xff267FC9),
-                  size: myHeight(context) / 40.0,
-                ),
-                SizedBox(width: 16.0),
-                Text(
-                  "Bloquer notification",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: myHeight(context) / 50.0),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: 4,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Icon(
-                  AmazingIcon.delete_bin_6_line,
-                  color: redColor,
-                  size: myHeight(context) / 40.0,
-                ),
-                SizedBox(width: 16.0),
-                Text(
-                  "Supprimer",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: myHeight(context) / 50.0),
-                ),
-              ],
-            ),
-          ),
         ],
         icon: Icon(Icons.more_vert, color: Colors.white),
       );
 
+  searchMethod(toSearch) {}
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        appBar: PreferredSize(
-            child: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [gradient1, gradient2])),
-              padding:
-                  EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Container(
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: Colors.white24),
-                      child: Padding(
-                        padding: EdgeInsets.all(myHeight(context) / 75),
-                        child: Text(
-                          _peer['name'].substring(0, 2).toUpperCase(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: myHeight(context) / 60),
+    return WillPopScope(
+      onWillPop: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainPage(
+                    index: 3,
+                  ))),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: PreferredSize(
+              child: Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [gradient1, gradient2])),
+                padding:
+                    EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
                         ),
-                      )),
-                  SizedBox(
-                    width: myWidth(context) / 30.0,
-                  ),
-                  Container(
-                    width: myWidth(context) / 2.5,
-                    child: Text(
-                      capitalize(_peer['name']),
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: myHeight(context) / 40.0,
-                          color: Colors.white),
-                    ),
-                  ),
-                  Spacer(),
-                  IconButton(
-                      icon: Icon(
-                        AmazingIcon.search_2_line,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {}),
-                  _offsetPopup()
-                ],
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage(
+                                      index: 3,
+                                    )))),
+                    Expanded(
+                      child: _searchMode
+                          ? Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: myWidth(context) / 50),
+                              child: TextFormField(
+                                  autofocus: true,
+                                  onFieldSubmitted: (value) =>
+                                      searchMethod(value),
+                                  decoration: InputDecoration(
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          AmazingIcon.close_line,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () =>
+                                            setState(() => _searchMode = false),
+                                      ),
+                                      labelStyle:
+                                          TextStyle(color: Colors.white),
+                                      hintStyle: TextStyle(color: Colors.white),
+                                      hintText: 'Recherche')),
+                            )
+                          : Row(
+                              children: [
+                                Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white24),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          myHeight(context) / 75),
+                                      child: Text(
+                                        _peer['name']
+                                            .substring(0, 2)
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            fontSize: myHeight(context) / 60),
+                                      ),
+                                    )),
+                                SizedBox(
+                                  width: myWidth(context) / 30.0,
+                                ),
+                                Container(
+                                  width: myWidth(context) / 2.5,
+                                  child: Text(
+                                    capitalize(_peer['name']),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: myHeight(context) / 40.0,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                                Spacer(),
+                                _messageIsSelected
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              AmazingIcon.file_shred_line,
+                                              color: Colors.redAccent[300],
+                                            ),
+                                            onPressed: () =>
+                                                _deleteMessage(_messageCode),
+                                          )
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                              icon: Icon(
+                                                AmazingIcon.search_2_line,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: () => setState(
+                                                  () => _searchMode = true)),
+                                          _offsetPopup()
+                                        ],
+                                      )
+                              ],
+                            ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
-        body: Padding(
-          padding: EdgeInsets.only(
-              left: myWidth(context) / 30.0,
-              right: myWidth(context) / 30.0,
-              top: myWidth(context) / 30.0),
-          child: SingleChildScrollView(
+              preferredSize: Size.fromHeight(myHeight(context) / 10.0)),
+          body: Padding(
+            padding: EdgeInsets.only(top: myWidth(context) / 30.0),
             child: Column(
               children: [
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('messages')
-                      .doc(groupChatId)
-                      .collection(groupChatId)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Text('Chargement de la discussion'),
+                Expanded(
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('messages')
+                        .doc(groupChatId)
+                        .collection(groupChatId)
+                        .orderBy('date')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Text('Chargement de la discussion'),
+                        );
+                      }
+                      if (_scrollController.hasClients) {
+                        _scrollController.animateTo(
+                            _scrollController.offset + myHeight(context),
+                            duration: Duration(microseconds: 300),
+                            curve: Curves.easeOut);
+                      }
+                      return Container(
+                        height: myHeight(context) * .77,
+                        child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              return snapshot.data.docs[index]
+                                          .data()['delete'] !=
+                                      0
+                                  ? Container()
+                                  : Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: snapshot
+                                                      .data.docs[index]
+                                                      .data()['idTo'] ==
+                                                  user.id.toString() ||
+                                              snapshot.data.docs[index]
+                                                      .data()['idTo'] ==
+                                                  user.id
+                                          ? CrossAxisAlignment.start
+                                          : CrossAxisAlignment.end,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () => _messageIsSelected &&
+                                                  index != _messageIndex
+                                              ? _selectedMessage(
+                                                  snapshot.data.docs[index].id,
+                                                  index,
+                                                  snapshot.data.docs.length < 2
+                                                      ? 'Lancer la discussion'
+                                                      : snapshot
+                                                          .data.docs[index - 1]
+                                                          .data()['message'])
+                                              : setState(() =>
+                                                  _messageIsSelected = false),
+                                          onLongPress: () => _messageIsSelected
+                                              ? null
+                                              : _selectedMessage(
+                                                  snapshot.data.docs[index].id,
+                                                  index,
+                                                  snapshot.data.docs.length < 2
+                                                      ? 'Commencer la discussion'
+                                                      : snapshot
+                                                          .data.docs[index - 1]
+                                                          .data()['message']),
+                                          child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    myWidth(context) / 30.0,
+                                              ),
+                                              color: index == _messageIndex &&
+                                                      _messageIsSelected
+                                                  ? Colors.blue.withOpacity(.1)
+                                                  : Colors.transparent,
+                                              child: buildMessage(
+                                                  snapshot.data.docs[index],
+                                                  index,
+                                                  snapshot.data.docs)),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: myWidth(context) / 30.0,
+                                          ),
+                                          child: Text(
+                                            formatHour(DateTime
+                                                .fromMicrosecondsSinceEpoch(
+                                                    snapshot.data.docs[index]
+                                                        .data()['date'])),
+                                            style: TextStyle(
+                                                color: textInverseModeColor
+                                                    .withOpacity(.38),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize:
+                                                    myHeight(context) / 70),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: myHeight(context) / 100,
+                                        ),
+                                      ],
+                                    );
+                            }),
                       );
-                    }
-                    return Container(
-                      height: myHeight(context) * .77,
-                      child: ListView.builder(
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index) {
-                            return buildMessage(snapshot.data.docs[index],
-                                index, snapshot.data.docs);
-                          }),
-                    );
-                  },
+                    },
+                  ),
                 ),
+                /*   
+                                           */
                 Container(
                   width: double.infinity,
                   color: textSameModeColor,
@@ -456,6 +570,7 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                       TextFormField(
                         controller: _controller,
                         focusNode: _node,
+                        maxLines: null,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(0.0),

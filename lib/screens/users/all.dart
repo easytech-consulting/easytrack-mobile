@@ -107,7 +107,7 @@ class _UserPageState extends State<UserPage> {
                               child: Row(
                                 children: <Widget>[
                                   Icon(
-                                    AmazingIcon.repeat_2_line,
+                                    AmazingIcon.edit_2_line,
                                     size: 15.0,
                                     color: gradient1,
                                   ),
@@ -157,7 +157,7 @@ class _UserPageState extends State<UserPage> {
                           InkWell(
                             onTap: () {
                               this._overlay.remove();
-                              _deleteSite(index);
+                              _deleteUser(user.id);
                             },
                             child: Padding(
                               padding:
@@ -247,21 +247,19 @@ class _UserPageState extends State<UserPage> {
         ? _user.tel
         : _userphoneController.text;
 
-    /* setState(() {
+    setState(() {
       _isLoading = true;
-    }); */
-    print(_params);
+    });
     Navigator.pop(context);
-    /* await createEmployee(_params).then((employee) {
+    await updateEmployee(_params, user.id).then((employee) {
       setState(() {
         _isLoading = false;
+        _futureEmployees = fetchEmployeesOfSite(_site.id);
       });
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SitePage()));
-    }); */
+    });
   }
 
-  _deleteSite(int index) {
+  _deleteUser(int index) {
     _showConfirmationMessage(index);
   }
 
@@ -286,7 +284,7 @@ class _UserPageState extends State<UserPage> {
                 Row(
                   children: <Widget>[
                     Container(
-                      height: myHeight(context)/1.5,
+                      width: myWidth(context) / 2,
                       child: Text(
                         _user.name,
                         overflow: TextOverflow.ellipsis,
@@ -312,11 +310,14 @@ class _UserPageState extends State<UserPage> {
                     SizedBox(
                       width: myWidth(context) / 50,
                     ),
-                    Text(
-                      '${_user.address}, Cameroun',
-                      style: TextStyle(
-                          color: textInverseModeColor.withOpacity(.54),
-                          fontSize: myHeight(context) / 38.0),
+                    Container(
+                      width: myWidth(context) / 1.7,
+                      child: Text(
+                        '${_user.address}, Cameroun',
+                        style: TextStyle(
+                            color: textInverseModeColor.withOpacity(.54),
+                            fontSize: myHeight(context) / 38.0),
+                      ),
                     ),
                   ],
                 ),
@@ -425,8 +426,7 @@ class _UserPageState extends State<UserPage> {
                         child: Center(
                           child: Text(
                             'Appeler',
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 18),
+                            style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ),
                       )),
@@ -730,7 +730,7 @@ class _UserPageState extends State<UserPage> {
                       InkWell(
                         onTap: () {
                           if (_formKey.currentState.validate()) {
-                            this._attemptSave();
+                            this._attemptUpdate(user);
                           }
                         },
                         child: Container(
@@ -1125,12 +1125,10 @@ class _UserPageState extends State<UserPage> {
                               items: _roles.map((role) {
                                 return DropdownMenuItem<Role>(
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Padding(
-                                          padding:
-                                              EdgeInsets.only(right: 10.0),
+                                          padding: EdgeInsets.only(right: 10.0),
                                           child: Icon(
                                               AmazingIcon.community_line,
                                               size: 15.0)),
@@ -1202,6 +1200,19 @@ class _UserPageState extends State<UserPage> {
         ));
   }
 
+  _deleteFunction(int id) async {
+    setState(() {
+      _isLoading = true;
+    });
+    Navigator.pop(context);
+    await deleteEmployee(id).then((employee) {
+      setState(() {
+        _isLoading = false;
+        _futureEmployees = fetchEmployeesOfSite(_site.id);
+      });
+    });
+  }
+
   _showConfirmationMessage(int index) {
     showDialog(
         context: context,
@@ -1255,7 +1266,7 @@ class _UserPageState extends State<UserPage> {
                                       BorderRadius.all(Radius.circular(30.0))),
                               borderSide:
                                   BorderSide(color: textInverseModeColor),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => _deleteFunction(index),
                               child: Container(
                                   alignment: Alignment.center,
                                   height: 40.0,
@@ -1286,6 +1297,7 @@ class _UserPageState extends State<UserPage> {
                       _users = snapshot.data['employees']
                           .map((e) => User.fromJson(e['user']))
                           .toList();
+                      globalEmployees = _users;
                       _userRole = snapshot.data['employees']
                           .map((e) => Role.fromJson(e['user']['role']))
                           .toList();
@@ -1473,58 +1485,16 @@ class _UserPageState extends State<UserPage> {
                                     'Site ${widget.site["name"]}', 'Employee',
                                     canAdd: true, onClick: () {}),
                                 SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                    return Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: index == 0
-                                                ? myHeight(context) / 50.0
-                                                : myHeight(context) / 100.0,
-                                            horizontal:
-                                                myHeight(context) / 40.0),
-                                        child: Container(
-                                            height: myHeight(context) / 6.5,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(
-                                                        myHeight(context) /
-                                                            70.0)),
-                                                border: Border.all(
-                                                    color: Colors.black12)),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(
-                                                  myHeight(context) / 60.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: <Widget>[
-                                                  Container(
-                                                    color: Color(0xFFE4E4E4),
-                                                    height: myHeight(context) /
-                                                        30.0,
-                                                    width: myWidth(context) / 2,
-                                                  ),
-                                                  Container(
-                                                    color: Color(0xFFE4E4E4),
-                                                    width:
-                                                        myWidth(context) / 1.5,
-                                                    height: myHeight(context) /
-                                                        30.0,
-                                                  ),
-                                                  Container(
-                                                    color: Color(0xFFE4E4E4),
-                                                    width:
-                                                        myWidth(context) / 3.5,
-                                                    height: myHeight(context) /
-                                                        30.0,
-                                                  ),
-                                                ],
-                                              ),
-                                            )));
-                                  }),
+                                  delegate: SliverChildListDelegate([
+                                    Container(
+                                      alignment: Alignment.center,
+                                      height: myHeight(context) / 1.5,
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation(gradient1),
+                                      ),
+                                    )
+                                  ]),
                                 )
                               ],
                             );
@@ -1696,50 +1666,15 @@ class _UserPageState extends State<UserPage> {
                             context, 'Site ${widget.site["name"]}', 'Employee',
                             canAdd: true, onClick: () {}),
                         SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
-                            return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: index == 0
-                                        ? myHeight(context) / 50.0
-                                        : myHeight(context) / 100.0,
-                                    horizontal: myHeight(context) / 40.0),
-                                child: Container(
-                                    height: myHeight(context) / 6.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                myHeight(context) / 70.0)),
-                                        border:
-                                            Border.all(color: Colors.black12)),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(
-                                          myHeight(context) / 60.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            height: myHeight(context) / 30.0,
-                                            width: myWidth(context) / 2,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 1.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 3.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                        ],
-                                      ),
-                                    )));
-                          }),
+                          delegate: SliverChildListDelegate([
+                            Container(
+                              alignment: Alignment.center,
+                              height: myHeight(context) / 1.5,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(gradient1),
+                              ),
+                            )
+                          ]),
                         )
                       ],
                     );

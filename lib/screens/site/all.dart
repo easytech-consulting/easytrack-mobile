@@ -3,7 +3,6 @@ import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/screens/customers/all.dart';
-import 'package:easytrack/screens/search/search.dart';
 import 'package:easytrack/screens/suppliers/all.dart';
 import 'package:easytrack/screens/users/all.dart';
 import 'package:easytrack/services/externalService.dart';
@@ -161,7 +160,7 @@ class _SitePageState extends State<SitePage> {
                               child: Row(
                                 children: <Widget>[
                                   Icon(
-                                    AmazingIcon.account_circle_line,
+                                    AmazingIcon.user_star_line,
                                     size: 15.0,
                                     color: gradient1,
                                   ),
@@ -198,7 +197,7 @@ class _SitePageState extends State<SitePage> {
                               child: Row(
                                 children: <Widget>[
                                   Icon(
-                                    AmazingIcon.shopping_cart_line,
+                                    AmazingIcon.user_received_line,
                                     size: 15.0,
                                     color: gradient1,
                                   ),
@@ -232,7 +231,7 @@ class _SitePageState extends State<SitePage> {
                               child: Row(
                                 children: <Widget>[
                                   Icon(
-                                    AmazingIcon.repeat_2_line,
+                                    AmazingIcon.group_line,
                                     size: 15.0,
                                     color: gradient1,
                                   ),
@@ -283,7 +282,7 @@ class _SitePageState extends State<SitePage> {
                           InkWell(
                             onTap: () {
                               this._overlay.remove();
-                              _deleteSite(index);
+                              _deleteSite(_sites[index].id);
                             },
                             child: Padding(
                               padding:
@@ -1168,7 +1167,7 @@ class _SitePageState extends State<SitePage> {
                                 _sitephone2Node.unfocus();
                               },
                               validator: (value) =>
-                                  checkEmailValidity(value, canBeEmpty: true),
+                                  checkNumberValidity(value, canBeEmpty: true),
                               decoration: InputDecoration(
                                   contentPadding:
                                       const EdgeInsets.only(left: 50.0),
@@ -1228,6 +1227,19 @@ class _SitePageState extends State<SitePage> {
         ));
   }
 
+  _deleteFunction(int id) async {
+    Navigator.pop(context);
+    setState(() {
+      _isLoading = true;
+    });
+    await deleteSite(id).then((site) {
+      setState(() {
+        _isLoading = false;
+        _companySites = fetchSiteOfCompany();
+      });
+    });
+  }
+
   _showConfirmationMessage(int index) {
     showDialog(
         context: context,
@@ -1281,7 +1293,7 @@ class _SitePageState extends State<SitePage> {
                                       BorderRadius.all(Radius.circular(30.0))),
                               borderSide:
                                   BorderSide(color: textInverseModeColor),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => _deleteFunction(index),
                               child: Container(
                                   alignment: Alignment.center,
                                   height: 40.0,
@@ -1313,6 +1325,8 @@ class _SitePageState extends State<SitePage> {
                       _sites = _allSitesData
                           .map((site) => Site.fromJson(site))
                           .toList();
+
+                      globalSites = _allSitesData;
                       return CustomScrollView(
                         slivers: [
                           sliverHeader(context, 'Gestion', 'Mes sites',
@@ -1474,50 +1488,15 @@ class _SitePageState extends State<SitePage> {
                         sliverHeader(context, 'Gestion', 'Mes sites',
                             canAdd: true, onClick: () {}),
                         SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, index) {
-                            return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: index == 0
-                                        ? myHeight(context) / 50.0
-                                        : myHeight(context) / 100.0,
-                                    horizontal: myHeight(context) / 40.0),
-                                child: Container(
-                                    height: myHeight(context) / 6.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                myHeight(context) / 70.0)),
-                                        border:
-                                            Border.all(color: Colors.black12)),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(
-                                          myHeight(context) / 60.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            height: myHeight(context) / 30.0,
-                                            width: myWidth(context) / 2,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 1.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                          Container(
-                                            color: Color(0xFFE4E4E4),
-                                            width: myWidth(context) / 3.5,
-                                            height: myHeight(context) / 30.0,
-                                          ),
-                                        ],
-                                      ),
-                                    )));
-                          }),
+                          delegate: SliverChildListDelegate([
+                            Container(
+                              alignment: Alignment.center,
+                              height: myHeight(context) / 1.5,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(gradient1),
+                              ),
+                            )
+                          ]),
                         )
                       ],
                     );

@@ -20,3 +20,20 @@ Future fetchSuppliersOfSnack() async {
     throw Exception('Fetch Suppliers of Snack with error $ex');
   }
 }
+
+Future deleteSuppliers(int id) async {
+  try {
+    bool result = false;
+    final response = await http.post('$endPoint/suppliers/$id/destroy',
+        headers: {HttpHeaders.authorizationHeader: "Bearer $userToken"});
+
+    if (response.statusCode == 200) {
+      result = true;
+    }
+
+    errorStatusCode = response.statusCode;
+    return result;
+  } catch (ex) {
+    throw Exception('Delete suppliers $id exited with error $ex');
+  }
+}

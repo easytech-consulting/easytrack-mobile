@@ -31,7 +31,8 @@ Future<User> fetchUserDetails(int id) async {
         company = Company.fromJson(data['companies'][0]);
       }
       print('$data\n $site, $_linkToSite, $company, $_linkToCompany}');
-      storeUserDetails(data, site, _linkToSite, company, _linkToCompany, userRole);
+      storeUserDetails(
+          data, site, _linkToSite, company, _linkToCompany, userRole);
       return user;
     }
 

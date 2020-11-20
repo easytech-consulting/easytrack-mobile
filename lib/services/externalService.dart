@@ -2,8 +2,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
-void launchNDA() {
-  launch('http://google.com');
+void launchURL({String url}) {
+  launch(url);
 }
 
 void launchMail(String email) {

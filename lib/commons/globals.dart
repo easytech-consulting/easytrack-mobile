@@ -4,10 +4,10 @@ import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
-import 'package:easytrack/services/agendaService.dart';
-import 'package:easytrack/services/contactService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/style.dart';
 
@@ -131,6 +131,9 @@ getThemeMode() async {
 final String endPoint =
     'https://easytracknew-easytrackdev.azurewebsites.net/api';
 
+final String websiteUrl =
+    'https://easytracknew-easytrackdev.azurewebsites.net';
+
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
 }
@@ -190,7 +193,7 @@ checkEmailValidity(String value, {canBeEmpty = false}) {
 }
 
 formatHour(DateTime date) {
-  return '${date.add(Duration(hours: 1)).hour}: ${date.minute}';
+  return '${date.hour}:${date.minute}';
 }
 
 formatDate(DateTime date) {
@@ -217,7 +220,6 @@ capitalize(String data) {
   String result = '';
   int index = 0;
   for (var word in words) {
-    
     result += index == words.length - 1
         ? '${word.substring(0, 1).toUpperCase()}${word.substring(1).toLowerCase()}'
         : '${word.substring(0, 1).toUpperCase()}${word.substring(1).toLowerCase()} ';
@@ -268,6 +270,26 @@ logUserOnFirebase() async {
   }
 }
 
+logPeerOnFirebase(Map peer) async {
+  final QuerySnapshot result = await FirebaseFirestore.instance
+      .collection('users')
+      .where('id', isEqualTo: peer['id'].toString())
+      .get();
+  if (result != null) {
+    final List<DocumentSnapshot> documents = result.docs;
+    if (documents.length == 0) {
+      FirebaseFirestore.instance.collection('users').doc().set({
+        'email': peer['email'].toString(),
+        'id': peer['id'].toString(),
+        'name': peer['name'].toString(),
+        'phone': peer['phone'].toString(),
+        'photo': peer['photo'].toString(),
+        'username': peer['username'].toString()
+      });
+    }
+  }
+}
+
 formatPrice(int price) {
   if (price == null) return '0';
   String result = price.toString();
@@ -308,6 +330,95 @@ String getDay(DateTime date) {
   return 'DIMANCHE';
 }
 
+oneSignalInitialisation() {
+  OneSignal.shared.init("1eb0665c-bca3-4923-8cd6-7b07b2ce0523");
+  //in case of iOS --- see belowOneSignal.shared.init("your_app_id_here", {
+  OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType
+      .notification); // will be called whenever a notification is received
+  OneSignal.shared
+      .setNotificationReceivedHandler((OSNotification notification) {
+    print('Received: ' + notification?.payload?.body ?? '');
+  }); // will be called whenever a notification is opened/button pressed.
+  OneSignal.shared
+      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+    print('Opened: ' + result.notification?.payload?.body ?? '');
+  });
+}
+
+Future<bool> onWillPop(context) async {
+  return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30.0))),
+              content: Container(
+                  height: myHeight(context) / 2.5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      errorAlertIcon(context),
+                      SizedBox(
+                        height: myHeight(context) / 40,
+                      ),
+                      Text(
+                        'Quitter l\'application',
+                        style: TextStyle(
+                            color: Color(0xff000000),
+                            fontSize: myWidth(context) / 22),
+                      ),
+                      SizedBox(height: myHeight(context) / 80),
+                      Text(
+                        'Vous allez sortir de l\'application',
+                        style: TextStyle(
+                            color: Color(0xff000000).withOpacity(.5),
+                            fontSize: myWidth(context) / 25),
+                      ),
+                      SizedBox(
+                        height: myHeight(context) / 40,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: FlatButton(
+                              color: gradient1,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              onPressed: () => SystemNavigator.pop(),
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  height: 40.0,
+                                  child: Text(
+                                    'Continuer',
+                                    style: TextStyle(color: textSameModeColor),
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: OutlineButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              borderSide: BorderSide(color: Color(0xff000000)),
+                              onPressed: () => Navigator.pop(context),
+                              child: Container(
+                                  alignment: Alignment.center,
+                                  height: 40.0,
+                                  child: Text('Fermer')),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ))))) ??
+      false;
+}
+
 int errorStatusCode, userId;
 bool showBottom;
 Map userRole;
@@ -330,3 +441,11 @@ int allSales,
     dailyPurchases,
     allIncomes,
     dailyIncomes;
+List globalEmployees,
+    globalSales,
+    globalSites,
+    globalProducts,
+    globalPurchases,
+    globalNotifications,
+    globalSuppliers,
+    globalClients;
