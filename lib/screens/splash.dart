@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:connectivity/connectivity.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
+import 'package:easytrack/screens/errors/lostconnection.dart';
 import 'package:easytrack/screens/home/home.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +18,23 @@ class _SplashPageState extends State<SplashPage> {
   bool _login;
   bool _alreadyDone;
 
+  StreamSubscription<ConnectivityResult> subscription;
+
   @override
   void initState() {
     super.initState();
+    subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.none) {
+        print('result');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LostConnection(),
+            ));
+      }
+    });
     _userLogged = userLogged();
     _login = false;
     _alreadyDone = false;
@@ -33,22 +49,21 @@ class _SplashPageState extends State<SplashPage> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
+  }
+
   _redirection() async {
     print(_login);
     if (!_alreadyDone) {
       _alreadyDone = true;
-      /* await getFirstConnexion().then((res) {
-        if (res) {
-          Navigator.pushNamed(context, '/welcome');
-        } else {
-          Navigator.pushNamed(context, '/login');
-        }
-      }); */
-       if (_login) {
+      if (_login) {
         String tokenExpireDate = await getTokenExpireDate();
         bool tokenAlreadyValid =
             DateTime.now().isBefore(DateTime.parse(tokenExpireDate));
-            print(tokenExpireDate);
+        print(tokenExpireDate);
         if (tokenAlreadyValid) {
           userToken = await getUserToken();
           user = User.fromJson(await getUser());
@@ -59,8 +74,6 @@ class _SplashPageState extends State<SplashPage> {
           if (user.isAdmin == 1) {
             site = Site.fromJson(await getUserSite());
           }
-          /* 
-          await logUserOnFirebase(); */
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => MainPage()));
         } else {
@@ -122,16 +135,6 @@ class _SplashPageState extends State<SplashPage> {
                           color: textInverseModeColor,
                           fontSize: screenSize(context).height / 20),
                     ),
-                    /* SizedBox(
-                      height: MediaQuery.of(context).size.height / 50,
-                    ),
-                    Text(
-                      'Bienvenue...',
-                      style: TextStyle(
-                          color: textInverseModeColor.withOpacity(.7),
-                          fontSize: screenSize(context).height / 39),
-                    ),
-                    SizedBox(height: 20.0) */
                   ],
                 ),
               );

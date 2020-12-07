@@ -5,6 +5,7 @@ import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/services/notificationService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -152,6 +153,8 @@ class _NotificationPageState extends State<NotificationsPage> {
   void initState() {
     super.initState();
     futureNotifications = fetchNotifications();
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Color(0xFFF8F8F8)));
   }
 
   @override

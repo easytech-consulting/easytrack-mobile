@@ -34,6 +34,17 @@ Widget errorAlertIcon(BuildContext context) {
   );
 }
 
+Widget networkIcon(BuildContext context, Color backgroundColorData,
+    Color colorData, IconData iconData) {
+  return Container(
+    width: myHeight(context) / 8.0,
+    height: myHeight(context) / 8.0,
+    decoration:
+        BoxDecoration(color: backgroundColorData, shape: BoxShape.circle),
+    child: Icon(iconData, color: colorData, size: myHeight(context) / 15.0),
+  );
+}
+
 storeToken(String token) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -131,8 +142,7 @@ getThemeMode() async {
 final String endPoint =
     'https://easytracknew-easytrackdev.azurewebsites.net/api';
 
-final String websiteUrl =
-    'https://easytracknew-easytrackdev.azurewebsites.net';
+final String websiteUrl = 'https://easytracknew-easytrackdev.azurewebsites.net';
 
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;

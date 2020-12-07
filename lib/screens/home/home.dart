@@ -22,9 +22,11 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    
     _currentIndex = widget.index ?? 0;
     _pageController = new PageController(initialPage: _currentIndex);
   }
+
 
   @override
   Widget build(BuildContext context) {
