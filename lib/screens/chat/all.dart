@@ -1,9 +1,8 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/show.dart';
 import 'package:easytrack/screens/search/search.dart';
-import 'package:easytrack/services/contactService.dart';
-import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
 class AllContacts extends StatefulWidget {
@@ -12,17 +11,12 @@ class AllContacts extends StatefulWidget {
 }
 
 class _AllContactsState extends State<AllContacts> {
-
   List dataToShow, allData;
 
   @override
   void initState() {
     super.initState();
-    initialization();
-  }
-
-  initialization() async {
-    await logUserOnFirebase();
+    loadData(globalContacts);
   }
 
   loadData(contacts) {
@@ -168,105 +162,81 @@ class _AllContactsState extends State<AllContacts> {
                   ),
                 ),
               ),
-              FutureBuilder(
-                future: fetchContacts(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (allData == null) {
-                      loadData(snapshot.data);
-                    }
-                    return Expanded(
-                      child: ListView.builder(
-                          itemCount: dataToShow.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ShowDiscussion(
-                                          textColor:
-                                              colorsSendOnFirebase(true, index),
-                                          bgcolor: colorsSendOnFirebase(
-                                              false, index),
-                                          user: dataToShow[index]))),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        bottom:
-                                            BorderSide(color: Colors.black12))),
-                                height: myHeight(context) / 8,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: myHeight(context) / 30.0,
+              Expanded(
+                child: ListView.builder(
+                    itemCount: dataToShow.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ShowDiscussion(
+                                    textColor:
+                                        colorsSendOnFirebase(true, index),
+                                    bgcolor: colorsSendOnFirebase(false, index),
+                                    user: dataToShow[index]))),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(color: Colors.black12))),
+                          height: myHeight(context) / 8,
+                          padding: EdgeInsets.symmetric(
+                            vertical: myHeight(context) / 30.0,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Container(
+                                width: myHeight(context) / 15.0,
+                                height: myHeight(context) / 15.0,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  dataToShow[index]['name']
+                                      .substring(0, 2)
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                      color: generateTextColor(index),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: myHeight(context) / 55),
                                 ),
-                                child: Row(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: generateBackgroundColor(index)),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: myHeight(context) / 50.0),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      width: myHeight(context) / 15.0,
-                                      height: myHeight(context) / 15.0,
-                                      alignment: Alignment.center,
+                                      width: myWidth(context) / 2,
                                       child: Text(
-                                        dataToShow[index]['name']
-                                            .substring(0, 2)
-                                            .toUpperCase(),
+                                        dataToShow[index]['name'],
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                            color: generateTextColor(index),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: myHeight(context) / 55),
-                                      ),
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color:
-                                              generateBackgroundColor(index)),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: myHeight(context) / 50.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            width: myWidth(context) / 2,
-                                            child: Text(
-                                              dataToShow[index]['name'],
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  fontSize:
-                                                      myHeight(context) / 45.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          Container(
-                                              width: myWidth(context) / 2,
-                                              child: Text(
-                                                'Demarrer la conversation',
-                                                overflow: TextOverflow.ellipsis,
-                                              )),
-                                        ],
+                                            fontSize: myHeight(context) / 45.0,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    Spacer(),
-                                    //Text('10:30')
+                                    Container(
+                                        width: myWidth(context) / 2,
+                                        child: Text(
+                                          'Demarrer la conversation',
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                   ],
                                 ),
                               ),
-                            );
-                          }),
-                    );
-                  }
-
-                  return Expanded(
-                      child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(gradient1),
-                    ),
-                  ));
-                },
-              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+              )
             ],
           ),
         ),

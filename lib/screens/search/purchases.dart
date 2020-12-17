@@ -203,7 +203,7 @@ class SubSearchPurchases extends StatelessWidget {
             child: Text('Aucune valeur'),
           )
         : data.isEmpty
-            ? Center(child: Text('Aucune correspondance'))
+            ? Center(child: Text('Vide'))
             : ListView.builder(
                 itemCount: _purchases.length,
                 itemBuilder: (context, index) => Padding(
@@ -277,7 +277,7 @@ class SubSearchPurchases extends StatelessWidget {
                                   ),
                                   Spacer(),
                                   Text(
-                                    'Il y\'a ${formatDate(DateTime.parse(_purchases[index]["created_at"]))}',
+                                    '${formatDate(DateTime.parse(_purchases[index]["created_at"]))}',
                                     style: TextStyle(
                                         color: Colors.black54,
                                         fontSize:

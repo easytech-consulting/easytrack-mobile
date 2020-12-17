@@ -33,7 +33,7 @@ class SubSearchNotification extends StatelessWidget {
                     Container(
                       width: myWidth(context) / 2,
                       child: Text(
-                        'il y a ${formatDate(DateTime.parse(notification["created_at"]))}',
+                        '${formatDate(DateTime.parse(notification["created_at"]))}',
                         style: TextStyle(
                             fontSize: myHeight(context) / 30,
                             fontWeight: FontWeight.bold),
@@ -125,7 +125,7 @@ class SubSearchNotification extends StatelessWidget {
             child: Text('Aucune valeur'),
           )
         : data.isEmpty
-            ? Center(child: Text('Aucune correspondance'))
+            ? Center(child: Text('Vide'))
             : ListView.builder(
                 itemCount: _notifications.length,
                 itemBuilder: (context, index) => Padding(
@@ -172,7 +172,7 @@ class SubSearchNotification extends StatelessWidget {
                                   height: myHeight(context) / 200.0,
                                 ),
                                 Text(
-                                  'Il y a ${formatDate(DateTime.parse(_notifications[index]["created_at"]))}',
+                                  '${formatDate(DateTime.parse(_notifications[index]["created_at"]))}',
                                   style: TextStyle(
                                       fontSize: myHeight(context) / 60,
                                       color: Colors.black54),

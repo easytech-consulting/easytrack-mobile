@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/sales/manage.dart';
@@ -40,7 +41,7 @@ class _UpdateSalesPageState extends State<UpdateSalesPage> {
     }
   }
 
-  _attemptUpdate(sale, List products, List quantities) async {
+  _attemptUpdate(saleData, List products, List quantities) async {
     String order = '';
     for (var i = 0; i < products.length; i++) {
       order += products[i]['id'].toString() +
@@ -53,21 +54,54 @@ class _UpdateSalesPageState extends State<UpdateSalesPage> {
 
     Map<String, dynamic> params = Map();
     params['order'] = order;
-    params['customer_id'] = sale['customer_id'].toString();
-    params['site_id'] = sale['site_id'].toString();
-    params['status'] = sale['status'].toString();
-    params['paying_method'] = sale['paying_method'].toString();
+    params['customer_id'] = saleData['customer_id'].toString();
+    params['site_id'] = saleData['site_id'].toString();
+    params['status'] = saleData['status'].toString();
+    params['paying_method'] =
+        labelOfPaymentMode ?? saleData['paying_method'].toString();
     params['sale_note'] = '';
-    print(params);
     setState(() {
       _isLoading = true;
     });
-    await updateSale(params, sale['id']).then((response) {
+    await updateSale(params, saleData['id']).then((response) async {
+      Map allData;
+      Map toRemove;
+      await FirebaseFirestore.instance.collection('sales').get().then((value) {
+        value.docs.forEach((element) {
+          for (var item in element.data()['sales']) {
+            if (item['code'] == saleData['code']) {
+              allData = element.data();
+              toRemove = item;
+            }
+          }
+        });
+      });
       setState(() {
         _isLoading = false;
       });
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ManageSales()));
+      List _sales = allData['sales'];
+      int index =
+          _sales.indexWhere((element) => element['code'] == toRemove['code']);
+      print(response['sale']['paying_method']);
+
+      _sales.removeAt(index);
+      toRemove['products'] = response['sale']['products'];
+      _sales.insert(index, toRemove);
+      await FirebaseFirestore.instance
+          .collection('sales')
+          .where('email', isEqualTo: allData['email'])
+          .get()
+          .then(
+              (value) => value.docs.first.reference.update({'sales': _sales}));
+      setState(() {
+        _isLoading = false;
+      });
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ManageSales(),
+          ));
     });
   }
 

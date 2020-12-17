@@ -1,10 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
-import 'package:easytrack/models/sale.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/models/site_with_id.dart';
-import 'package:easytrack/models/user_with_id.dart';
 import 'package:easytrack/services/externalService.dart';
-import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +13,6 @@ class SalePage extends StatefulWidget {
 }
 
 class _SalePageState extends State<SalePage> {
-  Future _companySales;
   List _sales, _initiators, _validators, _sites, _productsOnSales;
   List allSalesData;
   bool _isLoading;
@@ -23,37 +21,14 @@ class _SalePageState extends State<SalePage> {
   @override
   void initState() {
     super.initState();
-    _companySales = fetchSales();
     _initiators = [];
     _validators = [];
     _productsOnSales = [];
     _sites = [];
     _scaffoldKey = GlobalKey();
     _isLoading = false;
-  }
-
-  searchMethod(List items, filter) {
-    List result = [];
-    for (var item in items) {
-      if (item.code.toLowerCase().contains(filter.toLowerCase())) {
-        if (!result.contains(item)) {
-          result.add(item);
-        }
-      }
-      if (filter.contains('S'.toLowerCase())) {
-        if (item.code
-                .toLowerCase()
-                .contains(filter.substring(5).toLowerCase()) ||
-            item.code
-                .toLowerCase()
-                .contains(filter.substring(3).toLowerCase())) {
-          if (!result.contains(item)) {
-            result.add(item);
-          }
-        }
-      }
-    }
-    return filter == '' ? items : result;
+    allSalesData = globalSales;
+    _sales = _checkAllSales(allSalesData).toList();
   }
 
   showBill(String _customer, _site, _sale, _products, _initiator, {validator}) {
@@ -168,19 +143,19 @@ class _SalePageState extends State<SalePage> {
                       ),
                     ),
                     Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                height: myHeight(context) / 50.0,
-                              ),
-                              Text(
-                                'Date: ${_sale["created_at"]}',
-                                style: TextStyle(
-                                  fontSize: myHeight(context) / 50.0,
-                                ),
-                              ),
-                            ],
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: myHeight(context) / 50.0,
+                        ),
+                        Text(
+                          'Date: ${_sale["created_at"]}',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
                           ),
+                        ),
+                      ],
+                    ),
                     Text(
                       'Reference: S0-${_sale["code"]}',
                       style: TextStyle(
@@ -370,14 +345,10 @@ class _SalePageState extends State<SalePage> {
     List result = [];
     if (user.isAdmin == 1) {
       for (var sale in datas) {
-        _initiators.add(UserWithId.fromJson(sale['initiator']));
-        _validators.add(sale['validator'] == null
-            ? null
-            : UserWithId.fromJson(sale['validator']));
+        _initiators.add(sale['initiator']);
+        _validators.add(sale['validator']);
         _productsOnSales.add(sale['products']);
         _sites.add(site);
-        /* 
-        _customers.add(CustomerWithId.fromJson(sale['customer'])); */
 
         result.add(sale);
       }
@@ -385,11 +356,9 @@ class _SalePageState extends State<SalePage> {
       for (var site in datas) {
         for (var sale in site['sales']) {
           if (!result.contains(sale)) {
-            _initiators.add(UserWithId.fromJson(sale['initiator']));
+            _initiators.add(sale['initiator']);
             _productsOnSales.add(sale['products']);
-            _validators.add(sale['validator'] == null
-                ? null
-                : UserWithId.fromJson(sale['validator']));
+            _validators.add(sale['validator']);
             _sites.add(SiteWithId.fromJson(site));
             /* 
             _customers.add(CustomerWithId.fromJson(sale['customer'])); */
@@ -410,18 +379,11 @@ class _SalePageState extends State<SalePage> {
       body: SafeArea(
         child: Stack(
           children: <Widget>[
-            FutureBuilder(
-              future: _companySales,
+            StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection('sales').snapshots(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  if (_sales == null) {
-                    allSalesData = snapshot.data;
-                    globalSales = allSalesData;
-                    _sales = _checkAllSales(allSalesData)
-                        .map((sale) => Sale.fromJson(sale))
-                        .toList();
-                  }
+                if (snapshot.hasData) {
                   return CustomScrollView(
                     slivers: [
                       sliverHeader2(context, 'Mon site', 'Mes ventes'),
@@ -487,7 +449,7 @@ class _SalePageState extends State<SalePage> {
                                                         validator:
                                                             _validators[index]),
                                                     child: Text(
-                                                      'S0-${_sales[index].code}',
+                                                      'S0-${_sales[index]["code"]}',
                                                       style: TextStyle(
                                                           fontSize: myHeight(
                                                                   context) /
@@ -548,20 +510,20 @@ class _SalePageState extends State<SalePage> {
                                               Row(
                                                 children: <Widget>[
                                                   Text(
-                                                    _sales[index].status == 2
+                                                    _sales[index]["status"] == 2
                                                         ? 'Paye'
-                                                        : _sales[index]
-                                                                    .status ==
+                                                        : _sales[index][
+                                                                    "status"] ==
                                                                 1
                                                             ? 'Servie'
                                                             : 'En attente',
                                                     style: TextStyle(
-                                                        color: _sales[index]
-                                                                    .status ==
+                                                        color: _sales[index][
+                                                                    'status'] ==
                                                                 2
                                                             ? Colors.green
-                                                            : _sales[index]
-                                                                        .status ==
+                                                            : _sales[index][
+                                                                        'status'] ==
                                                                     1
                                                                 ? Colors.orange
                                                                 : gradient1,
@@ -572,7 +534,7 @@ class _SalePageState extends State<SalePage> {
                                                   ),
                                                   Spacer(),
                                                   Text(
-                                                    'Il y\'a ${formatDate(DateTime.parse(_sales[index].createdAt))}',
+                                                    '${formatDate(DateTime.parse(_sales[index]["created_at"]))}',
                                                     style: TextStyle(
                                                         color: Colors.black26,
                                                         fontSize:
@@ -590,22 +552,19 @@ class _SalePageState extends State<SalePage> {
                     ],
                   );
                 }
+
                 return CustomScrollView(
                   slivers: [
-                    sliverHeader2(
-                      context,
-                      'Mon site',
-                      'Mes ventes',
-                    ),
+                    sliverHeader2(context, 'Mon site', 'Mes ventes'),
                     SliverList(
-                      delegate: SliverChildListDelegate([
+                      delegate: SliverChildListDelegate.fixed([
                         Container(
-                          alignment: Alignment.center,
-                          height: myHeight(context) / 1.5,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(gradient1),
-                          ),
-                        )
+                            height: myHeight(context) / 1.5,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(gradient1),
+                            ))
                       ]),
                     )
                   ],

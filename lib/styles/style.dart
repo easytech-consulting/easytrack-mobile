@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-ThemeData appTheme =
-    ThemeData(primaryColor: Colors.white, fontFamily: 'Roboto');
+ThemeData appTheme = ThemeData(
+    primaryColor: Colors.white,
+    fontFamily: 'Roboto',
+    scaffoldBackgroundColor: Colors.white);
 
 Color gradient1 = Color(0xfff267FC9);
 Color gradient2 = Color(0xff26B1C3);
@@ -29,6 +31,5 @@ TextStyle mainPartTitleStyle =
 
 buildTextFormFieldContainer(Color color) {
   return BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.all(Radius.circular(30.0)));
+      color: color, borderRadius: BorderRadius.all(Radius.circular(30)));
 }

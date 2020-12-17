@@ -1,16 +1,15 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
+import 'package:easytrack/models/product.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/models/supplier_with_id.dart';
 import 'package:easytrack/models/user_with_id.dart';
-import 'package:easytrack/screens/search/customers.dart';
 import 'package:easytrack/screens/search/notifications.dart';
 import 'package:easytrack/screens/search/products.dart';
 import 'package:easytrack/screens/search/purchases.dart';
 import 'package:easytrack/screens/search/sales.dart';
 import 'package:easytrack/screens/search/sites.dart';
-import 'package:easytrack/screens/search/suppliers.dart';
-import 'package:easytrack/screens/search/users.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -35,8 +34,30 @@ class _SearchResultState extends State<Search> {
     super.initState();
     _controller = new TextEditingController();
     _node = new FocusNode();
-    _widgetShow = SubSearchUsers(globalEmployees);
+    _widgetShow = SubSearchSales(_checkAllSales(globalSales), _sitesForSales);
     _currentIndex = 0;
+    print(globalProducts.toString());
+  }
+
+  List _fieldProductValues(datas) {
+    List result = [];
+    if (user.isAdmin == 1) {
+      for (var product in datas) {
+        if (!result.contains(Product.fromJson(product))) {
+          result.add(Product.fromJson(product));
+        }
+      }
+    } else {
+      for (var site in datas) {
+        for (var product in site['products']) {
+          if (!result.contains(Product.fromJson(product))) {
+            result.add(Product.fromJson(product));
+          }
+        }
+      }
+    }
+
+    return result;
   }
 
   List _checkAllSales(datas) {
@@ -96,18 +117,6 @@ class _SearchResultState extends State<Search> {
 
     if (_currentIndex == 0) {
       setState(() {
-        _toShow = globalEmployees ?? [];
-        for (var item in _toShow) {
-          if (item.name.toLowerCase().contains(value.toLowerCase()) ||
-              item.address.toLowerCase().contains(value.toLowerCase()) ||
-              item.tel.toLowerCase().contains(value.toLowerCase())) {
-            result.add(item);
-          }
-        }
-        _widgetShow = SubSearchUsers(value.isEmpty ? _toShow : result);
-      });
-    } else if (_currentIndex == 1) {
-      setState(() {
         _toShow = _checkAllSales(globalSales ?? []);
         for (var item in _toShow) {
           if (item['code'].toLowerCase().contains(value.toLowerCase()) ||
@@ -132,7 +141,7 @@ class _SearchResultState extends State<Search> {
         _widgetShow =
             SubSearchSales(value.isEmpty ? _toShow : result, _sitesForSales);
       });
-    } else if (_currentIndex == 2) {
+    } else if (_currentIndex == 1) {
       setState(() {
         _toShow = globalSites ?? [];
         for (var item in _toShow) {
@@ -145,9 +154,9 @@ class _SearchResultState extends State<Search> {
         }
         _widgetShow = SubSearchSites(value.isEmpty ? _toShow : result);
       });
-    } else if (_currentIndex == 3) {
+    } else if (_currentIndex == 2) {
       setState(() {
-        _toShow = globalProducts ?? [];
+        _toShow = _fieldProductValues(globalProducts) ?? [];
         for (var item in _toShow) {
           if (item.name.toLowerCase().contains(value.toLowerCase())) {
             result.add(item);
@@ -155,7 +164,7 @@ class _SearchResultState extends State<Search> {
         }
         _widgetShow = SubSearchProducts(value.isEmpty ? _toShow : result);
       });
-    } else if (_currentIndex == 4) {
+    } else if (_currentIndex == 3) {
       setState(() {
         _toShow = _checkAllPurchases(globalPurchases ?? []);
         for (var item in _toShow) {
@@ -188,7 +197,7 @@ class _SearchResultState extends State<Search> {
             _initiatorsForPurchase,
             _validatorsForPurchase);
       });
-    } else if (_currentIndex == 5) {
+    } else if (_currentIndex == 4) {
       setState(() {
         _toShow = globalNotifications ?? [];
         for (var item in _toShow) {
@@ -198,30 +207,6 @@ class _SearchResultState extends State<Search> {
         }
         _widgetShow = SubSearchNotification(value.isEmpty ? _toShow : result);
       });
-    } else if (_currentIndex == 6) {
-      setState(() {
-        _toShow = globalSuppliers ?? [];
-        for (var item in _toShow) {
-          if (item.street.toLowerCase().contains(value.toLowerCase()) ||
-              item.town.toLowerCase().contains(value.toLowerCase()) ||
-              item.tel1.toLowerCase().contains(value.toLowerCase())) {
-            result.add(item);
-          }
-        }
-        _widgetShow = SubSearchSupplier(value.isEmpty ? _toShow : result);
-      });
-    } else if (_currentIndex == 7) {
-      setState(() {
-        _toShow = globalClients ?? [];
-        for (var item in _toShow) {
-          if (item.street.toLowerCase().contains(value.toLowerCase()) ||
-              item.town.toLowerCase().contains(value.toLowerCase()) ||
-              item.name.toLowerCase().contains(value.toLowerCase())) {
-            result.add(item);
-          }
-        }
-        _widgetShow = SubSearchCustomer(value.isEmpty ? _toShow : result);
-      });
     }
   }
 
@@ -230,7 +215,7 @@ class _SearchResultState extends State<Search> {
     return SafeArea(
         top: true,
         child: DefaultTabController(
-            length: 8,
+            length: 5,
             child: Scaffold(
                 backgroundColor: backgroundColor,
                 appBar: PreferredSize(
@@ -243,79 +228,83 @@ class _SearchResultState extends State<Search> {
                             end: Alignment.bottomCenter)),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: EdgeInsets.all(myHeight(context) / 50.0),
-                          child: Row(
-                            children: <Widget>[
-                              InkWell(
-                                onTap: () => Navigator.pop(context),
-                                child: Icon(
-                                  AmazingIcon.arrow_left_line,
-                                  color: Colors.white,
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: myHeight(context) / 50),
+                            child: Row(
+                              children: <Widget>[
+                                InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Icon(
+                                    AmazingIcon.arrow_left_line,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: myWidth(context) / 30.0,
-                              ),
-                              Expanded(
-                                child: Stack(
-                                  children: <Widget>[
-                                    Container(
-                                      height: 46.0,
-                                      decoration: buildTextFormFieldContainer(
-                                          decorationColor),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      child: Container(
+                                SizedBox(
+                                  width: myWidth(context) / 30.0,
+                                ),
+                                Expanded(
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Container(
                                         height: 46.0,
-                                        child: TextFormField(
-                                          textInputAction: TextInputAction.done,
-                                          style: TextStyle(
-                                              color: textSameModeColor
-                                                  .withOpacity(.87)),
-                                          controller: _controller,
-                                          focusNode: _node,
-                                          onChanged: (value) {
-                                            loadData(value);
-                                          },
-                                          onFieldSubmitted: (value) {
-                                            loadData(value);
-                                            _node.unfocus();
-                                          },
-                                          decoration: InputDecoration(
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      left: 50.0),
-                                              suffixIcon: GestureDetector(
-                                                onTap: () {
-                                                  _controller.text = '';
-                                                  _node.unfocus();
-                                                  loadData(_controller.text);
-                                                },
-                                                child: Icon(
-                                                    AmazingIcon.close_fill,
+                                        decoration: buildTextFormFieldContainer(
+                                            decorationColor),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        child: Container(
+                                          height: 46.0,
+                                          child: TextFormField(
+                                            textInputAction:
+                                                TextInputAction.done,
+                                            style: TextStyle(
+                                                color: textSameModeColor
+                                                    .withOpacity(.87)),
+                                            controller: _controller,
+                                            focusNode: _node,
+                                            onChanged: (value) {
+                                              loadData(value);
+                                            },
+                                            onFieldSubmitted: (value) {
+                                              loadData(value);
+                                              _node.unfocus();
+                                            },
+                                            decoration: InputDecoration(
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                        left: 50.0),
+                                                suffixIcon: GestureDetector(
+                                                  onTap: () {
+                                                    _controller.text = '';
+                                                    _node.unfocus();
+                                                    loadData(_controller.text);
+                                                  },
+                                                  child: Icon(
+                                                      AmazingIcon.close_fill,
+                                                      color: textSameModeColor),
+                                                ),
+                                                hintText: 'Recherche...',
+                                                prefixIcon: Icon(
+                                                    AmazingIcon.search_2_line,
                                                     color: textSameModeColor),
-                                              ),
-                                              hintText: 'Recherche...',
-                                              prefixIcon: Icon(
-                                                  AmazingIcon.search_2_line,
-                                                  color: textSameModeColor),
-                                              hintStyle: TextStyle(
-                                                  color: textSameModeColor
-                                                      .withOpacity(.35),
-                                                  fontSize: 18.0),
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide.none,
-                                              )),
+                                                hintStyle: TextStyle(
+                                                    color: textSameModeColor
+                                                        .withOpacity(.35),
+                                                    fontSize: 18.0),
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide.none,
+                                                )),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         TabBar(
@@ -330,35 +319,10 @@ class _SearchResultState extends State<Search> {
                               icon: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(AmazingIcon.user_6_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 0
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Employes',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
                                   Icon(AmazingIcon.shopping_bag_3_line,
                                       size: myHeight(context) / 40.0,
                                       color: textSameModeColor),
-                                  _currentIndex == 1
+                                  _currentIndex == 0
                                       ? Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -383,7 +347,7 @@ class _SearchResultState extends State<Search> {
                                   Icon(AmazingIcon.building_2_line,
                                       size: myHeight(context) / 40.0,
                                       color: textSameModeColor),
-                                  _currentIndex == 2
+                                  _currentIndex == 1
                                       ? Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -408,7 +372,7 @@ class _SearchResultState extends State<Search> {
                                   Icon(AmazingIcon.archive_line,
                                       size: myHeight(context) / 40.0,
                                       color: textSameModeColor),
-                                  _currentIndex == 3
+                                  _currentIndex == 2
                                       ? Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -433,7 +397,7 @@ class _SearchResultState extends State<Search> {
                                   Icon(AmazingIcon.calendar_line,
                                       size: myHeight(context) / 40.0,
                                       color: textSameModeColor),
-                                  _currentIndex == 4
+                                  _currentIndex == 3
                                       ? Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -458,7 +422,7 @@ class _SearchResultState extends State<Search> {
                                   Icon(AmazingIcon.notification_4_line,
                                       size: myHeight(context) / 40.0,
                                       color: textSameModeColor),
-                                  _currentIndex == 5
+                                  _currentIndex == 4
                                       ? Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -467,56 +431,6 @@ class _SearchResultState extends State<Search> {
                                             ),
                                             Text(
                                               'Notifications',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.community_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 6
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Fournisseurs',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.logo___white,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 7
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Clients',
                                               style: TextStyle(
                                                   color: textSameModeColor),
                                             ),

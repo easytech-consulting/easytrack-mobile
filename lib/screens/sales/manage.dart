@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/screens/sales/add.dart';
 import 'package:easytrack/screens/sales/update.dart';
+import 'package:easytrack/screens/search/search.dart';
 import 'package:easytrack/services/externalService.dart';
 import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
@@ -17,12 +20,10 @@ class ManageSales extends StatefulWidget {
 class _ManageSalesState extends State<ManageSales> {
   bool selectionMode = false;
   bool selectedItem = false;
-  bool _salesAlreadyLoad;
   TextEditingController _searchController = TextEditingController();
   FocusNode _searchNode = FocusNode();
-  List _salesForSearch = [];
 
-  Future _companySales;
+  Stream _companySales;
   Map product, currentSite;
   List _sales, _sites, _salesToShow, sitesToShow, products;
   List allSalesData;
@@ -31,67 +32,259 @@ class _ManageSalesState extends State<ManageSales> {
   GlobalKey<ScaffoldState> _scaffoldKey;
   PageController _pageController;
 
-  searchMethod(List items, filter) {
-    List result = [];
-    for (var item in items) {
-      if (item['code'].toLowerCase().contains(filter.toLowerCase())) {
-        if (!result.contains(item)) {
-          result.add(item);
-        }
-      }
-      if (filter.contains('S'.toLowerCase())) {
-        if (item['code']
-                .toLowerCase()
-                .contains(filter.substring(5).toLowerCase()) ||
-            item['code']
-                .toLowerCase()
-                .contains(filter.substring(3).toLowerCase())) {
-          if (!result.contains(item)) {
-            result.add(item);
+  _deleteFunction(Map sale) async {
+    Navigator.pop(context);
+    Map allData;
+    Map toRemove;
+    await FirebaseFirestore.instance.collection('sales').get().then((value) {
+      value.docs.forEach((element) {
+        for (var item in element.data()['sales']) {
+          if (item['code'] == sale['code']) {
+            allData = element.data();
+            toRemove = item;
           }
         }
-      }
-      if (item['validator']['name']
-              .toLowerCase()
-              .contains(filter.toLowerCase()) ||
-          item['initiator']['name'].toLowerCase() == filter.toLowerCase()) {
-        if (!result.contains(item)) {
-          result.add(item);
-        }
-      } else if (item['products'].firstWhere(
-          (element) => element['name'].toLowerCase() == filter.toLowerCase())) {
-        result.add(item);
-      }
-
-      print(item['validator']['name']
-          .toLowerCase()
-          .contains(filter.toLowerCase()));
-    }
-    return filter == '' ? items : result;
-  }
-
-  _deleteFunction(int id) async {
-    Navigator.pop(context);
-    setState(() {
-      _isLoading = true;
-    });
-    await deleteSales(id).then((site) {
-      setState(() {
-        _isLoading = false;
-        _salesAlreadyLoad = false;
-        _companySales = fetchSales();
       });
     });
+
+    List _sales = allData['sales'];
+    _sales.removeWhere((element) => element['code'] == toRemove['code']);
+    await FirebaseFirestore.instance
+        .collection('sales')
+        .where('email', isEqualTo: allData['email'])
+        .get()
+        .then((value) => value.docs.first.reference.update({'sales': _sales}));
+
+    deleteSales(sale['id']);
   }
 
-  _showConfirmationMessage(int index) {
+  _showDetails(sale) {
+    List _products = sale['products'];
+    Map _initiator = sale['initiator'];
+    Map validator = sale['validator'];
+    showDialog(
+        context: context,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.all(10),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+                vertical: myHeight(context) / 30,
+                horizontal: myHeight(context) / 25),
+            height: myHeight(context) * .9,
+            width: myWidth(context) * .9,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            child: Form(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    'img/logos/LogoWhiteWithText.png',
+                    color: textInverseModeColor,
+                    height: myHeight(context) / 20.0,
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Text(
+                    'Recu bon de vente',
+                    style: TextStyle(
+                        fontSize: myHeight(context) / 40.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Text(
+                    'Client: PASSAGER',
+                    style: TextStyle(
+                      fontSize: myHeight(context) / 50.0,
+                    ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: myHeight(context) / 50.0,
+                      ),
+                      Text(
+                        'Date: ${sale["created_at"]}',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 50.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Reference: S0-${sale["code"]}',
+                    style: TextStyle(
+                      fontSize: myHeight(context) / 50.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Text(
+                    'Initie par: ${_initiator["name"]}',
+                    style: TextStyle(
+                      fontSize: myHeight(context) / 50.0,
+                    ),
+                  ),
+                  validator == null
+                      ? Container(
+                          height: 0.0,
+                        )
+                      : Text(
+                          'Valide par: ${validator["name"]}',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: null,
+                      itemCount: _products.length,
+                      itemBuilder: (context, index) => Column(
+                        children: <Widget>[
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '${_products[index]['name']}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              )),
+                          SizedBox(
+                            height: myHeight(context) / 100.0,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                '${_products[index]['pivot']['qty']} x ${_products[index]['pivot']['price']}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                '${_products[index]['pivot']['qty'] * _products[index]['pivot']['price']}',
+                                style: TextStyle(
+                                  fontSize: myHeight(context) / 50.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                          SizedBox(
+                            height: myHeight(context) / 100.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 100.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        'Sous total',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 50.0,
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        '${calculTotal(sale['products'])} FCFA',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 50.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(),
+                  SizedBox(
+                    height: myHeight(context) / 100.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        'Total',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 50.0,
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        '${calculTotal(sale['products'])} FCFA',
+                        style: TextStyle(
+                          fontSize: myHeight(context) / 50.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 50.0,
+                  ),
+                  Container(
+                    color: Colors.blueGrey.withOpacity(.3),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: myHeight(context) / 100.0,
+                          horizontal: 1.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Paye par: ${sale["paying_method"].toUpperCase()}',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: myHeight(context) / 40.0,
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: double.infinity,
+                      height: myHeight(context) / 20.0,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: textInverseModeColor),
+                        borderRadius:
+                            BorderRadius.circular(myHeight(context) / 20.0),
+                      ),
+                      child: Text(
+                        'Retour',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: myHeight(context) / 50.0),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
+  _showConfirmationMessage(Map sale) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                  height: myHeight(context) / 2.5,
+                  height: myHeight(context) / 2.4,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -108,26 +301,24 @@ class _ManageSalesState extends State<ManageSales> {
                       ),
                       SizedBox(height: myHeight(context) / 80),
                       Text(
-                        'Vous allez supprimer le site ${index + 1}.',
+                        'Vous allez proceder a une suppression.',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 30),
                       ),
                       Text(
                         'Attention cette operation',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 30),
                       ),
                       Text(
                         'est irreversible.',
                         style: TextStyle(
                             color: textInverseModeColor.withOpacity(.5),
-                            fontSize: myWidth(context) / 25),
+                            fontSize: myWidth(context) / 30),
                       ),
-                      SizedBox(
-                        height: myHeight(context) / 40,
-                      ),
+                      Spacer(),
                       Row(
                         children: <Widget>[
                           Expanded(
@@ -137,10 +328,10 @@ class _ManageSalesState extends State<ManageSales> {
                                       BorderRadius.all(Radius.circular(30.0))),
                               borderSide:
                                   BorderSide(color: textInverseModeColor),
-                              onPressed: () => _deleteFunction(index),
+                              onPressed: () => _deleteFunction(sale),
                               child: Container(
                                   alignment: Alignment.center,
-                                  height: 40.0,
+                                  height: myHeight(context) / 30.0,
                                   child: Text('Supprimer')),
                             ),
                           ),
@@ -151,21 +342,22 @@ class _ManageSalesState extends State<ManageSales> {
             ));
   }
 
-  _deleteSite(int index) {
-    _showConfirmationMessage(index);
+  _deleteSite(Map sale) {
+    _showConfirmationMessage(sale);
   }
 
   OverlayEntry _overlay;
-  _show(GlobalKey<ScaffoldState> _key, int status, int saleId, currentIndex) {
+
+  _show(GlobalKey<ScaffoldState> _key, int status, Map sale, currentIndex) {
     setState(() {
       this._overlay =
-          this._createOverlayEntry(_key, status, saleId, currentIndex);
+          this._createOverlayEntry(_key, status, sale, currentIndex);
       Overlay.of(context).insert(this._overlay);
     });
   }
 
   _createOverlayEntry(
-      GlobalKey<ScaffoldState> _key, int status, int saleId, currentIndex) {
+      GlobalKey<ScaffoldState> _key, int status, Map sale, currentIndex) {
     return OverlayEntry(
         builder: (context) => Positioned(
             bottom: 0.0,
@@ -184,7 +376,7 @@ class _ManageSalesState extends State<ManageSales> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 10),
+                    padding: EdgeInsets.only(top: myHeight(context) / 100.0),
                     width: double.infinity,
                     height: status == 2
                         ? _salesToShow[currentIndex]['validator'] == null ||
@@ -203,229 +395,250 @@ class _ManageSalesState extends State<ManageSales> {
                       padding: EdgeInsets.symmetric(
                           horizontal: myWidth(context) / 13),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Container(
                             decoration: BoxDecoration(
                                 color: greyColor,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5.0))),
-                            height: 7.0,
-                            width: 50.0,
+                            width: myWidth(context) / 7,
+                            height: myHeight(context) / 150.0,
                           ),
                           SizedBox(
-                            height: 15.0,
+                            height: myHeight(context) / 100.0,
                           ),
-                          status != 0
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    _currentIndex = 0;
-                                    _changeSaleStatus(1, saleId);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.account_circle_line,
-                                          size: 15.0,
-                                          color: gradient1,
+                          Column(
+                            children: [
+                              status != 0
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        _changeSaleStatus(1, sale);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.account_circle_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: gradient1,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Servir commande',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Servir commande',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          status != 1
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    _currentIndex = 0;
-                                    _changeSaleStatus(2, saleId);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.shopping_cart_line,
-                                          size: 15.0,
-                                          color: gradient1,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Payer commande',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          _salesToShow[currentIndex]['validator'] == null
-                              ? Container(height: 0.0)
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    showBill(
-                                        'Passager',
-                                        _sites[currentIndex],
-                                        _salesToShow[currentIndex],
-                                        _salesToShow[currentIndex]['products'],
-                                        _salesToShow[currentIndex]['initiator'],
-                                        validator: _salesToShow[currentIndex]
-                                            ['validator']);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.repeat_2_line,
-                                          size: 15.0,
-                                          color: gradient1,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Voir facture',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          userRole['slug'] == 'server' ||
-                                  _salesToShow[currentIndex]['validator'] !=
-                                      null
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    _currentIndex = 0;
-                                    _validateSale(saleId);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.repeat_2_line,
-                                          size: 15.0,
-                                          color: gradient1,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Valider Commande',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          _salesToShow[currentIndex]['validator'] == null ||
-                                  _salesToShow[currentIndex]['validator']
-                                          ['id'] !=
-                                      user.id
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    _currentIndex = 0;
-                                    _invalidateSale(saleId);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.account_circle_line,
-                                          size: 15.0,
-                                          color: gradient1,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Invalider commande',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          status != 0
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        AmazingIcon.edit_2_line,
-                                        size: 15.0,
-                                        color: gradient1,
                                       ),
-                                      InkWell(
-                                        onTap: () async {
-                                          this._overlay.remove();
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UpdateSalesPage(
+                                    ),
+                              status != 1
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        _changeSaleStatus(2, sale);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.shopping_cart_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: gradient1,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Payer commande',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                              _salesToShow[currentIndex]['validator'] == null
+                                  ? Container(height: 0.0)
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        showBill(
+                                            'Passager',
+                                            _sites[currentIndex],
+                                            _salesToShow[currentIndex],
+                                            _salesToShow[currentIndex]
+                                                ['products'],
+                                            _salesToShow[currentIndex]
+                                                ['initiator'],
+                                            validator:
+                                                _salesToShow[currentIndex]
+                                                    ['validator']);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.repeat_2_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: gradient1,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Voir facture',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                              userRole['slug'] == 'server' ||
+                                      _salesToShow[currentIndex]['validator'] !=
+                                          null
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        _validateSale(sale);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.repeat_2_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: gradient1,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Valider Commande',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                              _salesToShow[currentIndex]['validator'] == null ||
+                                      _salesToShow[currentIndex]['validator']
+                                              ['id'] !=
+                                          user.id
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        _invalidateSale(sale);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.account_circle_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: gradient1,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Invalider commande',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                              status != 0
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: myHeight(context) / 100.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            AmazingIcon.edit_2_line,
+                                            size: myHeight(context) / 40.0,
+                                            color: gradient1,
+                                          ),
+                                          InkWell(
+                                            onTap: () async {
+                                              this._overlay.remove();
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) => UpdateSalesPage(
                                                           sale: _salesToShow[
                                                               currentIndex],
                                                           productsAlreadyInOrder:
@@ -433,58 +646,70 @@ class _ManageSalesState extends State<ManageSales> {
                                                                       currentIndex]
                                                                   [
                                                                   'products'])));
-                                        },
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Modifier',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                          status != 0
-                              ? Container(
-                                  height: 0.0,
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    this._overlay.remove();
-                                    _deleteSite(saleId);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          AmazingIcon.delete_bin_6_line,
-                                          size: 15.0,
-                                          color: redColor,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: Text(
-                                            'Supprimer',
-                                            style: TextStyle(
-                                                fontFamily: 'Ubuntu',
-                                                fontSize: 17.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: textInverseModeColor),
-                                          ),
-                                        )
-                                      ],
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Modifier',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ),
+                              status != 0
+                                  ? Container(
+                                      height: 0.0,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        this._overlay.remove();
+                                        _deleteSite(sale);
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                myHeight(context) / 100.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              AmazingIcon.delete_bin_6_line,
+                                              size: myHeight(context) / 40.0,
+                                              color: redColor,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20.0),
+                                              child: Text(
+                                                'Supprimer',
+                                                style: TextStyle(
+                                                    fontFamily: 'Ubuntu',
+                                                    fontSize:
+                                                        myHeight(context) /
+                                                            40.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        textInverseModeColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                            ],
+                          ),
+                          Container(
+                            height: myHeight(context) / 80.0,
+                          )
                         ],
                       ),
                     ),
@@ -497,8 +722,7 @@ class _ManageSalesState extends State<ManageSales> {
   @override
   void initState() {
     super.initState();
-    _companySales = fetchSales();
-    _salesAlreadyLoad = false;
+    _companySales = FirebaseFirestore.instance.collection('sales').snapshots();
     _salesToShow = [];
     _sites = [];
     _currentIndex = 0;
@@ -507,43 +731,112 @@ class _ManageSalesState extends State<ManageSales> {
     _pageController = new PageController();
   }
 
-  _changeSaleStatus(int newStatus, int saleId) async {
-    setState(() {
-      _isLoading = true;
+  _changeSaleStatus(int newStatus, Map sale) async {
+    Map allData;
+    Map toRemove;
+    await FirebaseFirestore.instance.collection('sales').get().then((value) {
+      value.docs.forEach((element) {
+        for (var item in element.data()['sales']) {
+          if (item['code'] == sale['code']) {
+            allData = element.data();
+            toRemove = item;
+          }
+        }
+      });
     });
+
+    List _sales = allData['sales'];
+    var _sale =
+        _sales.firstWhere((element) => element['code'] == toRemove['code']);
+    _sale['status'] = newStatus;
+    int index =
+        _sales.indexWhere((element) => element['code'] == toRemove['code']);
+    _sales.removeAt(index);
+    _sales.insert(index, _sale);
+    await FirebaseFirestore.instance
+        .collection('sales')
+        .where('email', isEqualTo: allData['email'])
+        .get()
+        .then((value) => value.docs.first.reference.update({'sales': _sales}));
+
     Map<String, dynamic> params = Map();
     params['status'] = newStatus.toString();
-    await changeSaleState(params, saleId).then((success) {
+    changeSaleState(params, sale['id']);
+  }
+
+  _validateSale(sale) async {
+    setState(() {
+      _isLoading = true;
+    });
+    await validateSale(sale['id']).then((success) async {
+      Map allData;
+      Map toRemove;
+      await FirebaseFirestore.instance.collection('sales').get().then((value) {
+        value.docs.forEach((element) {
+          for (var item in element.data()['sales']) {
+            if (item['code'] == sale['code']) {
+              allData = element.data();
+              toRemove = item;
+            }
+          }
+        });
+      });
+
+      List _sales = allData['sales'];
+      var _sale =
+          _sales.firstWhere((element) => element['code'] == toRemove['code']);
+      _sale['validator'] = success['sale']['validator'];
+      _sale['status'] = 2;
+      int index =
+          _sales.indexWhere((element) => element['code'] == toRemove['code']);
+      _sales.removeAt(index);
+      _sales.insert(index, _sale);
+      await FirebaseFirestore.instance
+          .collection('sales')
+          .where('email', isEqualTo: allData['email'])
+          .get()
+          .then(
+              (value) => value.docs.first.reference.update({'sales': _sales}));
       setState(() {
         _isLoading = false;
-        _salesAlreadyLoad = false;
-        _companySales = fetchSales();
       });
     });
   }
 
-  _validateSale(id) async {
+  _invalidateSale(sale) async {
     setState(() {
       _isLoading = true;
     });
-    await validateSale(id).then((success) {
-      setState(() {
-        _isLoading = false;
-        _salesAlreadyLoad = false;
-        _companySales = fetchSales();
+    await invalidateSale(sale['id']).then((success) async {
+      Map allData;
+      Map toRemove;
+      await FirebaseFirestore.instance.collection('sales').get().then((value) {
+        value.docs.forEach((element) {
+          for (var item in element.data()['sales']) {
+            if (item['code'] == sale['code']) {
+              allData = element.data();
+              toRemove = item;
+            }
+          }
+        });
       });
-    });
-  }
 
-  _invalidateSale(id) async {
-    setState(() {
-      _isLoading = true;
-    });
-    await invalidateSale(id).then((success) {
+      List _sales = allData['sales'];
+      var _sale =
+          _sales.firstWhere((element) => element['code'] == toRemove['code']);
+      _sale['validator'] = null;
+      int index =
+          _sales.indexWhere((element) => element['code'] == toRemove['code']);
+      _sales.removeAt(index);
+      _sales.insert(index, _sale);
+      await FirebaseFirestore.instance
+          .collection('sales')
+          .where('email', isEqualTo: allData['email'])
+          .get()
+          .then(
+              (value) => value.docs.first.reference.update({'sales': _sales}));
       setState(() {
         _isLoading = false;
-        _salesAlreadyLoad = false;
-        _companySales = fetchSales();
       });
     });
   }
@@ -659,20 +952,20 @@ class _ManageSalesState extends State<ManageSales> {
                         fontSize: myHeight(context) / 50.0,
                       ),
                     ),
-                  Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                height: myHeight(context) / 50.0,
-                              ),
-                              Text(
-                                'Date: ${_sale["created_at"]}',
-                                style: TextStyle(
-                                  fontSize: myHeight(context) / 50.0,
-                                ),
-                              ),
-                            ],
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: myHeight(context) / 50.0,
+                        ),
+                        Text(
+                          'Date: ${_sale["created_at"]}',
+                          style: TextStyle(
+                            fontSize: myHeight(context) / 50.0,
                           ),
+                        ),
+                      ],
+                    ),
                     Text(
                       'Reference: S0-${_sale["code"]}',
                       style: TextStyle(
@@ -868,9 +1161,8 @@ class _ManageSalesState extends State<ManageSales> {
     return result == null ? [] : result['products'];
   }
 
-  loadDesireSales(datas, {int filter = 0}) {
+  loadDesireSales(datas, filter) {
     _salesToShow.clear();
-    _salesAlreadyLoad = true;
     for (var data in datas) {
       if (data['status'] == filter) {
         _salesToShow.add(data);
@@ -882,7 +1174,7 @@ class _ManageSalesState extends State<ManageSales> {
     List result = [];
     if (user.isAdmin == 1) {
       for (var sale in datas) {
-        _sites.add(site); 
+        _sites.add(site);
         result.add(sale);
       }
     } else {
@@ -1037,68 +1329,51 @@ class _ManageSalesState extends State<ManageSales> {
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: Stack(
-                          children: <Widget>[
-                            Container(
-                              height: 46.0,
-                              decoration:
-                                  buildTextFormFieldContainer(decorationColor),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Container(
-                                height: 46.0,
-                                child: TextFormField(
-                                  textInputAction: TextInputAction.done,
-                                  style: TextStyle(
-                                      color: textInverseModeColor
-                                          .withOpacity(.87)),
-                                  controller: _searchController,
-                                  focusNode: _searchNode,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _sales =
-                                          searchMethod(_salesForSearch, value);
-                                      loadDesireSales(_sales);
-                                    });
-                                  },
-                                  onFieldSubmitted: (value) {
-                                    setState(() {
-                                      _sales =
-                                          searchMethod(_salesForSearch, value);
-                                      loadDesireSales(_sales);
-                                      _searchController.text = '';
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.only(left: 50.0),
-                                      suffixIcon: GestureDetector(
-                                        onTap: () {
-                                          _searchController.text = '';
-                                          _searchNode.unfocus();
-                                          _sales = _salesForSearch;
-                                          loadDesireSales(_sales);
-                                        },
-                                        child: Icon(AmazingIcon.close_fill,
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Search())),
+                          child: Stack(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: Container(
+                                  height: 46.0,
+                                  child: TextFormField(
+                                    textInputAction: TextInputAction.done,
+                                    style: TextStyle(
+                                        color: textInverseModeColor
+                                            .withOpacity(.87)),
+                                    controller: _searchController,
+                                    focusNode: _searchNode,
+                                    decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.only(left: 50.0),
+                                        suffixIcon: Icon(AmazingIcon.close_fill,
                                             color: textInverseModeColor),
-                                      ),
-                                      hintText: 'Recherche...',
-                                      prefixIcon: Icon(
-                                          AmazingIcon.search_2_line,
-                                          color: textInverseModeColor),
-                                      hintStyle: TextStyle(
-                                          color: textInverseModeColor
-                                              .withOpacity(.35),
-                                          fontSize: 18.0),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      )),
+                                        hintText: 'Recherche...',
+                                        prefixIcon: Icon(
+                                            AmazingIcon.search_2_line,
+                                            color: textInverseModeColor),
+                                        hintStyle: TextStyle(
+                                            color: textInverseModeColor
+                                                .withOpacity(.35),
+                                            fontSize: 18.0),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        )),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                              Container(
+                                height: 48,
+                                decoration: buildTextFormFieldContainer(
+                                    decorationColor),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                       _currentIndex == 0
@@ -1135,25 +1410,29 @@ class _ManageSalesState extends State<ManageSales> {
                     height: myHeight(context) / 100.0,
                   ),
                   Expanded(
-                    child: FutureBuilder(
-                        future: _companySales,
+                    child: StreamBuilder(
+                        stream: _companySales,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.done &&
-                              snapshot.hasData) {
-                            if (!_salesAlreadyLoad) {
-                              allSalesData = snapshot.data;
+                          if (snapshot.hasData) {
+                            if (user.isAdmin == 1) {
+                              globalSales =
+                                  snapshot.data.docs[0].data()['sales'];
+                              allSalesData = globalSales;
                               _sales = _checkAllSales(allSalesData);
-                              globalSales = allSalesData;
-                              _salesForSearch = _sales;
-                              loadDesireSales(_sales);
+                            } else {
+                              globalSales = [];
+                              for (var item in snapshot.data.docs) {
+                                globalSales.add(item.data());
+                              }
+                              allSalesData = globalSales;
+                              _sales = _checkAllSales(allSalesData);
                             }
+                            loadDesireSales(_sales, _currentIndex);
                             return PageView(
                               controller: _pageController,
                               onPageChanged: (index) {
                                 setState(() {
                                   _currentIndex = index;
-                                  loadDesireSales(_sales, filter: index);
                                 });
                               },
                               children:
@@ -1203,6 +1482,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   Row(
                                                                                     children: <Widget>[
                                                                                       InkWell(
+                                                                                        onTap: () => _showDetails(_salesToShow[index]),
                                                                                         child: Text(
                                                                                           'S0-${_salesToShow[index]["code"]}',
                                                                                           style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
@@ -1211,7 +1491,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       Spacer(),
                                                                                       GestureDetector(
                                                                                         onTap: () {
-                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index);
+                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
                                                                                         },
                                                                                         child: Icon(
                                                                                           Icons.more_vert,
@@ -1224,7 +1504,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                     padding: EdgeInsets.only(top: myHeight(context) / 62),
                                                                                     child: Container(
                                                                                       width: myWidth(context),
-                                                                                      height: 30.0,
+                                                                                      height: myHeight(context) / 40.0,
                                                                                       child: ListView.builder(
                                                                                           physics: null,
                                                                                           scrollDirection: Axis.horizontal,
@@ -1242,7 +1522,6 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Row(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            width: 50.0,
                                                                                             child: Stack(
                                                                                               children: <Widget>[
                                                                                                 Container(
@@ -1369,6 +1648,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   Row(
                                                                                     children: <Widget>[
                                                                                       InkWell(
+                                                                                        onTap: () => _showDetails(_salesToShow[index]),
                                                                                         child: Text(
                                                                                           'S0-${_salesToShow[index]["code"]}',
                                                                                           style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
@@ -1377,7 +1657,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       Spacer(),
                                                                                       GestureDetector(
                                                                                         onTap: () {
-                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index);
+                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
                                                                                         },
                                                                                         child: Icon(
                                                                                           Icons.more_vert,
@@ -1390,7 +1670,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                     padding: EdgeInsets.only(top: myHeight(context) / 62),
                                                                                     child: Container(
                                                                                       width: myWidth(context),
-                                                                                      height: 30.0,
+                                                                                      height: myHeight(context) / 40.0,
                                                                                       child: ListView.builder(
                                                                                           physics: null,
                                                                                           scrollDirection: Axis.horizontal,
@@ -1408,7 +1688,6 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                       child: Row(
                                                                                         children: <Widget>[
                                                                                           Container(
-                                                                                            width: 50.0,
                                                                                             child: Stack(
                                                                                               children: <Widget>[
                                                                                                 Container(
@@ -1532,6 +1811,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                               Row(
                                                                                 children: <Widget>[
                                                                                   InkWell(
+                                                                                    onTap: () => _showDetails(_salesToShow[index]),
                                                                                     child: Text(
                                                                                       'S0-${_salesToShow[index]["code"]}',
                                                                                       style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
@@ -1540,7 +1820,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   Spacer(),
                                                                                   GestureDetector(
                                                                                     onTap: () {
-                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index);
+                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
                                                                                     },
                                                                                     child: Icon(
                                                                                       Icons.more_vert,
@@ -1553,7 +1833,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                 padding: EdgeInsets.only(top: myHeight(context) / 62),
                                                                                 child: Container(
                                                                                   width: myWidth(context),
-                                                                                  height: 30.0,
+                                                                                  height: myHeight(context) / 40.0,
                                                                                   child: ListView.builder(
                                                                                       physics: null,
                                                                                       scrollDirection: Axis.horizontal,
@@ -1571,7 +1851,6 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   child: Row(
                                                                                     children: <Widget>[
                                                                                       Container(
-                                                                                        width: 50.0,
                                                                                         child: Stack(
                                                                                           children: <Widget>[
                                                                                             Container(
@@ -1676,7 +1955,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   Spacer(),
                                                                                   GestureDetector(
                                                                                     onTap: () {
-                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index]['id'], index);
+                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
                                                                                     },
                                                                                     child: Icon(
                                                                                       Icons.more_vert,
@@ -1689,7 +1968,7 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                 padding: EdgeInsets.only(top: myHeight(context) / 62),
                                                                                 child: Container(
                                                                                   width: myWidth(context),
-                                                                                  height: 30.0,
+                                                                                  height: myHeight(context) / 40.0,
                                                                                   child: ListView.builder(
                                                                                       physics: null,
                                                                                       scrollDirection: Axis.horizontal,
@@ -1707,7 +1986,6 @@ class _ManageSalesState extends State<ManageSales> {
                                                                                   child: Row(
                                                                                     children: <Widget>[
                                                                                       Container(
-                                                                                        width: 50.0,
                                                                                         child: Stack(
                                                                                           children: <Widget>[
                                                                                             Container(
@@ -1765,17 +2043,11 @@ class _ManageSalesState extends State<ManageSales> {
                                         ],
                             );
                           }
-                          return Column(
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor:
-                                        new AlwaysStoppedAnimation(gradient1),
-                                  ),
-                                ),
-                              ),
-                            ],
+
+                          return Center(
+                            child: CircularProgressIndicator(
+                              valueColor: new AlwaysStoppedAnimation(gradient1),
+                            ),
                           );
                         }),
                   )

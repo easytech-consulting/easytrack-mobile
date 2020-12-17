@@ -11,7 +11,6 @@ Future<bool> login(Map<String, dynamic> params) async {
       Map data = json.decode(res.body);
       userToken = data['access_token'];
       userId = data['user_id'];
-      storeToken(userToken);
       storeTokenExpireDate(data['expires_at']);
       response = true;
     }

@@ -27,7 +27,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                height: 256.0,
+                height: myHeight(context) / 2.5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +136,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                           Stack(
                             children: <Widget>[
                               Container(
-                                height: 48.0,
+                                height: myHeight(context) / 20,
                                 decoration: buildTextFormFieldContainer(
                                     decorationColor),
                               ),
@@ -186,7 +186,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                           Stack(
                             children: <Widget>[
                               Container(
-                                height: 48.0,
+                                height: myHeight(context) / 20,
                                 decoration: buildTextFormFieldContainer(
                                     decorationColor),
                               ),
@@ -251,7 +251,7 @@ class _RecoverNewValuePageState extends State<RecoverNewValuePage> {
                               }
                             },
                             child: Container(
-                                height: 48.0,
+                                height: myHeight(context) / 20,
                                 decoration: BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0)),

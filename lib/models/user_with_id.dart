@@ -5,7 +5,6 @@ class UserWithId {
   final String address;
   final String username;
   final String tel;
-  final int isAdmin;
   final String photo;
 
   UserWithId(
@@ -15,7 +14,6 @@ class UserWithId {
       this.address,
       this.username,
       this.tel,
-      this.isAdmin,
       this.photo});
 
   factory UserWithId.fromJson(Map<String, dynamic> json) {
@@ -26,7 +24,6 @@ class UserWithId {
         address: json['address'],
         username: json['username'],
         tel: json['phone'],
-        isAdmin: int.parse(json['is_admin'].toString()),
         photo: json['photo']);
   }
 
@@ -36,7 +33,6 @@ class UserWithId {
         'email': email.toString(),
         'address': address.toString(),
         'username': username.toString(),
-        'is_admin': isAdmin.toString,
         'phone': tel.toString(),
         'photo': photo.toString()
       };

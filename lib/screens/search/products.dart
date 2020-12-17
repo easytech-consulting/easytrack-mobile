@@ -14,7 +14,7 @@ class SubSearchProducts extends StatelessWidget {
             child: Text('Aucune valeur'),
           )
         : data.isEmpty
-            ? Center(child: Text('Aucune correspondance'))
+            ? Center(child: Text('Vide'))
             : ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) => Padding(

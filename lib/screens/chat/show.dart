@@ -556,8 +556,6 @@ class _ShowDiscussionState extends State<ShowDiscussion> {
                     },
                   ),
                 ),
-                /*   
-                                           */
                 Container(
                   width: double.infinity,
                   color: textSameModeColor,

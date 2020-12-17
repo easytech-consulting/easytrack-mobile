@@ -6,6 +6,7 @@ import 'package:easytrack/screens/home/shopping.dart';
 import 'package:easytrack/screens/home/stats/stats.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MainPage extends StatefulWidget {
   final int index;
@@ -22,11 +23,13 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
     _currentIndex = widget.index ?? 0;
     _pageController = new PageController(initialPage: _currentIndex);
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -33,6 +33,8 @@ Future<User> fetchUserDetails(int id) async {
       print('$data\n $site, $_linkToSite, $company, $_linkToCompany}');
       storeUserDetails(
           data, site, _linkToSite, company, _linkToCompany, userRole);
+
+      storeToken(userToken);
       return user;
     }
 

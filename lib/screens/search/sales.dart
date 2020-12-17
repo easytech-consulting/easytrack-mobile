@@ -128,12 +128,12 @@ class SubSearchSales extends StatelessWidget {
                         SizedBox(
                           height: myHeight(context) / 50.0,
                         ),
-                        Text(
+                        /*  Text(
                           'Date: ${_sale["created_at"]}',
                           style: TextStyle(
                             fontSize: myHeight(context) / 50.0,
                           ),
-                        ),
+                        ), */
                       ],
                     ),
                     Text(
@@ -330,7 +330,7 @@ class SubSearchSales extends StatelessWidget {
             child: Text('Aucune valeur'),
           )
         : data.isEmpty
-            ? Center(child: Text('Aucune correspondance'))
+            ? Center(child: Text('Vide'))
             : ListView.builder(
                 itemCount: _sales.length,
                 itemBuilder: (context, index) => Padding(
@@ -429,7 +429,7 @@ class SubSearchSales extends StatelessWidget {
                                   ),
                                   Spacer(),
                                   Text(
-                                    'Il y\'a ${formatDate(DateTime.parse(_sales[index]["created_at"]))}',
+                                    '${formatDate(DateTime.tryParse(_sales[index]["created_at"]))}',
                                     style: TextStyle(
                                         color: Colors.black26,
                                         fontSize:

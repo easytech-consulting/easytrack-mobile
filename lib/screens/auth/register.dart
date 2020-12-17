@@ -1,9 +1,6 @@
-import 'dart:async';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
-import 'package:easytrack/models/plan.dart';
 import 'package:easytrack/services/authService.dart';
-import 'package:easytrack/services/planService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +13,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading, _obscureText;
   var _formKey;
   int _currentPage;
-  Plan _selectedPlan;
-  Future<List<Plan>> _plans;
-  List<Plan> _listOfPlans;
 
   TextEditingController _usernameController;
   TextEditingController _useraddressController;
@@ -63,10 +57,8 @@ class _RegisterPageState extends State<RegisterPage> {
     super.initState();
     _formKey = GlobalKey<FormState>();
     _isLoading = false;
-    _listOfPlans = [];
     _currentPage = 0;
     _obscureText = true;
-    _plans = fetchAllPlans();
 
     _usernameController = new TextEditingController();
     _useraddressController = new TextEditingController();
@@ -138,8 +130,6 @@ class _RegisterPageState extends State<RegisterPage> {
       _params['sitephone2'] = _sitephone2Controller.text;
     }
 
-    _params['type'] = _selectedPlan.id.toString();
-
     await register(_params).then((success) {
       setState(() {
         _isLoading = false;
@@ -165,306 +155,293 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _firstPage() {
-    return FutureBuilder(
-      future: _plans,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          _listOfPlans = snapshot.data;
-          _selectedPlan = _listOfPlans[0];
-        } else if (snapshot.connectionState == ConnectionState.none) {
-          errorStatusCode = 0;
-          _showErrorMessage();
-        }
-        return Column(
+    return Column(
+      children: <Widget>[
+        Stack(
           children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: buildTextFormFieldContainer(decorationColor),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48,
+                decoration: buildTextFormFieldContainer(decorationColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                controller: _usernameController,
+                focusNode: _usernameNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _usernameNode, _useraddressNode),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Champs obligatoire';
+                  }
+                  return null;
+                },
+                style: TextStyle(
+                  color: textInverseModeColor,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    controller: _usernameController,
-                    focusNode: _usernameNode,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) =>
-                        nextNode(context, _usernameNode, _useraddressNode),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(
-                      color: textInverseModeColor,
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.account_circle_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Nom complet',
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
                     ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.account_circle_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Nom complet',
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.5),
-                  child: Container(
-                      height: 48.0,
-                      decoration: buildTextFormFieldContainer(decorationColor)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    obscureText: false,
-                    controller: _useraddressController,
-                    focusNode: _useraddressNode,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) =>
-                        nextNode(context, _useraddressNode, _userphoneNode),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(
-                      color: textInverseModeColor,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.map_pin_2_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Adresse',
-                        fillColor: textSameModeColor,
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: buildTextFormFieldContainer(decorationColor),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    controller: _userphoneController,
-                    focusNode: _userphoneNode,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    onFieldSubmitted: (_) =>
-                        nextNode(context, _userphoneNode, _useremailNode),
-                    validator: (value) => checkNumberValidity(value),
-                    style: TextStyle(
-                      color: textInverseModeColor,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.phone_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Telephone',
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: buildTextFormFieldContainer(decorationColor),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    controller: _useremailController,
-                    focusNode: _useremailNode,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.emailAddress,
-                    onFieldSubmitted: (_) =>
-                        nextNode(context, _useremailNode, _userloginNode),
-                    validator: (value) => checkEmailValidity(value),
-                    style: TextStyle(
-                      color: textInverseModeColor,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.at_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Email',
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: buildTextFormFieldContainer(decorationColor),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    controller: _userloginController,
-                    focusNode: _userloginNode,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) =>
-                        nextNode(context, _userloginNode, _userpasswordNode),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(
-                      color: textInverseModeColor,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.user_6_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Nom d\'utilisateur',
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: screenSize(context).height / 31.0,
-            ),
-            Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    height: 48.0,
-                    decoration: buildTextFormFieldContainer(decorationColor),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: TextFormField(
-                    obscureText: _obscureText,
-                    controller: _userpasswordController,
-                    focusNode: _userpasswordNode,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _userpasswordNode.unfocus(),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Champs obligatoire';
-                      }
-                      if (value.length < 8) {
-                        return 'Au minimum 8 carateres';
-                      }
-                      return null;
-                    },
-                    style: TextStyle(
-                      color: textInverseModeColor,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 50.0),
-                        prefixIcon: Icon(AmazingIcon.lock_password_line,
-                            color: textInverseModeColor, size: 15.0),
-                        hintText: 'Mot de passe',
-                        suffixIcon: IconButton(
-                          onPressed: () => _toggle(),
-                          icon: Icon(
-                              _obscureText
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: textInverseModeColor,
-                              size: 15.0),
-                        ),
-                        hintStyle: TextStyle(
-                            color: textInverseModeColor.withOpacity(.35),
-                            fontSize: 18.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        )),
-                  ),
-                ),
-              ],
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
             ),
           ],
-        );
-      },
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.5),
+              child: Container(
+                  height: 48,
+                  decoration: buildTextFormFieldContainer(decorationColor)),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                obscureText: false,
+                controller: _useraddressController,
+                focusNode: _useraddressNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _useraddressNode, _userphoneNode),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Champs obligatoire';
+                  }
+                  return null;
+                },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.map_pin_2_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Adresse',
+                    fillColor: textSameModeColor,
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            )
+          ],
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48,
+                decoration: buildTextFormFieldContainer(decorationColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                controller: _userphoneController,
+                focusNode: _userphoneNode,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.number,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _userphoneNode, _useremailNode),
+                validator: (value) => checkNumberValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.phone_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Telephone',
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48,
+                decoration: buildTextFormFieldContainer(decorationColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                controller: _useremailController,
+                focusNode: _useremailNode,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.emailAddress,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _useremailNode, _userloginNode),
+                validator: (value) => checkEmailValidity(value),
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.at_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Email',
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48,
+                decoration: buildTextFormFieldContainer(decorationColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                controller: _userloginController,
+                focusNode: _userloginNode,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) =>
+                    nextNode(context, _userloginNode, _userpasswordNode),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Champs obligatoire';
+                  }
+                  return null;
+                },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.user_6_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Nom d\'utilisateur',
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: screenSize(context).height / 31.0,
+        ),
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Container(
+                height: 48,
+                decoration: buildTextFormFieldContainer(decorationColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: TextFormField(
+                obscureText: _obscureText,
+                controller: _userpasswordController,
+                focusNode: _userpasswordNode,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => _userpasswordNode.unfocus(),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Champs obligatoire';
+                  }
+                  if (value.length < 8) {
+                    return 'Au minimum 8 carateres';
+                  }
+                  return null;
+                },
+                style: TextStyle(
+                  color: textInverseModeColor,
+                ),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 50.0),
+                    prefixIcon: Icon(AmazingIcon.lock_password_line,
+                        color: textInverseModeColor, size: 15.0),
+                    hintText: 'Mot de passe',
+                    suffixIcon: IconButton(
+                      onPressed: () => _toggle(),
+                      icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: textInverseModeColor,
+                          size: 15.0),
+                    ),
+                    hintStyle: TextStyle(
+                        color: textInverseModeColor.withOpacity(.35),
+                        fontSize: 18.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    )),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -476,7 +453,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -524,7 +501,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -567,7 +544,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -615,7 +592,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -663,7 +640,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -706,7 +683,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -755,7 +732,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -800,7 +777,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -843,7 +820,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -891,7 +868,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -939,7 +916,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -982,7 +959,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                height: 48.0,
+                height: 48,
                 decoration: buildTextFormFieldContainer(decorationColor),
               ),
             ),
@@ -1015,138 +992,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
                     )),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _lastPage() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: screenSize(context).height / 20),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Pack',
-                    style: TextStyle(
-                        color: textInverseModeColor,
-                        fontSize: screenSize(context).height / 43),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  Container(
-                    width: myWidth(context) / 3,
-                    child: Text(_selectedPlan.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: textInverseModeColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: screenSize(context).height / 35)),
-                  ),
-                ],
-              ),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    'Duree',
-                    style: TextStyle(
-                        color: textInverseModeColor,
-                        fontSize: screenSize(context).height / 43),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  Text("${_selectedPlan.duration.toString()} Jours",
-                      style: TextStyle(
-                          color: textInverseModeColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: screenSize(context).height / 35)),
-                ],
-              )
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 20.0,
-        ),
-        Text(
-          'Montant',
-          style: TextStyle(
-              color: textInverseModeColor,
-              fontSize: screenSize(context).height / 43),
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Text("${_selectedPlan.price.toString()} FCFA",
-            style: TextStyle(
-                color: textInverseModeColor,
-                fontWeight: FontWeight.bold,
-                fontSize: screenSize(context).height / 35)),
-        SizedBox(
-          height: 20.0,
-        ),
-        Stack(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Container(
-                  height: 48.0,
-                  decoration: buildTextFormFieldContainer(decorationColor)),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 10.0, top: 5.0),
-              child: DropdownButton<Plan>(
-                dropdownColor: backgroundColor,
-                underline: Text(''),
-                icon: Icon(
-                  AmazingIcon.arrow_down_s_line,
-                  color: textInverseModeColor.withOpacity(.4),
-                ),
-                isExpanded: true,
-                value: _selectedPlan,
-                onChanged: (Plan plan) {
-                  setState(() {
-                    _selectedPlan = plan;
-                  });
-                },
-                items: _listOfPlans.map((Plan plan) {
-                  return DropdownMenuItem<Plan>(
-                    onTap: () {},
-                    value: plan,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          AmazingIcon.file_shield_2_line,
-                          color: textInverseModeColor,
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Text(
-                          plan.title,
-                          style: TextStyle(
-                            color: textInverseModeColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
               ),
             ),
           ],
@@ -1229,20 +1074,6 @@ class _RegisterPageState extends State<RegisterPage> {
           SizedBox(
             height: 20.0,
           ),
-          Text(
-            'Licence',
-            style: TextStyle(
-                color: textInverseModeColor,
-                fontSize: screenSize(context).height / 43),
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          Text(_selectedPlan.title,
-              style: TextStyle(
-                  color: textInverseModeColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: screenSize(context).height / 35)),
         ],
       ),
     );
@@ -1256,6 +1087,7 @@ class _RegisterPageState extends State<RegisterPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
+                  height: myHeight(context) / 2.5,
                   child: errorStatusCode == 401
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1431,7 +1263,7 @@ class _RegisterPageState extends State<RegisterPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(30.0))),
             content: Container(
-                height: 275.0,
+                height: myHeight(context) / 2.5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1466,7 +1298,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     InkWell(
                       onTap: () => Navigator.pushNamed(context, '/login'),
                       child: Container(
-                          height: 48.0,
+                          height: 48,
                           decoration: BoxDecoration(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(30.0)),
@@ -1505,29 +1337,120 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Container(
                     width: screenSize(context).width,
                     height: screenSize(context).height,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(
-                            height: screenSize(context).height / 30,
-                          ),
-                          Center(
-                            child: Image.asset(
-                              _currentPage < 4
-                                  ? 'img/Logo.png'
-                                  : 'img/logos/LogoWithText.png',
-                              width: _currentPage < 4
-                                  ? screenSize(context).height / 13
-                                  : screenSize(context).height / 5,
-                            ),
-                          ),
-                          SizedBox(
-                            height: screenSize(context).height / 30.0,
-                          ),
-                          _currentPage < 4
-                              ? Column(
+                    child: _currentPage > 2
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                height: screenSize(context).height / 30,
+                              ),
+                              Center(
+                                child: Image.asset(
+                                 'img/logos/LogoWithText.png',
+                                  width: _currentPage < 3
+                                      ? screenSize(context).height / 13
+                                      : screenSize(context).height / 5,
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenSize(context).height / 30.0,
+                              ),
+                              Spacer(),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Recapitulatif',
+                                  style: TextStyle(
+                                      color: textInverseModeColor,
+                                      fontSize:
+                                          screenSize(context).height / 21),
+                                ),
+                              ),
+                              SizedBox(height: screenSize(context).height / 30),
+                              _recapPage(),
+                              Spacer(),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: screenSize(context).height / 60.0,
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (_formKey.currentState.validate()) {
+                                      _connectionAttempt();
+                                    }
+                                  },
+                                  child: Container(
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(30.0)),
+                                          gradient: LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [gradient1, gradient2])),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Center(
+                                          child: Text(
+                                            'Terminer',
+                                            style: TextStyle(
+                                                color: textSameModeColor,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: screenSize(context).height / 31.0,
+                                ),
+                                child: InkWell(
+                                  onTap: () => _setPage(--_currentPage),
+                                  child: Container(
+                                      height: 45.0,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: textInverseModeColor),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30.0)),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 7.0),
+                                        child: Center(
+                                          child: Text(
+                                            'Retour',
+                                            style: TextStyle(
+                                                color: textInverseModeColor,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                              ),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(
+                                  height: screenSize(context).height / 30,
+                                ),
+                                Center(
+                                  child: Image.asset(
+                                    'img/Logo.png',
+                                    width: screenSize(context).height / 13,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenSize(context).height / 30.0,
+                                ),
+                                Column(
                                   children: <Widget>[
                                     Text('Inscription',
                                         style: TextStyle(
@@ -1543,9 +1466,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           ? 'Creer un compte pour acceder'
                                           : _currentPage == 1
                                               ? 'Ajouter un snack sur'
-                                              : _currentPage == 2
-                                                  ? 'Ajouter un site a'
-                                                  : 'Selectionner la licence',
+                                              : 'Ajouter un site a',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.7),
@@ -1557,9 +1478,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           ? 'a la plate-forme'
                                           : _currentPage == 1
                                               ? 'la plate-forme'
-                                              : _currentPage == 2
-                                                  ? 'votre snack'
-                                                  : 'pour votre snack',
+                                              : 'votre snack',
                                       style: TextStyle(
                                           color: textInverseModeColor
                                               .withOpacity(.7),
@@ -1567,97 +1486,87 @@ class _RegisterPageState extends State<RegisterPage> {
                                               screenSize(context).height / 39),
                                     ),
                                   ],
-                                )
-                              : Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Recapitulatif',
-                                    style: TextStyle(
-                                        color: textInverseModeColor,
-                                        fontSize:
-                                            screenSize(context).height / 21),
-                                  ),
                                 ),
-                          SizedBox(height: screenSize(context).height / 30),
-                          _currentPage == 0
-                              ? _firstPage()
-                              : _currentPage == 1
-                                  ? _secondPage()
-                                  : _currentPage == 2
-                                      ? _thirdPage()
-                                      : _currentPage == 3
-                                          ? _lastPage()
-                                          : _recapPage(),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: screenSize(context).height / 31.0,
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                if (_formKey.currentState.validate()) {
-                                  _currentPage < 4
-                                      ? _setPage(++_currentPage)
-                                      : _connectionAttempt();
-                                }
-                              },
-                              child: Container(
-                                  height: 48.0,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(30.0)),
-                                      gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [gradient1, gradient2])),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Center(
-                                      child: Text(
-                                        _currentPage < 4
-                                            ? 'continuer'
-                                            : 'Terminer',
-                                        style: TextStyle(
-                                            color: textSameModeColor,
-                                            fontSize: 18),
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                          ),
-                          _currentPage > 0
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: screenSize(context).height / 31.0,
+                                SizedBox(
+                                    height: screenSize(context).height / 30),
+                                _currentPage == 0
+                                    ? _firstPage()
+                                    : _currentPage == 1
+                                        ? _secondPage()
+                                        : _thirdPage(),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenSize(context).height / 31.0,
                                   ),
                                   child: InkWell(
-                                    onTap: () => _setPage(--_currentPage),
+                                    onTap: () {
+                                      if (_formKey.currentState.validate()) {
+                                        _setPage(++_currentPage);
+                                      }
+                                    },
                                     child: Container(
-                                        height: 45.0,
+                                        height: 48,
                                         decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: textInverseModeColor),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(30.0)),
-                                        ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(30.0)),
+                                            gradient: LinearGradient(
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                                colors: [
+                                                  gradient1,
+                                                  gradient2
+                                                ])),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 7.0),
+                                              vertical: 8.0),
                                           child: Center(
                                             child: Text(
-                                              'Retour',
+                                              'continuer',
                                               style: TextStyle(
-                                                  color: textInverseModeColor,
+                                                  color: textSameModeColor,
                                                   fontSize: 18),
                                             ),
                                           ),
                                         )),
                                   ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                    ),
+                                ),
+                                _currentPage > 0
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom:
+                                              screenSize(context).height / 31.0,
+                                        ),
+                                        child: InkWell(
+                                          onTap: () => _setPage(--_currentPage),
+                                          child: Container(
+                                              height: 45.0,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color:
+                                                        textInverseModeColor),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30.0)),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 7.0),
+                                                child: Center(
+                                                  child: Text(
+                                                    'Retour',
+                                                    style: TextStyle(
+                                                        color:
+                                                            textInverseModeColor,
+                                                        fontSize: 18),
+                                                  ),
+                                                ),
+                                              )),
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                          ),
                   )),
             ),
             _isLoading

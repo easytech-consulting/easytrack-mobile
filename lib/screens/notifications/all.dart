@@ -1,5 +1,6 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/gradientIcon.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/home/home.dart';
 import 'package:easytrack/services/notificationService.dart';
@@ -80,7 +81,7 @@ class _NotificationPageState extends State<NotificationsPage> {
                     Container(
                       width: myWidth(context) / 2,
                       child: Text(
-                        'il y a ${formatDate(DateTime.parse(notification["created_at"]))}',
+                        '${formatDate(DateTime.parse(notification["created_at"]))}',
                         style: TextStyle(
                             fontSize: myHeight(context) / 30,
                             fontWeight: FontWeight.bold),
@@ -149,12 +150,17 @@ class _NotificationPageState extends State<NotificationsPage> {
 
   List dataShow, allData;
   Future futureNotifications;
+
   @override
   void initState() {
     super.initState();
-    futureNotifications = fetchNotifications();
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color(0xFFF8F8F8)));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Color(0xFFF8F8F8),
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
+    allData = globalNotifications;
+    globalNotifications = allData;
+    dataShow = loadData(allData, index);
   }
 
   @override
@@ -191,109 +197,88 @@ class _NotificationPageState extends State<NotificationsPage> {
                     ],
                   ),
                   Expanded(
-                      child: FutureBuilder(
-                    future: futureNotifications,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (allData == null) {
-                          allData = snapshot.data;
-                          globalNotifications = allData;
-                          dataShow = loadData(allData, index);
-                        }
-                        return dataShow == null || dataShow.length == 0
-                            ? Center(
-                                child: Text('Aucune notification'),
-                              )
-                            : ListView.builder(
-                                itemCount: dataShow.length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(
-                                        top: index == 0
-                                            ? myHeight(context) / 30
-                                            : myHeight(context) / 50),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            GradientIcon(
-                                                AmazingIcon.message_2_line,
-                                                myHeight(context) / 22,
-                                                notificationGradient[
-                                                    index % 5]),
-                                            SizedBox(
-                                              width: myWidth(context) / 25.0,
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      _showDetails(
-                                                          dataShow[index]);
-                                                    },
-                                                    child: Text(
-                                                      dataShow[index]['text'],
-                                                      style: TextStyle(
-                                                          fontSize: myHeight(
-                                                                  context) /
-                                                              40,
-                                                          fontWeight: dataShow[
-                                                                          index]
-                                                                      [
-                                                                      'is_active'] ==
-                                                                  0
-                                                              ? FontWeight.w500
-                                                              : FontWeight
-                                                                  .w600),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines: 1,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: myHeight(context) /
-                                                        200.0,
-                                                  ),
-                                                  Text(
-                                                    'Il y a ${formatDate(DateTime.parse(dataShow[index]["created_at"]))}',
+                      child: dataShow == null || dataShow.length == 0
+                          ? Center(
+                              child: Text('Aucune notification'),
+                            )
+                          : ListView.builder(
+                              itemCount: dataShow.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      top: index == 0
+                                          ? myHeight(context) / 30
+                                          : myHeight(context) / 50),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          GradientIcon(
+                                              AmazingIcon.message_2_line,
+                                              myHeight(context) / 22,
+                                              notificationGradient[index % 5]),
+                                          SizedBox(
+                                            width: myWidth(context) / 25.0,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    _showDetails(
+                                                        dataShow[index]);
+                                                  },
+                                                  child: Text(
+                                                    dataShow[index]['text'],
                                                     style: TextStyle(
                                                         fontSize:
                                                             myHeight(context) /
-                                                                50,
-                                                        color: Colors.black54),
+                                                                40,
+                                                        fontWeight: dataShow[
+                                                                        index][
+                                                                    'is_active'] ==
+                                                                0
+                                                            ? FontWeight.w500
+                                                            : FontWeight.w600),
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     maxLines: 1,
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      myHeight(context) / 200.0,
+                                                ),
+                                                Text(
+                                                  '${formatDate(DateTime.parse(dataShow[index]["created_at"]))}',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          myHeight(context) /
+                                                              50,
+                                                      color: Colors.black54),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                            height: myHeight(context) / 50),
-                                        Divider(
-                                          color: Colors.black.withOpacity(.05),
-                                          thickness: 2,
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                });
-                      }
-                      return Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(gradient1),
-                        ),
-                      );
-                    },
-                  )),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: myHeight(context) / 50),
+                                      Divider(
+                                        color: Colors.black.withOpacity(.05),
+                                        thickness: 2,
+                                      )
+                                    ],
+                                  ),
+                                );
+                              })),
                   dataShow == null || dataShow.length >= allData.length
                       ? Container(
                           height: 0.0,

@@ -269,7 +269,7 @@ class _RecoverPageState extends State<RecoverPage> {
                     InkWell(
                       onTap: () => Navigator.pushNamed(context, '/login'),
                       child: Container(
-                          height: 48.0,
+                          height: 48,
                           decoration: BoxDecoration(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(30.0)),
@@ -357,7 +357,7 @@ class _RecoverPageState extends State<RecoverPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Container(
-                                    height: 48.0,
+                                    height: 48,
                                     decoration: buildTextFormFieldContainer(
                                         decorationColor)),
                               ),
@@ -407,7 +407,7 @@ class _RecoverPageState extends State<RecoverPage> {
                               }
                             },
                             child: Container(
-                                height: 48.0,
+                                height: 48,
                                 decoration: BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(30.0)),

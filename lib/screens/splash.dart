@@ -7,6 +7,7 @@ import 'package:easytrack/models/user.dart';
 import 'package:easytrack/screens/errors/lostconnection.dart';
 import 'package:easytrack/screens/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -23,11 +24,14 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
     subscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.none) {
-        print('result');
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -56,13 +60,13 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _redirection() async {
-    print(_login);
     if (!_alreadyDone) {
       _alreadyDone = true;
       if (_login) {
         String tokenExpireDate = await getTokenExpireDate();
         bool tokenAlreadyValid =
             DateTime.now().isBefore(DateTime.parse(tokenExpireDate));
+
         print(tokenExpireDate);
         if (tokenAlreadyValid) {
           userToken = await getUserToken();
@@ -74,8 +78,13 @@ class _SplashPageState extends State<SplashPage> {
           if (user.isAdmin == 1) {
             site = Site.fromJson(await getUserSite());
           }
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MainPage()));
+          await logUserOnFirebase();
+          loadInitialData().then((value) {
+            pushInitialDataOnFirebase();
+            _refreshData();
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainPage()));
+          });
         } else {
           Navigator.pushNamed(context, '/login');
         }
@@ -92,54 +101,66 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _navigation() {
-    Timer(Duration(seconds: 3), _redirection);
+    _redirection();
+  }
+
+  _refreshData() {
+    Timer(Duration(minutes: 15), () {
+      print('launch from splash navigation');
+      loadInitialData().then((value) {
+        pushInitialDataOnFirebase();
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: true,
-      child: Scaffold(
-          backgroundColor: backgroundColor,
-          bottomNavigationBar: Container(
-            height: 30.0,
-            child: Center(
-                child: Text(
-              'Version 1.0.0',
-              style: TextStyle(fontSize: screenSize(context).height / 70),
+    return WillPopScope(
+      onWillPop: null,
+      child: SafeArea(
+        top: true,
+        child: Scaffold(
+            backgroundColor: backgroundColor,
+            bottomNavigationBar: Container(
+              height: 30.0,
+              child: Center(
+                  child: Text(
+                'Version 1.0.0',
+                style: TextStyle(fontSize: screenSize(context).height / 70),
+              )),
+            ),
+            body: FutureBuilder(
+              future: _userLogged,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  _login = snapshot.data;
+                  _navigation();
+                }
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Hero(
+                        tag: 'logo',
+                        child: Image.asset('img/Logo.png',
+                            width: screenSize(context).height / 5),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height / 50,
+                      ),
+                      Text(
+                        'easytrack',
+                        style: TextStyle(
+                            color: textInverseModeColor,
+                            fontSize: screenSize(context).height / 20),
+                      ),
+                    ],
+                  ),
+                );
+              },
             )),
-          ),
-          body: FutureBuilder(
-            future: _userLogged,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                _login = snapshot.data;
-                _navigation();
-              }
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
-                      tag: 'logo',
-                      child: Image.asset('img/Logo.png',
-                          width: screenSize(context).height / 5),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 50,
-                    ),
-                    Text(
-                      'easytrack',
-                      style: TextStyle(
-                          color: textInverseModeColor,
-                          fontSize: screenSize(context).height / 20),
-                    ),
-                  ],
-                ),
-              );
-            },
-          )),
+      ),
     );
   }
 }

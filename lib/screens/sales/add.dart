@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/sales/manage.dart';
@@ -46,7 +47,6 @@ class _AddSalesPageState extends State<AddSalesPage> {
         _isLoading = false;
       });
       sitesToShow = _fieldValues(value);
-      print(sitesToShow);
     });
   }
 
@@ -270,12 +270,154 @@ class _AddSalesPageState extends State<AddSalesPage> {
     setState(() {
       _isLoading = true;
     });
-    await storeSale(params).then((response) {
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ManageSales()));
+    await storeSale(params).then((response) async {
+      if (user.isAdmin == 1) {
+        Map sale = response['sale'];
+
+        var firebaseParams = {
+          "id": sale['sale_id'],
+          "site_id": sale['site']['site_id'],
+          "initiator_id": sale['initiator']['user_id'],
+          "validator_id": null,
+          "customer_id": '3',
+          "code": sale['code'],
+          "is_active": 1,
+          "status": 0,
+          "shipping_cost": null,
+          "sale_note": null,
+          "seller_note": null,
+          "paying_method": sale['paying_method'],
+          "created_at": DateTime.now().toString(),
+          "deleted_at": null,
+          "customer": {
+            "id": '3',
+            "site_id": sale['site']['site_id'],
+            "name": "",
+            "company_name": null,
+            "email": null,
+            "phone": "",
+            "town": null,
+            "street": null,
+            "is_active": 1,
+            "created_at": DateTime.now().toString(),
+            "deleted_at": null
+          },
+          "initiator": {
+            "id": sale['initiator']['user_id'],
+            "role_id": 5,
+            "name": sale['initiator']['name'],
+            "username": sale['initiator']['username'],
+            "email": sale['initiator']['email'],
+            "phone": sale['initiator']['phone'],
+            "photo": null,
+            "address": sale['initiator']['address'],
+            "bio": null,
+            "is_active": 1,
+            "is_admin": sale['initiator']['is_admin'],
+            "email_verified_at": null,
+            "created_at": DateTime.now().toString(),
+            "deleted_at": null
+          },
+          "validator": null,
+          "products": sale['products']
+        };
+
+        await FirebaseFirestore.instance
+            .collection('sales')
+            .where('id', isEqualTo: site.id)
+            .get()
+            .then((value) => value.docs.first.data())
+            .then((data) async {
+          List _sales = data['sales'];
+          _sales.add(firebaseParams);
+          await FirebaseFirestore.instance
+              .collection('sales')
+              .where('id', isEqualTo: sale['site']['site_id'])
+              .get()
+              .then((val) => val.docs.first.reference)
+              .then((reference) => reference.update({'sales': _sales}));
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ManageSales(),
+              ));
+        });
+      } else {
+        Map sale = response['sale'];
+        var firebaseParams = {
+          "id": sale['sale_id'],
+          "site_id": sale['site']['site_id'],
+          "initiator_id": sale['initiator']['user_id'],
+          "validator_id": null,
+          "customer_id": '3',
+          "code": sale['code'],
+          "is_active": 1,
+          "status": 0,
+          "shipping_cost": null,
+          "sale_note": null,
+          "seller_note": null,
+          "paying_method": sale['paying_method'],
+          "created_at": DateTime.now().toString(),
+          "deleted_at": null,
+          "customer": {
+            "id": '3',
+            "site_id": sale['site']['site_id'],
+            "name": "",
+            "company_name": null,
+            "email": null,
+            "phone": "",
+            "town": null,
+            "street": null,
+            "is_active": 1,
+            "created_at": DateTime.now().toString(),
+            "deleted_at": null
+          },
+          "initiator": {
+            "id": sale['initiator']['user_id'],
+            "role_id": 5,
+            "name": sale['initiator']['name'],
+            "username": sale['initiator']['username'],
+            "email": sale['initiator']['email'],
+            "phone": sale['initiator']['phone'],
+            "photo": null,
+            "address": sale['initiator']['address'],
+            "bio": null,
+            "is_active": 1,
+            "is_admin": sale['initiator']['is_admin'],
+            "email_verified_at": null,
+            "created_at": DateTime.now().toString(),
+            "deleted_at": null
+          },
+          "validator": null,
+          "products": sale['products']
+        };
+        await FirebaseFirestore.instance
+            .collection('sales')
+            .where('id', isEqualTo: sale['site']['site_id'])
+            .get()
+            .then((value) => value.docs.first.data())
+            .then((data) async {
+          List _sales = data['sales'];
+          _sales.add(firebaseParams);
+          await FirebaseFirestore.instance
+              .collection('sales')
+              .where('id', isEqualTo: sale['site']['site_id'])
+              .get()
+              .then((val) => val.docs.first.reference)
+              .then((reference) => reference.update({'sales': _sales}));
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ManageSales(),
+              ));
+        });
+      }
     });
   }
 
@@ -629,7 +771,7 @@ class _AddSalesPageState extends State<AddSalesPage> {
                       ),
                       Spacer(),
                       InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Navigator.pop(context, true),
                         child: Icon(
                           AmazingIcon.close_fill,
                           size: myHeight(context) / 25.0,
@@ -1063,7 +1205,9 @@ class _AddSalesPageState extends State<AddSalesPage> {
                     onTap: _productsOnOrder == null || _productsOnOrder.isEmpty
                         ? null
                         : () => showDifferenceDialog(
-                            _productsOnOrder, _quantities, currentSite['id']),
+                            _productsOnOrder,
+                            _quantities,
+                            user.isAdmin == 1 ? site.id : currentSite['id']),
                     child: Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: myWidth(context) / 20.0),

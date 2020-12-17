@@ -1,9 +1,19 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/site.dart';
 import 'package:easytrack/models/company.dart';
 import 'package:easytrack/models/user.dart';
+import 'package:easytrack/services/agendaService.dart';
+import 'package:easytrack/services/categoryService.dart';
+import 'package:easytrack/services/contactService.dart';
+import 'package:easytrack/services/homerService.dart';
+import 'package:easytrack/services/notificationService.dart';
+import 'package:easytrack/services/productService.dart';
+import 'package:easytrack/services/purchaseService.dart';
+import 'package:easytrack/services/saleService.dart';
+import 'package:easytrack/services/siteService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -139,10 +149,9 @@ getThemeMode() async {
   return prefs.getBool('is_dark_mode') ?? false;
 }
 
-final String endPoint =
-    'https://easytracknew-easytrackdev.azurewebsites.net/api';
+final String endPoint = 'https://www.easytrack237.com/api';
 
-final String websiteUrl = 'https://easytracknew-easytrackdev.azurewebsites.net';
+final String websiteUrl = 'https://www.easytrack237.com';
 
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
@@ -211,18 +220,18 @@ formatDate(DateTime date) {
   return now.difference(date).inSeconds <= 0
       ? 'A l\'instant'
       : now.difference(date).inSeconds <= 60
-          ? '${now.difference(date).inSeconds} secs'
+          ? 'Il y\'a ${now.difference(date).inSeconds} secs'
           : now.difference(date).inMinutes <= 60
-              ? '${now.difference(date).inMinutes} mins'
+              ? 'Il y\'a ${now.difference(date).inMinutes} mins'
               : now.difference(date).inHours <= 24
-                  ? '${now.difference(date).inHours} hrs'
+                  ? 'Il y\'a ${now.difference(date).inHours} hrs'
                   : now.difference(date).inDays <= 7
-                      ? '${now.difference(date).inDays} jrs'
+                      ? 'Il y\'a ${now.difference(date).inDays} jrs'
                       : now.difference(date).inDays ~/ 7 <= 4
-                          ? '${(now.difference(date).inDays ~/ 7)} sem'
+                          ? 'Il y\'a ${(now.difference(date).inDays ~/ 7)} sem'
                           : now.difference(date).inDays ~/ 30 < 12
-                              ? '${(now.difference(date).inDays ~/ 30)} mois'
-                              : '${(now.difference(date).inDays ~/ 365)} ans';
+                              ? 'Il y\'a ${(now.difference(date).inDays ~/ 30)} mois'
+                              : 'Il y\'a ${(now.difference(date).inDays ~/ 365)} ans';
 }
 
 capitalize(String data) {
@@ -451,11 +460,89 @@ int allSales,
     dailyPurchases,
     allIncomes,
     dailyIncomes;
-List globalEmployees,
-    globalSales,
-    globalSites,
-    globalProducts,
-    globalPurchases,
-    globalNotifications,
-    globalSuppliers,
-    globalClients;
+
+Future<bool> loadInitialData() async {
+  print('debut de l\'initialisation des valeurs');
+  if (user.isAdmin == 1) {
+    globalStats = [];
+    globalStats.add(await fetchStats().then((value) => value));
+  } else {
+    globalStats = await fetchStats().then((value) => value);
+  }
+
+  globalContacts = await fetchContacts().then((value) => value);
+
+  globalProducts = await fetchProductsOfSnack().then((value) => value);
+
+  await fetchSiteOfCompany().then((value) => value).then((value) async {
+    if (user.isAdmin == 1) {
+      globalSites = [];
+      globalSites.add(value);
+      globalFirstTeam =
+          await fetchTeamsOfSites(globalSites[0]['id']).then((value) => value);
+    } else {
+      globalSites = value;
+      globalFirstTeam =
+          await fetchTeamsOfSites(value[0]['id']).then((value) => value);
+    }
+  });
+
+  globalNotifications = await fetchNotifications().then((value) => value);
+
+  globalSales = await fetchSales().then((value) => value);
+
+  globalPurchases = await fetchPurchases().then((value) => value);
+
+  globalCategories = await fetchCategories().then((value) => value);
+
+  return true;
+}
+
+pushInitialDataOnFirebase() async {
+  FirebaseFirestore.instance.collection('sales').get().then((value) async {
+    value.docs.forEach((element) {
+      print(element.reference);
+      element.reference.delete();
+    });
+    print('push on firebase');
+    if (user.isAdmin == 1) {
+      DocumentReference documentReference =
+          FirebaseFirestore.instance.collection('sales').doc();
+
+      Map<String, dynamic> params = {
+        'company_id': '2',
+        'created_at': DateTime.now(),
+        'deleted_at': null,
+        'email': site.email,
+        'id': site.id,
+        'is_active': '1',
+        'name': site.name,
+        'phone1': site.tel1,
+        'phone2': site.tel2,
+        'slug': site.slug,
+        'street': site.street,
+        'town': site.town,
+        'sales': globalSales
+      };
+
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.set(
+          documentReference,
+          params,
+        );
+      });
+    } else {
+      for (var sale in globalSales) {
+        DocumentReference documentReference =
+            FirebaseFirestore.instance.collection('sales').doc();
+
+        FirebaseFirestore.instance.runTransaction((transaction) async {
+          transaction.set(
+            documentReference,
+            sale,
+          );
+        });
+      }
+    }
+  });
+}

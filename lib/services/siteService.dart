@@ -15,7 +15,7 @@ Future fetchSiteOfCompany() async {
     }
 
     throw Exception(
-        'Fetch Site of Snack exited with code ${response.statusCode}');
+        'Fetch Site of Snack exited with code ${response.body}');
   } catch (ex) {
     throw Exception('Fetch Site of Snack with error $ex');
   }

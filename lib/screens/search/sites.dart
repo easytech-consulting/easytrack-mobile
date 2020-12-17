@@ -224,7 +224,7 @@ class SubSearchSites extends StatelessWidget {
             child: Text('Aucune valeur'),
           )
         : data.isEmpty
-            ? Center(child: Text('Aucune correspondance'))
+            ? Center(child: Text('Vide'))
             : ListView.builder(
                 itemCount: _sites.length,
                 itemBuilder: (context, index) => Padding(

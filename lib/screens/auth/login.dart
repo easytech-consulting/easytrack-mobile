@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
-import 'package:easytrack/screens/home/super_admin/adminPage.dart';
 import 'package:easytrack/services/authService.dart';
 import 'package:easytrack/services/userService.dart';
 import 'package:flutter/material.dart';
@@ -63,10 +64,11 @@ class _LoginPageState extends State<LoginPage> {
           await fetchUserDetails(userId).then((user) async {
             if (user != null) {
               await logUserOnFirebase();
-              user.isAdmin == 3
-                  ? Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => AdminPage()))
-                  : Navigator.pushReplacementNamed(context, '/home');
+              await loadInitialData().then((value) {
+                pushInitialDataOnFirebase();
+                _synchronisation();
+                Navigator.pushReplacementNamed(context, '/home');
+              });
             } else {
               _retrieveUserDataError();
             }
@@ -81,6 +83,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  _synchronisation() {
+    Timer(Duration(minutes: 15), () {
+      loadInitialData().then((value) {
+        pushInitialDataOnFirebase();
+      });
+    });
+  }
+
   _showErrorMessage() {
     showDialog(
         context: context,
@@ -89,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
+                  height: myHeight(context) / 2.5,
                   child: errorStatusCode == 401
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -477,7 +488,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Container(
-                                      height: 48.0,
+                                      height: 48,
                                       decoration: buildTextFormFieldContainer(
                                           decorationColor)),
                                 ),
@@ -528,7 +539,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Padding(
                                   padding: const EdgeInsets.only(left: 8.5),
                                   child: Container(
-                                      height: 48.0,
+                                      height: 48,
                                       decoration: buildTextFormFieldContainer(
                                           decorationColor)),
                                 ),
@@ -589,7 +600,7 @@ class _LoginPageState extends State<LoginPage> {
                             InkWell(
                               onTap: () => _connectionAttempt(),
                               child: Container(
-                                  height: 48.0,
+                                  height: 48,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(30.0)),

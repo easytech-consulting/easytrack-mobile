@@ -1,5 +1,6 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
+import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/role.dart';
 import 'package:easytrack/models/site.dart';
@@ -413,7 +414,7 @@ class _UserPageState extends State<UserPage> {
                 Spacer(),
                 InkWell(
                   child: Container(
-                      height: 48.0,
+                      height: 48,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
                         gradient: LinearGradient(
@@ -512,7 +513,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.5),
                             child: Container(
-                                height: 48.0,
+                                height: 48,
                                 decoration: buildTextFormFieldContainer(
                                     decorationColor)),
                           ),
@@ -557,9 +558,9 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.5),
                             child: Container(
-                                height: 48.0,
+                                height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                    decorationColor)),
+                                      decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -600,7 +601,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -645,7 +646,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -690,7 +691,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -815,9 +816,9 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.5),
                             child: Container(
-                                height: 48.0,
+                                height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                    decorationColor)),
+                                      decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -860,9 +861,9 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.5),
                             child: Container(
-                                height: 48.0,
+                                height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                    decorationColor)),
+                                      decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -909,7 +910,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -953,7 +954,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -997,7 +998,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -1045,7 +1046,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
-                              height: 48.0,
+                              height: 48,
                               decoration:
                                   buildTextFormFieldContainer(decorationColor),
                             ),
@@ -1110,7 +1111,7 @@ class _UserPageState extends State<UserPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Container(
-                          height: 48.0,
+                          height: 48,
                           decoration:
                               buildTextFormFieldContainer(decorationColor),
                           child: Padding(
