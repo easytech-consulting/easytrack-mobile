@@ -113,7 +113,7 @@ class _AllContactsState extends State<AllContacts> {
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Search(),
+                                builder: (context) => Search(index: 5,),
                               )),
                           child: Icon(
                             AmazingIcon.search_2_line,

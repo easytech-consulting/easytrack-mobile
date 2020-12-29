@@ -1,5 +1,4 @@
 import 'package:easytrack/commons/globals.dart';
-import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:flutter/material.dart';
 
 class SubSearchProducts extends StatelessWidget {
@@ -48,12 +47,6 @@ class SubSearchProducts extends StatelessWidget {
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  Spacer(),
-                                  Icon(
-                                    AmazingIcon.more_2_fill,
-                                    size: 25.0,
-                                    color: Colors.black,
-                                  )
                                 ],
                               ),
                               Container(

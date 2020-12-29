@@ -1,4 +1,5 @@
 import 'package:easytrack/commons/globals.dart';
+import 'package:easytrack/screens/sales/manage.dart';
 import 'package:easytrack/services/externalService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class SubSearchSales extends StatelessWidget {
   SubSearchSales(this.data, this.sites);
 
   List _sales;
+  List _productsOnSales;
 
   showBill(context, String _customer, _site, _sale, _products, _initiator,
       {validator}) {
@@ -324,7 +326,10 @@ class SubSearchSales extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _sales = data;
-
+    _productsOnSales = [];
+    for (var sale in _sales) {
+      _productsOnSales.add(sale['products']);
+    }
     return data == null
         ? Center(
             child: Text('Aucune valeur'),
@@ -332,113 +337,113 @@ class SubSearchSales extends StatelessWidget {
         : data.isEmpty
             ? Center(child: Text('Vide'))
             : ListView.builder(
-                itemCount: _sales.length,
-                itemBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: index == 0 ? 0.0 : myHeight(context) / 100.0,
-                        horizontal: myHeight(context) / 40.0),
-                    child: Container(
-                        height: myHeight(context) / 6.4,
-                        margin: EdgeInsets.symmetric(
-                          vertical: myWidth(context) / 50.0,
-                        ),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(myHeight(context) / 90.0)),
-                            border: Border.all(
-                                width: 1.0,
-                                color: Colors.black.withOpacity(.1))),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: myWidth(context) / 30.0,
-                              vertical: myHeight(context) / 70.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  InkWell(
-                                    onTap: () => showBill(
-                                        context,
-                                        'Passager',
-                                        sites[index],
-                                        _sales[index],
-                                        _sales[index]['products'],
-                                        _sales[index]['initiator'],
-                                        validator: _sales[index]['validator']),
-                                    child: Text(
+                itemCount: _sales.length > 10 ? 10 : _sales.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ManageSales(),
+                          )),
+                      child: Container(
+                          height: myHeight(context) / 6.4,
+                          margin: EdgeInsets.symmetric(
+                              vertical: myWidth(context) / 50.0,
+                              horizontal: myHeight(context) / 40.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(myHeight(context) / 90.0)),
+                              border: Border.all(
+                                  width: 1.0,
+                                  color: Colors.black.withOpacity(.1))),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: myWidth(context) / 30.0,
+                                vertical: myHeight(context) / 70.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Text(
                                       'S0-${_sales[index]["code"]}',
                                       style: TextStyle(
                                           fontSize: myHeight(context) / 33.0,
                                           fontWeight: FontWeight.w500),
                                     ),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.more_vert,
-                                    size: myWidth(context) / 16.0,
-                                  )
-                                ],
-                              ),
-                              Spacer(),
-                              Expanded(
-                                child: Container(
-                                  width: myWidth(context),
-                                  child: ListView.builder(
-                                      physics: null,
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount:
-                                          _sales[index]['products'].length > 1
-                                              ? 1
-                                              : _sales[index]['products']
-                                                  .length,
-                                      itemBuilder: (context, ind) {
-                                        return Text(
-                                          _sales[index]['products'].length > 1
-                                              ? "${_sales[index]['products'][ind]['pivot']['qty']}x ${_sales[index]['products'][ind]['name']}..."
-                                              : '${_sales[index]['products'][ind]['pivot']['qty']}x Guiness Smooth',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: textInverseModeColor
-                                                  .withOpacity(.54),
-                                              fontSize:
-                                                  myHeight(context) / 45.0),
-                                        );
-                                      }),
+                                    Spacer(),
+                                    Icon(
+                                      Icons.more_vert,
+                                      size: myWidth(context) / 16.0,
+                                    )
+                                  ],
                                 ),
-                              ),
-                              Spacer(),
-                              Row(
-                                children: <Widget>[
-                                  Text(
-                                    _sales[index]['status'] == 2
-                                        ? 'Paye'
-                                        : _sales[index]['status'] == 1
-                                            ? 'Servie'
-                                            : 'En attente',
-                                    style: TextStyle(
-                                        color: _sales[index]['status'] == 2
-                                            ? Colors.green
-                                            : _sales[index]['status'] == 1
-                                                ? Colors.orange
-                                                : gradient1,
-                                        fontSize:
-                                            screenSize(context).height / 53.0),
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                        top: myHeight(context) / 62),
+                                    alignment: Alignment.center,
+                                    child: ListView.builder(
+                                        physics: null,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount:
+                                            _productsOnSales[index].length > 1
+                                                ? 1
+                                                : _productsOnSales[index]
+                                                    .length,
+                                        itemBuilder: (context, ind) {
+                                          return Text(
+                                            _productsOnSales[index].length > 1
+                                                ? '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}...'
+                                                : '${_productsOnSales[index][ind]['pivot']['qty']}x ${_productsOnSales[index][ind]['name']}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                color: textInverseModeColor
+                                                    .withOpacity(.54),
+                                                fontSize:
+                                                    myHeight(context) / 45.0),
+                                          );
+                                        }),
                                   ),
-                                  Spacer(),
-                                  Text(
-                                    '${formatDate(DateTime.tryParse(_sales[index]["created_at"]))}',
-                                    style: TextStyle(
-                                        color: Colors.black26,
-                                        fontSize:
-                                            screenSize(context).height / 60.0),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      bottom: myHeight(context) / 200.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        _sales[index]["status"] == 2
+                                            ? 'Paye'
+                                            : _sales[index]["status"] == 1
+                                                ? 'Servie'
+                                                : 'En attente',
+                                        style: TextStyle(
+                                            color: _sales[index]["status"] == 2
+                                                ? Colors.green
+                                                : _sales[index]["status"] == 1
+                                                    ? Colors.orange
+                                                    : gradient1,
+                                            fontSize:
+                                                screenSize(context).height /
+                                                    53.0),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        '${formatDate(DateTime.parse(_sales[index]["created_at"]))}',
+                                        style: TextStyle(
+                                            color: Colors.black26,
+                                            fontSize:
+                                                screenSize(context).height /
+                                                    60.0),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ))));
+                                )
+                              ],
+                            ),
+                          )));
+                },
+              );
   }
 }

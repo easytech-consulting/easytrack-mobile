@@ -386,7 +386,7 @@ class _SalePageState extends State<SalePage> {
                 if (snapshot.hasData) {
                   return CustomScrollView(
                     slivers: [
-                      sliverHeader2(context, 'Mon site', 'Mes ventes'),
+                      sliverHeader2(context, 'Mon site', 'Mes ventes', 0),
                       _sites == null || _sites.length == 0
                           ? SliverList(
                               delegate: SliverChildListDelegate.fixed([
@@ -555,7 +555,7 @@ class _SalePageState extends State<SalePage> {
 
                 return CustomScrollView(
                   slivers: [
-                    sliverHeader2(context, 'Mon site', 'Mes ventes'),
+                    sliverHeader2(context, 'Mon site', 'Mes ventes', 0),
                     SliverList(
                       delegate: SliverChildListDelegate.fixed([
                         Container(

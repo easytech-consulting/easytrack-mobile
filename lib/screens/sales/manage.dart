@@ -235,8 +235,7 @@ class _ManageSalesState extends State<ManageSales> {
                     color: Colors.blueGrey.withOpacity(.3),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: myHeight(context) / 100.0,
-                          horizontal: 1.0),
+                          vertical: myHeight(context) / 100.0, horizontal: 1.0),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -410,7 +409,10 @@ class _ManageSalesState extends State<ManageSales> {
                           ),
                           Column(
                             children: [
-                              status != 0
+                              status != 0 ||
+                                      _salesToShow[currentIndex]['initiator']
+                                              ['id'] !=
+                                          user.id
                                   ? Container(
                                       height: 0.0,
                                     )
@@ -449,7 +451,10 @@ class _ManageSalesState extends State<ManageSales> {
                                         ),
                                       ),
                                     ),
-                              status != 1
+                              status != 1 ||
+                                      _salesToShow[currentIndex]['initiator']
+                                              ['id'] !=
+                                          user.id
                                   ? Container(
                                       height: 0.0,
                                     )
@@ -618,7 +623,10 @@ class _ManageSalesState extends State<ManageSales> {
                                         ),
                                       ),
                                     ),
-                              status != 0
+                              status != 0 ||
+                                      _salesToShow[currentIndex]['initiator']
+                                              ['id'] !=
+                                          user.id
                                   ? Container(
                                       height: 0.0,
                                     )
@@ -1224,48 +1232,43 @@ class _ManageSalesState extends State<ManageSales> {
           SizedBox(
             width: myHeight(context) / 100.0,
           ),
-          user.isAdmin == 1 && userRole['slug'] == 'server'
-              ? Container(
-                  height: 0.0,
-                  width: 0.0,
-                )
-              : Row(
-                  children: <Widget>[
-                    _currentIndex == 1
-                        ? Container(
-                            height: myHeight(context) / 100.0,
-                            width: myHeight(context) / 38.0,
-                            decoration: BoxDecoration(
-                                color: gradient1,
-                                borderRadius: BorderRadius.circular(10.0)),
-                          )
-                        : Container(
-                            height: myHeight(context) / 100.0,
-                            width: myHeight(context) / 70.0,
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                    SizedBox(
-                      width: myHeight(context) / 100.0,
+          Row(
+            children: <Widget>[
+              _currentIndex == 1
+                  ? Container(
+                      height: myHeight(context) / 100.0,
+                      width: myHeight(context) / 38.0,
+                      decoration: BoxDecoration(
+                          color: gradient1,
+                          borderRadius: BorderRadius.circular(10.0)),
+                    )
+                  : Container(
+                      height: myHeight(context) / 100.0,
+                      width: myHeight(context) / 70.0,
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(10.0)),
                     ),
-                    _currentIndex == 2
-                        ? Container(
-                            height: myHeight(context) / 100.0,
-                            width: myHeight(context) / 38.0,
-                            decoration: BoxDecoration(
-                                color: gradient1,
-                                borderRadius: BorderRadius.circular(10.0)),
-                          )
-                        : Container(
-                            height: myHeight(context) / 100.0,
-                            width: myHeight(context) / 70.0,
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                  ],
-                )
+              SizedBox(
+                width: myHeight(context) / 100.0,
+              ),
+              _currentIndex == 2
+                  ? Container(
+                      height: myHeight(context) / 100.0,
+                      width: myHeight(context) / 38.0,
+                      decoration: BoxDecoration(
+                          color: gradient1,
+                          borderRadius: BorderRadius.circular(10.0)),
+                    )
+                  : Container(
+                      height: myHeight(context) / 100.0,
+                      width: myHeight(context) / 70.0,
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(10.0)),
+                    ),
+            ],
+          )
         ],
       ),
     );
@@ -1333,7 +1336,9 @@ class _ManageSalesState extends State<ManageSales> {
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Search())),
+                                  builder: (context) => Search(
+                                        index: 0,
+                                      ))),
                           child: Stack(
                             children: <Widget>[
                               Padding(
@@ -1435,612 +1440,556 @@ class _ManageSalesState extends State<ManageSales> {
                                   _currentIndex = index;
                                 });
                               },
-                              children:
-                                  user.isAdmin == 1 &&
-                                          userRole['slug'] == 'server'
-                                      ? <Widget>[
-                                          /* Serveuse */
-                                          Column(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  child:
-                                                      _salesToShow == null ||
-                                                              _salesToShow
-                                                                      .length ==
-                                                                  0
-                                                          ? Center(
-                                                              child: Text(
-                                                                  'Aucune vente'),
-                                                            )
-                                                          : ListView.builder(
-                                                              itemCount:
-                                                                  _salesToShow
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Padding(
-                                                                    padding: EdgeInsets.only(
-                                                                        top: myHeight(context) /
-                                                                            100.0),
+                              children: <Widget>[
+                                /* Premiere */
+                                Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child:
+                                            _salesToShow == null ||
+                                                    _salesToShow.length == 0
+                                                ? Center(
+                                                    child: Text('Aucune vente'),
+                                                  )
+                                                : ListView.builder(
+                                                    itemCount:
+                                                        _salesToShow.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return Padding(
+                                                          padding: EdgeInsets.only(
+                                                              top: myHeight(
+                                                                      context) /
+                                                                  100.0),
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                  height: myHeight(
+                                                                          context) /
+                                                                      5.5,
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(myHeight(context) /
+                                                                              90.0)),
+                                                                      border: Border.all(
+                                                                          width:
+                                                                              1.0,
+                                                                          color: Colors
+                                                                              .black
+                                                                              .withOpacity(.1))),
+                                                                  child: Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            myWidth(context) /
+                                                                                30.0,
+                                                                        vertical:
+                                                                            myHeight(context) /
+                                                                                70.0),
                                                                     child:
                                                                         Column(
-                                                                      children: [
-                                                                        Container(
-                                                                            height: myHeight(context) /
-                                                                                5.5,
-                                                                            decoration: BoxDecoration(
-                                                                                color: Colors.white,
-                                                                                borderRadius: BorderRadius.all(Radius.circular(myHeight(context) / 90.0)),
-                                                                                border: Border.all(width: 1.0, color: Colors.black.withOpacity(.1))),
-                                                                            child: Padding(
-                                                                              padding: EdgeInsets.symmetric(horizontal: myWidth(context) / 30.0, vertical: myHeight(context) / 70.0),
-                                                                              child: Column(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: <Widget>[
-                                                                                  Row(
-                                                                                    children: <Widget>[
-                                                                                      InkWell(
-                                                                                        onTap: () => _showDetails(_salesToShow[index]),
-                                                                                        child: Text(
-                                                                                          'S0-${_salesToShow[index]["code"]}',
-                                                                                          style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Spacer(),
-                                                                                      GestureDetector(
-                                                                                        onTap: () {
-                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
-                                                                                        },
-                                                                                        child: Icon(
-                                                                                          Icons.more_vert,
-                                                                                          size: myWidth(context) / 16.0,
-                                                                                        ),
-                                                                                      )
-                                                                                    ],
-                                                                                  ),
-                                                                                  Padding(
-                                                                                    padding: EdgeInsets.only(top: myHeight(context) / 62),
-                                                                                    child: Container(
-                                                                                      width: myWidth(context),
-                                                                                      height: myHeight(context) / 40.0,
-                                                                                      child: ListView.builder(
-                                                                                          physics: null,
-                                                                                          scrollDirection: Axis.horizontal,
-                                                                                          itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
-                                                                                          itemBuilder: (context, ind) {
-                                                                                            return Text(
-                                                                                              _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
-                                                                                              style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
-                                                                                            );
-                                                                                          }),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Padding(
-                                                                                      padding: EdgeInsets.only(bottom: myHeight(context) / 200.0),
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          Container(
-                                                                                            child: Stack(
-                                                                                              children: <Widget>[
-                                                                                                Container(
-                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                  child: Padding(
-                                                                                                    padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                    child: Text(
-                                                                                                      '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                                _salesToShow[index]['validator'] == null
-                                                                                                    ? Container(
-                                                                                                        width: 0.0,
-                                                                                                      )
-                                                                                                    : Container(
-                                                                                                        transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                        decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                        child: Padding(
-                                                                                                          padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                          child: Text(
-                                                                                                            '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          ),
-                                                                                          Spacer(),
-                                                                                          Container(
-                                                                                            child: Column(
-                                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                              children: <Widget>[
-                                                                                                Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
-                                                                                                Text(
-                                                                                                  '${calculTotal(_salesToShow[index]['products'])} FCFA',
-                                                                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                )
-                                                                                              ],
-                                                                                            ),
-                                                                                          )
-                                                                                        ],
-                                                                                      ))
-                                                                                ],
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Row(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            InkWell(
+                                                                              onTap: () => _showDetails(_salesToShow[index]),
+                                                                              child: Text(
+                                                                                'S0-${_salesToShow[index]["code"]}',
+                                                                                style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
                                                                               ),
-                                                                            )),
-                                                                        index == _salesToShow.length - 1 &&
-                                                                                _salesToShow.length > 3
-                                                                            ? InkWell(
-                                                                                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddSalesPage())),
-                                                                                child: Container(
-                                                                                  margin: EdgeInsets.symmetric(vertical: myHeight(context) / 30.0),
-                                                                                  padding: EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
-                                                                                  width: double.infinity,
-                                                                                  alignment: Alignment.center,
-                                                                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(myHeight(context) / 30.0), color: gradient1.withOpacity(.1)),
-                                                                                  child: Row(
-                                                                                    mainAxisSize: MainAxisSize.min,
-                                                                                    children: [
-                                                                                      Icon(Icons.add, color: gradient1, size: myHeight(context) / 30.0),
-                                                                                      SizedBox(
-                                                                                        width: myWidth(context) / 30.0,
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'Ajouter une commande',
-                                                                                        style: TextStyle(color: gradient1, fontSize: myHeight(context) / 45.0),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              )
-                                                                            : Container(
-                                                                                height: 0.0,
-                                                                              )
-                                                                      ],
-                                                                    ));
-                                                              })),
-                                            ],
-                                          ),
-                                        ]
-                                      : <Widget>[
-                                          /* Premiere */
-                                          Column(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  child:
-                                                      _salesToShow == null ||
-                                                              _salesToShow
-                                                                      .length ==
-                                                                  0
-                                                          ? Center(
-                                                              child: Text(
-                                                                  'Aucune vente'),
-                                                            )
-                                                          : ListView.builder(
-                                                              itemCount:
-                                                                  _salesToShow
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Padding(
-                                                                    padding: EdgeInsets.only(
-                                                                        top: myHeight(context) /
-                                                                            100.0),
-                                                                    child:
-                                                                        Column(
-                                                                      children: [
-                                                                        Container(
-                                                                            height: myHeight(context) /
-                                                                                5.5,
-                                                                            decoration: BoxDecoration(
-                                                                                color: Colors.white,
-                                                                                borderRadius: BorderRadius.all(Radius.circular(myHeight(context) / 90.0)),
-                                                                                border: Border.all(width: 1.0, color: Colors.black.withOpacity(.1))),
-                                                                            child: Padding(
-                                                                              padding: EdgeInsets.symmetric(horizontal: myWidth(context) / 30.0, vertical: myHeight(context) / 70.0),
-                                                                              child: Column(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                children: <Widget>[
-                                                                                  Row(
-                                                                                    children: <Widget>[
-                                                                                      InkWell(
-                                                                                        onTap: () => _showDetails(_salesToShow[index]),
-                                                                                        child: Text(
-                                                                                          'S0-${_salesToShow[index]["code"]}',
-                                                                                          style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Spacer(),
-                                                                                      GestureDetector(
-                                                                                        onTap: () {
-                                                                                          _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
-                                                                                        },
-                                                                                        child: Icon(
-                                                                                          Icons.more_vert,
-                                                                                          size: myWidth(context) / 16.0,
-                                                                                        ),
-                                                                                      )
-                                                                                    ],
-                                                                                  ),
-                                                                                  Padding(
-                                                                                    padding: EdgeInsets.only(top: myHeight(context) / 62),
-                                                                                    child: Container(
-                                                                                      width: myWidth(context),
-                                                                                      height: myHeight(context) / 40.0,
-                                                                                      child: ListView.builder(
-                                                                                          physics: null,
-                                                                                          scrollDirection: Axis.horizontal,
-                                                                                          itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
-                                                                                          itemBuilder: (context, ind) {
-                                                                                            return Text(
-                                                                                              _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
-                                                                                              style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
-                                                                                            );
-                                                                                          }),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Padding(
-                                                                                      padding: EdgeInsets.only(bottom: myHeight(context) / 200.0),
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          Container(
-                                                                                            child: Stack(
-                                                                                              children: <Widget>[
-                                                                                                Container(
-                                                                                                  decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                  child: Padding(
-                                                                                                    padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                    child: Text(
-                                                                                                      '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                                _salesToShow[index]['validator'] == null
-                                                                                                    ? Container(
-                                                                                                        width: 0.0,
-                                                                                                      )
-                                                                                                    : Container(
-                                                                                                        transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                        decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                        child: Padding(
-                                                                                                          padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                          child: Text(
-                                                                                                            '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          ),
-                                                                                          Spacer(),
-                                                                                          Container(
-                                                                                            child: Column(
-                                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                              children: <Widget>[
-                                                                                                Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
-                                                                                                Text(
-                                                                                                  '${calculTotal(_salesToShow[index]['products'])} FCFA',
-                                                                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                )
-                                                                                              ],
-                                                                                            ),
-                                                                                          )
-                                                                                        ],
-                                                                                      ))
-                                                                                ],
+                                                                            ),
+                                                                            Spacer(),
+                                                                            GestureDetector(
+                                                                              onTap: () {
+                                                                                _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
+                                                                              },
+                                                                              child: Icon(
+                                                                                Icons.more_vert,
+                                                                                size: myWidth(context) / 16.0,
                                                                               ),
-                                                                            )),
-                                                                        index == _salesToShow.length - 1 &&
-                                                                                _salesToShow.length > 3
-                                                                            ? InkWell(
-                                                                                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddSalesPage())),
-                                                                                child: Container(
-                                                                                  margin: EdgeInsets.symmetric(vertical: myHeight(context) / 30.0),
-                                                                                  padding: EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
-                                                                                  width: double.infinity,
-                                                                                  alignment: Alignment.center,
-                                                                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(myHeight(context) / 30.0), color: gradient1.withOpacity(.1)),
-                                                                                  child: Row(
-                                                                                    mainAxisSize: MainAxisSize.min,
-                                                                                    children: [
-                                                                                      Icon(Icons.add, color: gradient1, size: myHeight(context) / 30.0),
-                                                                                      SizedBox(
-                                                                                        width: myWidth(context) / 30.0,
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'Ajouter une commande',
-                                                                                        style: TextStyle(color: gradient1, fontSize: myHeight(context) / 45.0),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              )
-                                                                            : Container(
-                                                                                height: 0.0,
-                                                                              )
-                                                                      ],
-                                                                    ));
-                                                              })),
-                                            ],
-                                          ),
-
-                                          /* Deuxieme */
-                                          Column(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  child:
-                                                      _salesToShow == null ||
-                                                              _salesToShow
-                                                                      .length ==
-                                                                  0
-                                                          ? Center(
-                                                              child: Text(
-                                                                  'Aucune vente'),
-                                                            )
-                                                          : ListView.builder(
-                                                              itemCount:
-                                                                  _salesToShow
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Padding(
-                                                                    padding: EdgeInsets.only(
-                                                                        top: myHeight(context) /
-                                                                            100.0),
-                                                                    child: Container(
-                                                                        height: myHeight(context) / 5.5,
-                                                                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(myHeight(context) / 90.0)), border: Border.all(width: 1.0, color: Colors.black.withOpacity(.1))),
-                                                                        child: Padding(
-                                                                          padding: EdgeInsets.symmetric(
-                                                                              horizontal: myWidth(context) / 30.0,
-                                                                              vertical: myHeight(context) / 70.0),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        Padding(
+                                                                          padding:
+                                                                              EdgeInsets.only(top: myHeight(context) / 62),
                                                                           child:
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.spaceBetween,
-                                                                            children: <Widget>[
-                                                                              Row(
-                                                                                children: <Widget>[
-                                                                                  InkWell(
-                                                                                    onTap: () => _showDetails(_salesToShow[index]),
-                                                                                    child: Text(
-                                                                                      'S0-${_salesToShow[index]["code"]}',
-                                                                                      style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Spacer(),
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
-                                                                                    },
-                                                                                    child: Icon(
-                                                                                      Icons.more_vert,
-                                                                                      size: myWidth(context) / 16.0,
-                                                                                    ),
-                                                                                  )
-                                                                                ],
-                                                                              ),
-                                                                              Padding(
-                                                                                padding: EdgeInsets.only(top: myHeight(context) / 62),
-                                                                                child: Container(
-                                                                                  width: myWidth(context),
-                                                                                  height: myHeight(context) / 40.0,
-                                                                                  child: ListView.builder(
-                                                                                      physics: null,
-                                                                                      scrollDirection: Axis.horizontal,
-                                                                                      itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
-                                                                                      itemBuilder: (context, ind) {
-                                                                                        return Text(
-                                                                                          _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
-                                                                                          style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
-                                                                                        );
-                                                                                      }),
-                                                                                ),
-                                                                              ),
-                                                                              Padding(
-                                                                                  padding: EdgeInsets.only(bottom: myHeight(context) / 200.0),
-                                                                                  child: Row(
+                                                                              Container(
+                                                                            width:
+                                                                                myWidth(context),
+                                                                            height:
+                                                                                myHeight(context) / 40.0,
+                                                                            child: ListView.builder(
+                                                                                physics: null,
+                                                                                scrollDirection: Axis.horizontal,
+                                                                                itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
+                                                                                itemBuilder: (context, ind) {
+                                                                                  return Text(
+                                                                                    _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
+                                                                                    style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
+                                                                                  );
+                                                                                }),
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                            padding:
+                                                                                EdgeInsets.only(bottom: myHeight(context) / 200.0),
+                                                                            child: Row(
+                                                                              children: <Widget>[
+                                                                                Container(
+                                                                                  child: Stack(
                                                                                     children: <Widget>[
                                                                                       Container(
-                                                                                        child: Stack(
-                                                                                          children: <Widget>[
-                                                                                            Container(
+                                                                                        decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
+                                                                                        child: Padding(
+                                                                                          padding: EdgeInsets.all(myHeight(context) / 80.0),
+                                                                                          child: Text(
+                                                                                            '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      _salesToShow[index]['validator'] == null
+                                                                                          ? Container(
+                                                                                              width: 0.0,
+                                                                                            )
+                                                                                          : Container(
+                                                                                              transform: Matrix4.translationValues(23, 0, 0),
                                                                                               decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
                                                                                               child: Padding(
                                                                                                 padding: EdgeInsets.all(myHeight(context) / 80.0),
                                                                                                 child: Text(
-                                                                                                  '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                                  '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
                                                                                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
                                                                                                 ),
                                                                                               ),
                                                                                             ),
-                                                                                            _salesToShow[index]['validator'] == null
-                                                                                                ? Container(
-                                                                                                    width: 0.0,
-                                                                                                  )
-                                                                                                : Container(
-                                                                                                    transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                    decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                    child: Padding(
-                                                                                                      padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                      child: Text(
-                                                                                                        '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ),
-                                                                                      Spacer(),
-                                                                                      Container(
-                                                                                        child: Column(
-                                                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                          children: <Widget>[
-                                                                                            Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
-                                                                                            Text(
-                                                                                              '${calculTotal(_salesToShow[index]['products'])} FCFA',
-                                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                                Spacer(),
+                                                                                Container(
+                                                                                  child: Column(
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: <Widget>[
+                                                                                      Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
+                                                                                      Text(
+                                                                                        '${calculTotal(_salesToShow[index]['products'])} FCFA',
+                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
                                                                                       )
                                                                                     ],
-                                                                                  ))
-                                                                            ],
-                                                                          ),
-                                                                        )));
-                                                              })),
-                                              SizedBox(
-                                                height: 20.0,
-                                              ),
-                                            ],
-                                          ),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ))
+                                                                      ],
+                                                                    ),
+                                                                  )),
+                                                              index == _salesToShow.length - 1 &&
+                                                                      _salesToShow
+                                                                              .length >
+                                                                          3
+                                                                  ? InkWell(
+                                                                      onTap: () => Navigator.push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => AddSalesPage())),
+                                                                      child:
+                                                                          Container(
+                                                                        margin: EdgeInsets.symmetric(
+                                                                            vertical:
+                                                                                myHeight(context) / 30.0),
+                                                                        padding:
+                                                                            EdgeInsets.symmetric(vertical: myHeight(context) / 100.0),
+                                                                        width: double
+                                                                            .infinity,
+                                                                        alignment:
+                                                                            Alignment.center,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(myHeight(context) /
+                                                                                30.0),
+                                                                            color:
+                                                                                gradient1.withOpacity(.1)),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          children: [
+                                                                            Icon(Icons.add,
+                                                                                color: gradient1,
+                                                                                size: myHeight(context) / 30.0),
+                                                                            SizedBox(
+                                                                              width: myWidth(context) / 30.0,
+                                                                            ),
+                                                                            Text(
+                                                                              'Ajouter une commande',
+                                                                              style: TextStyle(color: gradient1, fontSize: myHeight(context) / 45.0),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  : Container(
+                                                                      height:
+                                                                          0.0,
+                                                                    )
+                                                            ],
+                                                          ));
+                                                    })),
+                                  ],
+                                ),
 
-                                          /* Troisieme */
-                                          Column(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  child:
-                                                      _salesToShow == null ||
-                                                              _salesToShow
-                                                                      .length ==
-                                                                  0
-                                                          ? Center(
-                                                              child: Text(
-                                                                  'Aucune vente'),
-                                                            )
-                                                          : ListView.builder(
-                                                              itemCount:
-                                                                  _salesToShow
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Padding(
-                                                                    padding: EdgeInsets.only(
-                                                                        top: myHeight(context) /
-                                                                            100.0),
-                                                                    child: Container(
-                                                                        height: myHeight(context) / 5.5,
-                                                                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(myHeight(context) / 90.0)), border: Border.all(width: 1.0, color: Colors.black.withOpacity(.1))),
-                                                                        child: Padding(
-                                                                          padding: EdgeInsets.symmetric(
-                                                                              horizontal: myWidth(context) / 30.0,
-                                                                              vertical: myHeight(context) / 70.0),
+                                /* Deuxieme */
+                                Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child:
+                                            _salesToShow == null ||
+                                                    _salesToShow.length == 0
+                                                ? Center(
+                                                    child: Text('Aucune vente'),
+                                                  )
+                                                : ListView.builder(
+                                                    itemCount:
+                                                        _salesToShow.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return Padding(
+                                                          padding: EdgeInsets.only(
+                                                              top: myHeight(
+                                                                      context) /
+                                                                  100.0),
+                                                          child: Container(
+                                                              height:
+                                                                  myHeight(context) /
+                                                                      5.5,
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius: BorderRadius.all(
+                                                                      Radius.circular(
+                                                                          myHeight(context) /
+                                                                              90.0)),
+                                                                  border: Border.all(
+                                                                      width:
+                                                                          1.0,
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(.1))),
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        myWidth(context) /
+                                                                            30.0,
+                                                                    vertical:
+                                                                        myHeight(context) /
+                                                                            70.0),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Row(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        InkWell(
+                                                                          onTap: () =>
+                                                                              _showDetails(_salesToShow[index]),
                                                                           child:
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.spaceBetween,
-                                                                            children: <Widget>[
-                                                                              Row(
+                                                                              Text(
+                                                                            'S0-${_salesToShow[index]["code"]}',
+                                                                            style:
+                                                                                TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
+                                                                          ),
+                                                                        ),
+                                                                        Spacer(),
+                                                                        GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _show(
+                                                                                _scaffoldKey,
+                                                                                _salesToShow[index]['status'],
+                                                                                _salesToShow[index],
+                                                                                index);
+                                                                          },
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.more_vert,
+                                                                            size:
+                                                                                myWidth(context) / 16.0,
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: EdgeInsets.only(
+                                                                          top: myHeight(context) /
+                                                                              62),
+                                                                      child:
+                                                                          Container(
+                                                                        width: myWidth(
+                                                                            context),
+                                                                        height: myHeight(context) /
+                                                                            40.0,
+                                                                        child: ListView.builder(
+                                                                            physics: null,
+                                                                            scrollDirection: Axis.horizontal,
+                                                                            itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
+                                                                            itemBuilder: (context, ind) {
+                                                                              return Text(
+                                                                                _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
+                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
+                                                                              );
+                                                                            }),
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            bottom: myHeight(context) /
+                                                                                200.0),
+                                                                        child:
+                                                                            Row(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            Container(
+                                                                              child: Stack(
                                                                                 children: <Widget>[
-                                                                                  InkWell(
-                                                                                    child: Text(
-                                                                                      'S0-${_salesToShow[index]["code"]}',
-                                                                                      style: TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
+                                                                                  Container(
+                                                                                    decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
+                                                                                    child: Padding(
+                                                                                      padding: EdgeInsets.all(myHeight(context) / 80.0),
+                                                                                      child: Text(
+                                                                                        '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                      ),
                                                                                     ),
                                                                                   ),
-                                                                                  Spacer(),
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      _show(_scaffoldKey, _salesToShow[index]['status'], _salesToShow[index], index);
-                                                                                    },
-                                                                                    child: Icon(
-                                                                                      Icons.more_vert,
-                                                                                      size: myWidth(context) / 16.0,
-                                                                                    ),
+                                                                                  _salesToShow[index]['validator'] == null
+                                                                                      ? Container(
+                                                                                          width: 0.0,
+                                                                                        )
+                                                                                      : Container(
+                                                                                          transform: Matrix4.translationValues(23, 0, 0),
+                                                                                          decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
+                                                                                          child: Padding(
+                                                                                            padding: EdgeInsets.all(myHeight(context) / 80.0),
+                                                                                            child: Text(
+                                                                                              '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Spacer(),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: <Widget>[
+                                                                                  Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
+                                                                                  Text(
+                                                                                    '${calculTotal(_salesToShow[index]['products'])} FCFA',
+                                                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
                                                                                   )
                                                                                 ],
                                                                               ),
-                                                                              Padding(
-                                                                                padding: EdgeInsets.only(top: myHeight(context) / 62),
-                                                                                child: Container(
-                                                                                  width: myWidth(context),
-                                                                                  height: myHeight(context) / 40.0,
-                                                                                  child: ListView.builder(
-                                                                                      physics: null,
-                                                                                      scrollDirection: Axis.horizontal,
-                                                                                      itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
-                                                                                      itemBuilder: (context, ind) {
-                                                                                        return Text(
-                                                                                          _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
-                                                                                          style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
-                                                                                        );
-                                                                                      }),
-                                                                                ),
-                                                                              ),
-                                                                              Padding(
-                                                                                  padding: EdgeInsets.only(bottom: myHeight(context) / 200.0),
-                                                                                  child: Row(
-                                                                                    children: <Widget>[
-                                                                                      Container(
-                                                                                        child: Stack(
-                                                                                          children: <Widget>[
-                                                                                            Container(
-                                                                                              decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                              child: Padding(
-                                                                                                padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                child: Text(
-                                                                                                  '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            _salesToShow[index]['validator'] == null
-                                                                                                ? Container(
-                                                                                                    width: 0.0,
-                                                                                                  )
-                                                                                                : Container(
-                                                                                                    transform: Matrix4.translationValues(23, 0, 0),
-                                                                                                    decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
-                                                                                                    child: Padding(
-                                                                                                      padding: EdgeInsets.all(myHeight(context) / 80.0),
-                                                                                                      child: Text(
-                                                                                                        '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
-                                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ),
-                                                                                      Spacer(),
-                                                                                      Container(
-                                                                                        child: Column(
-                                                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                          children: <Widget>[
-                                                                                            Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
-                                                                                            Text(
-                                                                                              '${calculTotal(_salesToShow[index]['products'])} FCFA',
-                                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      )
-                                                                                    ],
-                                                                                  ))
-                                                                            ],
+                                                                            )
+                                                                          ],
+                                                                        ))
+                                                                  ],
+                                                                ),
+                                                              )));
+                                                    })),
+                                    SizedBox(
+                                      height: 20.0,
+                                    ),
+                                  ],
+                                ),
+
+                                /* Troisieme */
+                                Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child:
+                                            _salesToShow == null ||
+                                                    _salesToShow.length == 0
+                                                ? Center(
+                                                    child: Text('Aucune vente'),
+                                                  )
+                                                : ListView.builder(
+                                                    itemCount:
+                                                        _salesToShow.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return Padding(
+                                                          padding: EdgeInsets.only(
+                                                              top: myHeight(
+                                                                      context) /
+                                                                  100.0),
+                                                          child: Container(
+                                                              height:
+                                                                  myHeight(context) /
+                                                                      5.5,
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius: BorderRadius.all(
+                                                                      Radius.circular(
+                                                                          myHeight(context) /
+                                                                              90.0)),
+                                                                  border: Border.all(
+                                                                      width:
+                                                                          1.0,
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(.1))),
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        myWidth(context) /
+                                                                            30.0,
+                                                                    vertical:
+                                                                        myHeight(context) /
+                                                                            70.0),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Row(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        InkWell(
+                                                                          child:
+                                                                              Text(
+                                                                            'S0-${_salesToShow[index]["code"]}',
+                                                                            style:
+                                                                                TextStyle(fontSize: myHeight(context) / 33.0, fontWeight: FontWeight.w500),
                                                                           ),
-                                                                        )));
-                                                              })),
-                                              SizedBox(
-                                                height: 20.0,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                                        ),
+                                                                        Spacer(),
+                                                                        GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            _show(
+                                                                                _scaffoldKey,
+                                                                                _salesToShow[index]['status'],
+                                                                                _salesToShow[index],
+                                                                                index);
+                                                                          },
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.more_vert,
+                                                                            size:
+                                                                                myWidth(context) / 16.0,
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: EdgeInsets.only(
+                                                                          top: myHeight(context) /
+                                                                              62),
+                                                                      child:
+                                                                          Container(
+                                                                        width: myWidth(
+                                                                            context),
+                                                                        height: myHeight(context) /
+                                                                            40.0,
+                                                                        child: ListView.builder(
+                                                                            physics: null,
+                                                                            scrollDirection: Axis.horizontal,
+                                                                            itemCount: _salesToShow[index]['products'].length > 1 ? 1 : _salesToShow[index]['products'].length,
+                                                                            itemBuilder: (context, ind) {
+                                                                              return Text(
+                                                                                _salesToShow[index]['products'].length > 1 ? '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}...' : '${_salesToShow[index]['products'][ind]['pivot']['qty']}x ${_salesToShow[index]['products'][ind]['name']}',
+                                                                                style: TextStyle(fontWeight: FontWeight.w500, color: textInverseModeColor.withOpacity(.54), fontSize: myHeight(context) / 45.0),
+                                                                              );
+                                                                            }),
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            bottom: myHeight(context) /
+                                                                                200.0),
+                                                                        child:
+                                                                            Row(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            Container(
+                                                                              child: Stack(
+                                                                                children: <Widget>[
+                                                                                  Container(
+                                                                                    decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
+                                                                                    child: Padding(
+                                                                                      padding: EdgeInsets.all(myHeight(context) / 80.0),
+                                                                                      child: Text(
+                                                                                        '${_salesToShow[index]['initiator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  _salesToShow[index]['validator'] == null
+                                                                                      ? Container(
+                                                                                          width: 0.0,
+                                                                                        )
+                                                                                      : Container(
+                                                                                          transform: Matrix4.translationValues(23, 0, 0),
+                                                                                          decoration: BoxDecoration(color: Color(0xffE4E4E4), shape: BoxShape.circle, border: Border.all(color: Color(0xffCDCDCD), width: 1.3)),
+                                                                                          child: Padding(
+                                                                                            padding: EdgeInsets.all(myHeight(context) / 80.0),
+                                                                                            child: Text(
+                                                                                              '${_salesToShow[index]['validator']['name'].substring(0, 2).toUpperCase()}',
+                                                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Spacer(),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: <Widget>[
+                                                                                  Text('Total', style: TextStyle(color: Colors.black45, fontSize: myHeight(context) / 55.0)),
+                                                                                  Text(
+                                                                                    '${calculTotal(_salesToShow[index]['products'])} FCFA',
+                                                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: myHeight(context) / 50.0),
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ))
+                                                                  ],
+                                                                ),
+                                                              )));
+                                                    })),
+                                    SizedBox(
+                                      height: 20.0,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             );
                           }
 

@@ -1,7 +1,6 @@
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/data.dart';
-import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/models/category.dart';
 import 'package:easytrack/models/product.dart';
 import 'package:easytrack/services/productService.dart';
@@ -75,6 +74,7 @@ class _ProductPageState extends State<ProductPage> {
                               widget.category == null
                                   ? 'Produits'
                                   : widget.category.name,
+                              2,
                               canAdd: false,
                               onClick: () {}),
                           _products == null || _products.length == 0
@@ -141,12 +141,6 @@ class _ProductPageState extends State<ProductPage> {
                                                                       .w600),
                                                         ),
                                                       ),
-                                                      Spacer(),
-                                                      Icon(
-                                                        AmazingIcon.more_2_fill,
-                                                        size: 25.0,
-                                                        color: Colors.black,
-                                                      )
                                                     ],
                                                   ),
                                                   Container(
@@ -199,6 +193,7 @@ class _ProductPageState extends State<ProductPage> {
                                     widget.category == null
                                         ? 'Produits'
                                         : widget.category.name,
+                                    2,
                                     canAdd: false,
                                     onClick: () {}),
                                 _products == null || _products.length == 0
@@ -272,14 +267,6 @@ class _ProductPageState extends State<ProductPage> {
                                                                             .w600),
                                                               ),
                                                             ),
-                                                            Spacer(),
-                                                            Icon(
-                                                              AmazingIcon
-                                                                  .more_2_fill,
-                                                              size: 25.0,
-                                                              color:
-                                                                  Colors.black,
-                                                            )
                                                           ],
                                                         ),
                                                         Container(
@@ -333,6 +320,7 @@ class _ProductPageState extends State<ProductPage> {
                                       widget.category == null
                                           ? 'Produits'
                                           : widget.category.name,
+                                      2,
                                       canAdd: false,
                                       onClick: () {}),
                                 ],

@@ -1,5 +1,3 @@
-
-
 import 'package:easytrack/commons/globals.dart';
 import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/data.dart';
@@ -44,8 +42,8 @@ class _CustomerPageState extends State<CustomerPage> {
               children: [
                 CustomScrollView(
                   slivers: [
-                    sliverHeader(context, 'Site $name', 'Clients',
-                        canAdd: false, onClick: null),
+                    sliverHeader(context, 'Site $name', 'Clients', 0,
+                        canSearch: false, canAdd: false, onClick: null),
                     _customers == null || _customers.length == 0
                         ? SliverList(
                             delegate: SliverChildListDelegate.fixed([

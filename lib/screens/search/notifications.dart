@@ -132,7 +132,7 @@ class SubSearchNotification extends StatelessWidget {
                   padding: EdgeInsets.only(
                       left: myHeight(context) / 40.0,
                       right: myHeight(context) / 40.0,
-                      top: index == 0 ? 0 : myHeight(context) / 70),
+                      top: myHeight(context) / 70),
                   child: Column(
                     children: [
                       Row(

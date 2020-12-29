@@ -560,7 +560,7 @@ class _UserPageState extends State<UserPage> {
                             child: Container(
                                 height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                      decorationColor)),
+                                    decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -818,7 +818,7 @@ class _UserPageState extends State<UserPage> {
                             child: Container(
                                 height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                      decorationColor)),
+                                    decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -863,7 +863,7 @@ class _UserPageState extends State<UserPage> {
                             child: Container(
                                 height: 48,
                                 decoration: buildTextFormFieldContainer(
-                                      decorationColor)),
+                                    decorationColor)),
                           ),
                           Padding(
                             padding:
@@ -1310,9 +1310,14 @@ class _UserPageState extends State<UserPage> {
                               _roles = snapshotRole.data;
                               return CustomScrollView(
                                 slivers: [
-                                  sliverHeader(context,
-                                      'Site ${widget.site["name"]}', 'Employee',
-                                      canAdd: true, onClick: _createUser),
+                                  sliverHeader(
+                                      context,
+                                      'Site ${widget.site["name"]}',
+                                      'Employee',
+                                      0,
+                                      canAdd: true,
+                                      canSearch: false,
+                                      onClick: _createUser),
                                   _users == null || _users.length == 0
                                       ? SliverList(
                                           delegate:
@@ -1482,9 +1487,14 @@ class _UserPageState extends State<UserPage> {
                             }
                             return CustomScrollView(
                               slivers: [
-                                sliverHeader(context,
-                                    'Site ${widget.site["name"]}', 'Employee',
-                                    canAdd: true, onClick: () {}),
+                                sliverHeader(
+                                    context,
+                                    'Site ${widget.site["name"]}',
+                                    'Employee',
+                                    0,
+                                    canAdd: true,
+                                    canSearch: false,
+                                    onClick: () {}),
                                 SliverList(
                                   delegate: SliverChildListDelegate([
                                     Container(
@@ -1505,8 +1515,10 @@ class _UserPageState extends State<UserPage> {
                       return CustomScrollView(
                         slivers: [
                           sliverHeader(context, 'Site ${widget.site["name"]}',
-                              'Employee',
-                              canAdd: true, onClick: _createUser),
+                              'Employee', 0,
+                              canAdd: true,
+                              canSearch: false,
+                              onClick: _createUser),
                           _users == null || _users.length == 0
                               ? SliverList(
                                   delegate: SliverChildListDelegate.fixed([
@@ -1663,9 +1675,9 @@ class _UserPageState extends State<UserPage> {
                     }
                     return CustomScrollView(
                       slivers: [
-                        sliverHeader(
-                            context, 'Site ${widget.site["name"]}', 'Employee',
-                            canAdd: true, onClick: () {}),
+                        sliverHeader(context, 'Site ${widget.site["name"]}',
+                            'Employee', 0,
+                            canSearch: false, canAdd: true, onClick: () {}),
                         SliverList(
                           delegate: SliverChildListDelegate([
                             Container(

@@ -904,7 +904,8 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     header2(
                         context,
                         user.isAdmin == 1 ? 'Mon Site' : 'Mon Snack',
-                        user.isAdmin == 1 ? _showUser : _showAdmin),
+                        user.isAdmin == 1 ? _showUser : _showAdmin,
+                        0),
                     SizedBox(
                       height: 10.0,
                     ),

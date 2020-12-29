@@ -900,7 +900,7 @@ class _StatsAdminPageState extends State<StatsAdminPage>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  header(context, _show),
+                  header(context, _show, 0),
                   SizedBox(
                     height: myHeight(context) / 30,
                   ),

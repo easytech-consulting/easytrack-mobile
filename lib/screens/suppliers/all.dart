@@ -41,8 +41,8 @@ class _SupplierPageState extends State<SupplierPage> {
               children: [
                 CustomScrollView(
                   slivers: [
-                    sliverHeader(context, 'Site $name', 'Fournisseurs',
-                        canAdd: false, onClick: null),
+                    sliverHeader(context, 'Site $name', 'Fournisseurs', 0,
+                        canSearch: false, canAdd: false, onClick: null),
                     _suppliers == null || _suppliers.length == 0
                         ? SliverList(
                             delegate: SliverChildListDelegate.fixed([
@@ -107,15 +107,6 @@ class _SupplierPageState extends State<SupplierPage> {
                                                     ),
                                                   ),
                                                 ),
-                                                Spacer(),
-                                                InkWell(
-                                                    /*  onTap: () => _showBu(index),
-                                                    */
-                                                    child: Icon(
-                                                  AmazingIcon.more_2_fill,
-                                                  size: 25.0,
-                                                  color: Colors.black,
-                                                ))
                                               ],
                                             ),
                                             Row(

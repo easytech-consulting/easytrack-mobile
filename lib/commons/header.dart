@@ -4,7 +4,7 @@ import 'package:easytrack/screens/search/search.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
-Widget header(BuildContext context, Function _onClick) {
+Widget header(BuildContext context, Function _onClick, int index) {
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: myHeight(context) / 30.0),
     child: Container(
@@ -33,7 +33,9 @@ Widget header(BuildContext context, Function _onClick) {
                 onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Search(),
+                      builder: (context) => Search(
+                        index: index,
+                      ),
                     )),
                 child: Icon(
                   AmazingIcon.search_2_line,
@@ -83,7 +85,7 @@ Widget header(BuildContext context, Function _onClick) {
   );
 }
 
-Widget header2(BuildContext context, String title, onclick,
+Widget header2(BuildContext context, String title, onclick, int index,
     {bool search = true}) {
   return Container(
     child: Padding(
@@ -112,7 +114,7 @@ Widget header2(BuildContext context, String title, onclick,
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Search(),
+                          builder: (context) => Search(index: index),
                         )),
                     child: Icon(
                       AmazingIcon.search_2_line,
@@ -161,7 +163,8 @@ Widget header2(BuildContext context, String title, onclick,
   );
 }
 
-Widget sliverHeader(BuildContext context, String title, String subtitle,
+Widget sliverHeader(
+    BuildContext context, String title, String subtitle, int index,
     {@required bool canAdd,
     @required Function onClick,
     bool canSearch = true}) {
@@ -214,8 +217,10 @@ Widget sliverHeader(BuildContext context, String title, String subtitle,
                     height: 0.0,
                   )
                 : GestureDetector(
-                    onTap: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Search())),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Search(index: index))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Icon(
@@ -255,6 +260,7 @@ Widget sliverHeader2(
   BuildContext context,
   String title,
   String subtitle,
+  int index,
 ) {
   return SliverAppBar(
     pinned: true,
@@ -298,7 +304,9 @@ Widget sliverHeader2(
             Spacer(),
             GestureDetector(
               onTap: () => Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Search())),
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Search(index: index))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Icon(

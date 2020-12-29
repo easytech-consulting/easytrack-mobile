@@ -411,7 +411,7 @@ class _StatEmployeeState extends State<StatEmployee> {
           children: [
             Column(
               children: [
-                header(context, _show2),
+                header(context, _show2, 0),
                 StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('sales')

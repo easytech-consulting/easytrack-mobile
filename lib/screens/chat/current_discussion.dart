@@ -1113,7 +1113,7 @@ class _CurrentDiscussionState extends State<CurrentDiscussion> {
             child: Column(
               children: [
                 header2(context, 'Chat',
-                    user.isAdmin == 1 ? _showUser : _showAdmin),
+                    user.isAdmin == 1 ? _showUser : _showAdmin, 5),
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('messages')

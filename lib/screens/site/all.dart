@@ -1327,7 +1327,7 @@ class _SitePageState extends State<SitePage> {
                 !_valueHasChange
                     ? CustomScrollView(
                         slivers: [
-                          sliverHeader(context, 'Gestion', 'Mes sites',
+                          sliverHeader(context, 'Gestion', 'Mes sites', 1,
                               canAdd: true, onClick: _createSite),
                           _sites == null || _sites.length == 0
                               ? SliverList(
@@ -1494,7 +1494,7 @@ class _SitePageState extends State<SitePage> {
                             globalSites = _allSitesData;
                             return CustomScrollView(
                               slivers: [
-                                sliverHeader(context, 'Gestion', 'Mes sites',
+                                sliverHeader(context, 'Gestion', 'Mes sites', 1,
                                     canAdd: true, onClick: _createSite),
                                 _sites == null || _sites.length == 0
                                     ? SliverList(
@@ -1661,7 +1661,7 @@ class _SitePageState extends State<SitePage> {
                           }
                           return CustomScrollView(
                             slivers: [
-                              sliverHeader(context, 'Gestion', 'Mes sites',
+                              sliverHeader(context, 'Gestion', 'Mes sites', 1,
                                   canAdd: true, onClick: () {}),
                               SliverList(
                                 delegate: SliverChildListDelegate([

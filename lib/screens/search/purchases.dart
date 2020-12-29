@@ -208,7 +208,7 @@ class SubSearchPurchases extends StatelessWidget {
                 itemCount: _purchases.length,
                 itemBuilder: (context, index) => Padding(
                     padding: EdgeInsets.symmetric(
-                        vertical: index == 0 ? 0.0 : myHeight(context) / 100.0,
+                        vertical: myHeight(context) / 100.0,
                         horizontal: myHeight(context) / 40.0),
                     child: Container(
                         height: myHeight(context) / 6.5,

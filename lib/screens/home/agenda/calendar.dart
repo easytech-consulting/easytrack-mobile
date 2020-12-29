@@ -19,32 +19,27 @@ class _CalendarPageState extends State<CalendarPage> {
   Future _teams;
   bool _isLoading;
   List userSites;
-  bool initialState;
 
   @override
   void initState() {
     super.initState();
     _isLoading = false;
     userSites = globalSites;
-    initialState = true;
     loadData(globalFirstTeam);
     indexOfCurrentSite = 0;
     siteMap = userSites[0];
+    _teams = fetchTeamsOfSites(siteMap['site_id']);
   }
 
   loadSite() {
     indexOfCurrentSite = 0;
     siteMap = userSites[0];
     setState(() {
-      _teams = fetchTeamsOfSites(siteMap['id']);
+      _teams = fetchTeamsOfSites(siteMap['site_id']);
     });
   }
 
   fetchSites() async {
-    setState(() {
-      initialState = false;
-    });
-
     loadSite();
   }
 
@@ -212,7 +207,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                             indexOfCurrentSite = index;
                                             siteMap = userSites[index];
                                             _teams = fetchTeamsOfSites(
-                                                siteMap['id']);
+                                                siteMap['site_id']);
                                           });
                                         },
                                         child: Container(
@@ -354,11 +349,15 @@ class _CalendarPageState extends State<CalendarPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     header2(context, 'Agenda',
-                        user.isAdmin == 1 ? () {} : onAvatorClick,
+                        user.isAdmin == 1 ? () {} : onAvatorClick, 0,
                         search: false),
                     Expanded(
-                      child: initialState
-                          ? Container(
+                      child: FutureBuilder(
+                        future: _teams,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            loadData(snapshot.data);
+                            return Container(
                               margin:
                                   EdgeInsets.only(top: myHeight(context) / 100),
                               height: myHeight(context) * .8,
@@ -500,170 +499,170 @@ class _CalendarPageState extends State<CalendarPage> {
                                       ),
                                     );
                                   }),
-                            )
-                          : FutureBuilder(
-                              future: _teams,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  loadData(snapshot.data);
-                                  return Container(
-                                    margin: EdgeInsets.only(
-                                        top: myHeight(context) / 100),
-                                    height: myHeight(context) * .8,
-                                    child: ListView.builder(
-                                        itemCount: 7,
-                                        itemBuilder: (context, index) {
-                                          return GestureDetector(
-                                            onTap: () => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => ShowAgendaDayPage(
-                                                        siteId: siteMap['site_id'],
-                                                        day: getDay(
+                            );
+                          }
+                          return Stack(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(
+                                    top: myHeight(context) / 100),
+                                height: myHeight(context) * .8,
+                                child: ListView.builder(
+                                    itemCount: 7,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => ShowAgendaDayPage(
+                                                    siteId: siteMap['site_id'],
+                                                    day: getDay(DateTime.now()
+                                                        .add(Duration(
+                                                            days: index - 1))),
+                                                    id: identication(getDay(
+                                                        DateTime.now().add(Duration(
+                                                            days: index -
+                                                                1))))))),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.black12),
+                                            borderRadius: BorderRadius.circular(
+                                                myHeight(context) / 70.0),
+                                            color: Colors.white,
+                                          ),
+                                          margin: EdgeInsets.only(
+                                              bottom: myHeight(context) / 37.0),
+                                          height: myHeight(context) / 5.8,
+                                          child: Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                myHeight(context) / 35.0,
+                                                myHeight(context) / 33.0,
+                                                0.0,
+                                                myHeight(context) / 30.0),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: myWidth(context) / 6,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        (DateTime.now()
+                                                                .add(Duration(
+                                                                    days:
+                                                                        index))
+                                                                .day
+                                                                .toString())
+                                                            .toString(),
+                                                        style: new TextStyle(
+                                                            letterSpacing: -0.5,
+                                                            fontSize: myHeight(
+                                                                    context) /
+                                                                15,
+                                                            foreground: Paint()
+                                                              ..shader =
+                                                                  LinearGradient(
+                                                                begin: Alignment
+                                                                    .topLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                                colors:
+                                                                    getColors(
+                                                                        index),
+                                                              ).createShader(Rect
+                                                                      .fromLTWH(
+                                                                          0.0,
+                                                                          0.0,
+                                                                          200.0,
+                                                                          70.0))),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            myHeight(context) /
+                                                                100.0,
+                                                      ),
+                                                      Container(
+                                                        padding: EdgeInsets.only(
+                                                            left: myHeight(
+                                                                    context) /
+                                                                10.0),
+                                                        height: 1.9,
+                                                        width:
+                                                            myWidth(context) /
+                                                                12.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: getColor(
+                                                                    index)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 30.0,
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        spaceWord(getDay(
                                                             DateTime.now().add(
                                                                 Duration(
                                                                     days: index -
-                                                                        1))),
-                                                        id: identication(getDay(
-                                                            DateTime.now().add(
-                                                                Duration(days: index - 1))))))),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.black12),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        myHeight(context) /
-                                                            70.0),
-                                                color: Colors.white,
-                                              ),
-                                              margin: EdgeInsets.only(
-                                                  bottom:
-                                                      myHeight(context) / 37.0),
-                                              height: myHeight(context) / 5.8,
-                                              child: Padding(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    myHeight(context) / 35.0,
-                                                    myHeight(context) / 33.0,
-                                                    0.0,
-                                                    myHeight(context) / 30.0),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width:
-                                                          myWidth(context) / 6,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            (DateTime.now()
-                                                                    .add(Duration(
-                                                                        days:
-                                                                            index))
-                                                                    .day
-                                                                    .toString())
-                                                                .toString(),
-                                                            style: new TextStyle(
-                                                                letterSpacing: -0.5,
-                                                                fontSize: myHeight(context) / 15,
-                                                                foreground: Paint()
-                                                                  ..shader = LinearGradient(
-                                                                    begin: Alignment
-                                                                        .topLeft,
-                                                                    end: Alignment
-                                                                        .bottomRight,
-                                                                    colors:
-                                                                        getColors(
-                                                                            index),
-                                                                  ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0))),
-                                                          ),
-                                                          SizedBox(
-                                                            height: myHeight(
-                                                                    context) /
-                                                                100.0,
-                                                          ),
-                                                          Container(
-                                                            padding: EdgeInsets.only(
-                                                                left: myHeight(
-                                                                        context) /
-                                                                    10.0),
-                                                            height: 1.9,
-                                                            width: myWidth(
-                                                                    context) /
-                                                                12.0,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    color: getColor(
-                                                                        index)),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: myWidth(context) /
-                                                          30.0,
-                                                    ),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            spaceWord(getDay(DateTime
-                                                                    .now()
-                                                                .add(Duration(
-                                                                    days: index -
                                                                         1)))),
-                                                            style: TextStyle(
-                                                                fontSize: myHeight(
-                                                                        context) /
-                                                                    35.0),
-                                                          ),
-                                                          Text(
-                                                            siteMap['name'],
-                                                            style: TextStyle(
-                                                                fontSize: myHeight(
-                                                                        context) /
-                                                                    40.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          Text(
-                                                            '${teamsNumber[index]} Equipe(s)',
-                                                            style: TextStyle(
-                                                                fontSize: myHeight(
-                                                                        context) /
-                                                                    50.0),
-                                                          )
-                                                        ],
+                                                        style: TextStyle(
+                                                            fontSize: myHeight(
+                                                                    context) /
+                                                                35.0),
                                                       ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
+                                                      Text(
+                                                        siteMap['name'],
+                                                        style: TextStyle(
+                                                            fontSize: myHeight(
+                                                                    context) /
+                                                                40.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Text(
+                                                        '${teamsNumber[index]} Equipe(s)',
+                                                        style: TextStyle(
+                                                            fontSize: myHeight(
+                                                                    context) /
+                                                                50.0),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
                                             ),
-                                          );
-                                        }),
-                                  );
-                                }
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor:
-                                        AlwaysStoppedAnimation(gradient1),
-                                  ),
-                                );
-                              },
-                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                color: Colors.white60,
+                                child: CircularProgressIndicator(),
+                              )
+                            ],
+                          );
+                        },
+                      ),
                     )
                   ],
                 ),

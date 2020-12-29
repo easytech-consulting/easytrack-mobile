@@ -260,7 +260,7 @@ class _PurchasePageState extends State<PurchasePage> {
               children: [
                 CustomScrollView(
                   slivers: [
-                    sliverHeader2(context, 'Mon site', 'Mes achats'),
+                    sliverHeader2(context, 'Mon site', 'Mes achats', 3),
                     _sites == null || _sites.length == 0
                         ? SliverList(
                             delegate: SliverChildListDelegate.fixed([

@@ -5,6 +5,7 @@ import 'package:easytrack/models/product.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/models/supplier_with_id.dart';
 import 'package:easytrack/models/user_with_id.dart';
+import 'package:easytrack/screens/search/contacts.dart';
 import 'package:easytrack/screens/search/notifications.dart';
 import 'package:easytrack/screens/search/products.dart';
 import 'package:easytrack/screens/search/purchases.dart';
@@ -14,6 +15,8 @@ import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
 class Search extends StatefulWidget {
+  final int index;
+  Search({@required this.index}) : assert(index != null);
   @override
   _SearchResultState createState() => _SearchResultState();
 }
@@ -34,9 +37,29 @@ class _SearchResultState extends State<Search> {
     super.initState();
     _controller = new TextEditingController();
     _node = new FocusNode();
-    _widgetShow = SubSearchSales(_checkAllSales(globalSales), _sitesForSales);
-    _currentIndex = 0;
-    print(globalProducts.toString());
+    _currentIndex = widget.index;
+    initialPage(_currentIndex);
+  }
+
+  initialPage(int index) {
+    if (_currentIndex == 0) {
+      _widgetShow = SubSearchSales(_checkAllSales(globalSales), _sitesForSales);
+    } else if (_currentIndex == 1) {
+      _widgetShow = SubSearchSites(globalSites);
+    } else if (_currentIndex == 2) {
+      _widgetShow = SubSearchProducts(_fieldProductValues(globalProducts));
+    } else if (_currentIndex == 3) {
+      _widgetShow = SubSearchPurchases(
+          _checkAllPurchases(globalPurchases),
+          _suppliersForPurchase,
+          _sitesForPurchase,
+          _initiatorsForPurchase,
+          _validatorsForPurchase);
+    } else if (_currentIndex == 4) {
+      _widgetShow = SubSearchNotification(globalNotifications);
+    } else if (_currentIndex == 5) {
+      _widgetShow = SubSearchContact(globalContacts);
+    }
   }
 
   List _fieldProductValues(datas) {
@@ -207,6 +230,16 @@ class _SearchResultState extends State<Search> {
         }
         _widgetShow = SubSearchNotification(value.isEmpty ? _toShow : result);
       });
+    } else if (_currentIndex == 5) {
+      setState(() {
+        _toShow = globalContacts ?? [];
+        for (var item in _toShow) {
+          if (item['name'].toLowerCase().contains(value.toLowerCase())) {
+            result.add(item);
+          }
+        }
+        _widgetShow = SubSearchContact(value.isEmpty ? _toShow : result);
+      });
     }
   }
 
@@ -215,7 +248,8 @@ class _SearchResultState extends State<Search> {
     return SafeArea(
         top: true,
         child: DefaultTabController(
-            length: 5,
+            length: 6,
+            initialIndex: widget.index,
             child: Scaffold(
                 backgroundColor: backgroundColor,
                 appBar: PreferredSize(
@@ -431,6 +465,31 @@ class _SearchResultState extends State<Search> {
                                             ),
                                             Text(
                                               'Notifications',
+                                              style: TextStyle(
+                                                  color: textSameModeColor),
+                                            ),
+                                          ],
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
+                            Tab(
+                              icon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(AmazingIcon.chat_1_line,
+                                      size: myHeight(context) / 40.0,
+                                      color: textSameModeColor),
+                                  _currentIndex == 5
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                              width: myWidth(context) / 60.0,
+                                            ),
+                                            Text(
+                                              'Contacts',
                                               style: TextStyle(
                                                   color: textSameModeColor),
                                             ),

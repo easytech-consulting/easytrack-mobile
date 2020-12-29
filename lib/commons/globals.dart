@@ -479,11 +479,11 @@ Future<bool> loadInitialData() async {
       globalSites = [];
       globalSites.add(value);
       globalFirstTeam =
-          await fetchTeamsOfSites(globalSites[0]['id']).then((value) => value);
+          await fetchTeamsOfSites(globalSites[0]['site_id']).then((value) => value);
     } else {
       globalSites = value;
       globalFirstTeam =
-          await fetchTeamsOfSites(value[0]['id']).then((value) => value);
+          await fetchTeamsOfSites(value[0]['site_id']).then((value) => value);
     }
   });
 
