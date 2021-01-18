@@ -373,10 +373,6 @@ class SubSearchSales extends StatelessWidget {
                                           fontWeight: FontWeight.w500),
                                     ),
                                     Spacer(),
-                                    Icon(
-                                      Icons.more_vert,
-                                      size: myWidth(context) / 16.0,
-                                    )
                                   ],
                                 ),
                                 Expanded(

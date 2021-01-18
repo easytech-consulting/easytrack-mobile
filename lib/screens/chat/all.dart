@@ -3,6 +3,8 @@ import 'package:easytrack/data.dart';
 import 'package:easytrack/icons/amazingIcon.dart';
 import 'package:easytrack/screens/chat/show.dart';
 import 'package:easytrack/screens/search/search.dart';
+import 'package:easytrack/services/contactService.dart';
+import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
 class AllContacts extends StatefulWidget {
@@ -16,10 +18,9 @@ class _AllContactsState extends State<AllContacts> {
   @override
   void initState() {
     super.initState();
-    loadData(globalContacts);
   }
 
-  loadData(contacts) {
+  _loadData(contacts) {
     dataToShow = contacts;
     allData = contacts;
   }
@@ -113,7 +114,9 @@ class _AllContactsState extends State<AllContacts> {
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Search(index: 5,),
+                                builder: (context) => Search(
+                                  index: 5,
+                                ),
                               )),
                           child: Icon(
                             AmazingIcon.search_2_line,
@@ -163,79 +166,98 @@ class _AllContactsState extends State<AllContacts> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                    itemCount: dataToShow.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ShowDiscussion(
-                                    textColor:
-                                        colorsSendOnFirebase(true, index),
-                                    bgcolor: colorsSendOnFirebase(false, index),
-                                    user: dataToShow[index]))),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black12))),
-                          height: myHeight(context) / 8,
-                          padding: EdgeInsets.symmetric(
-                            vertical: myHeight(context) / 30.0,
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Container(
-                                width: myHeight(context) / 15.0,
-                                height: myHeight(context) / 15.0,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  dataToShow[index]['name']
-                                      .substring(0, 2)
-                                      .toUpperCase(),
-                                  style: TextStyle(
-                                      color: generateTextColor(index),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: myHeight(context) / 55),
-                                ),
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: generateBackgroundColor(index)),
+                child: FutureBuilder(
+                  future: fetchContacts(),
+                  builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    globalContacts = snapshot.data;
+                    _loadData(snapshot.data);
+                    return ListView.builder(
+                        itemCount: dataToShow.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ShowDiscussion(
+                                        textColor:
+                                            colorsSendOnFirebase(true, index),
+                                        bgcolor:
+                                            colorsSendOnFirebase(false, index),
+                                        user: dataToShow[index]))),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom:
+                                          BorderSide(color: Colors.black12))),
+                              height: myHeight(context) / 8,
+                              padding: EdgeInsets.symmetric(
+                                vertical: myHeight(context) / 30.0,
                               ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: myHeight(context) / 50.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: myWidth(context) / 2,
-                                      child: Text(
-                                        dataToShow[index]['name'],
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: myHeight(context) / 45.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Container(
+                                    width: myHeight(context) / 15.0,
+                                    height: myHeight(context) / 15.0,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      dataToShow[index]['name']
+                                          .substring(0, 2)
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          color: generateTextColor(index),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: myHeight(context) / 55),
                                     ),
-                                    Container(
-                                        width: myWidth(context) / 2,
-                                        child: Text(
-                                          'Demarrer la conversation',
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ],
-                                ),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: generateBackgroundColor(index)),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: myHeight(context) / 50.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: myWidth(context) / 2,
+                                          child: Text(
+                                            dataToShow[index]['name'],
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize:
+                                                    myHeight(context) / 45.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Container(
+                                            width: myWidth(context) / 2,
+                                            child: Text(
+                                              'Demarrer la conversation',
+                                              overflow: TextOverflow.ellipsis,
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                            ),
+                          );
+                        });
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(
+                        gradient1,
+                      ),
+                    ),
+                  );
+                }),
               )
             ],
           ),

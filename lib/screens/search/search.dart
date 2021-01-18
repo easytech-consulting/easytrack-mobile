@@ -11,6 +11,12 @@ import 'package:easytrack/screens/search/products.dart';
 import 'package:easytrack/screens/search/purchases.dart';
 import 'package:easytrack/screens/search/sales.dart';
 import 'package:easytrack/screens/search/sites.dart';
+import 'package:easytrack/services/contactService.dart';
+import 'package:easytrack/services/notificationService.dart';
+import 'package:easytrack/services/productService.dart';
+import 'package:easytrack/services/purchaseService.dart';
+import 'package:easytrack/services/saleService.dart';
+import 'package:easytrack/services/siteService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +31,7 @@ class _SearchResultState extends State<Search> {
   TextEditingController _controller;
   int _currentIndex;
   Widget _widgetShow;
+  bool _isLoading;
   FocusNode _node;
   List _sitesForSales = [];
   List _suppliersForPurchase = [],
@@ -35,10 +42,46 @@ class _SearchResultState extends State<Search> {
   @override
   void initState() {
     super.initState();
+    _isLoading = true;
     _controller = new TextEditingController();
     _node = new FocusNode();
+    _isLoading = true;
     _currentIndex = widget.index;
+    loadMissingData();
+  }
+
+  loadMissingData() async {
+    print('Chargement des donnees manquantes');
+    if (globalNotifications == null) {
+      globalNotifications = await fetchNotifications().then((value) => value);
+    }
+    if (globalProducts == null) {
+      globalProducts = await fetchProductsOfSnack().then((value) => value);
+    }
+    if (globalSales == null) {
+      globalSales = await fetchSales().then((value) => value);
+    }
+    if (globalPurchases == null) {
+      globalPurchases = await fetchPurchases().then((value) => value);
+    }
+    if (globalContacts == null) {
+      globalContacts = await fetchContacts().then((value) => value);
+    }
+    if (globalSites == null) {
+      await fetchSiteOfCompany().then((value) => value).then((value) async {
+        if (user.isAdmin == 1) {
+          globalSites = [];
+          globalSites.add(value);
+        } else {
+          globalSites = value;
+        }
+      });
+    }
+
     initialPage(_currentIndex);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   initialPage(int index) {
@@ -247,264 +290,293 @@ class _SearchResultState extends State<Search> {
   Widget build(BuildContext context) {
     return SafeArea(
         top: true,
-        child: DefaultTabController(
-            length: 6,
-            initialIndex: widget.index,
-            child: Scaffold(
-                backgroundColor: backgroundColor,
-                appBar: PreferredSize(
-                  preferredSize: Size.fromHeight(myHeight(context) / 5.5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [gradient1, gradient2],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomCenter)),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: myHeight(context) / 50),
-                            child: Row(
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () => Navigator.pop(context),
-                                  child: Icon(
-                                    AmazingIcon.arrow_left_line,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: myWidth(context) / 30.0,
-                                ),
-                                Expanded(
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Container(
-                                        height: 46.0,
-                                        decoration: buildTextFormFieldContainer(
-                                            decorationColor),
+        child: Stack(
+          children: [
+            DefaultTabController(
+                length: 6,
+                initialIndex: widget.index,
+                child: Scaffold(
+                    backgroundColor: backgroundColor,
+                    appBar: PreferredSize(
+                      preferredSize: Size.fromHeight(myHeight(context) / 5.5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [gradient1, gradient2],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomCenter)),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: myHeight(context) / 50),
+                                child: Row(
+                                  children: <Widget>[
+                                    InkWell(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Icon(
+                                        AmazingIcon.arrow_left_line,
+                                        color: Colors.white,
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10.0),
-                                        child: Container(
-                                          height: 46.0,
-                                          child: TextFormField(
-                                            textInputAction:
-                                                TextInputAction.done,
-                                            style: TextStyle(
-                                                color: textSameModeColor
-                                                    .withOpacity(.87)),
-                                            controller: _controller,
-                                            focusNode: _node,
-                                            onChanged: (value) {
-                                              loadData(value);
-                                            },
-                                            onFieldSubmitted: (value) {
-                                              loadData(value);
-                                              _node.unfocus();
-                                            },
-                                            decoration: InputDecoration(
-                                                contentPadding:
-                                                    const EdgeInsets.only(
-                                                        left: 50.0),
-                                                suffixIcon: GestureDetector(
-                                                  onTap: () {
-                                                    _controller.text = '';
-                                                    _node.unfocus();
-                                                    loadData(_controller.text);
-                                                  },
-                                                  child: Icon(
-                                                      AmazingIcon.close_fill,
+                                    ),
+                                    SizedBox(
+                                      width: myWidth(context) / 30.0,
+                                    ),
+                                    Expanded(
+                                      child: Stack(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 46.0,
+                                            decoration:
+                                                buildTextFormFieldContainer(
+                                                    decorationColor),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Container(
+                                              height: 46.0,
+                                              child: TextFormField(
+                                                textInputAction:
+                                                    TextInputAction.done,
+                                                style: TextStyle(
+                                                    color: textSameModeColor
+                                                        .withOpacity(.87)),
+                                                controller: _controller,
+                                                focusNode: _node,
+                                                onChanged: (value) {
+                                                  loadData(value);
+                                                },
+                                                onFieldSubmitted: (value) {
+                                                  loadData(value);
+                                                  _node.unfocus();
+                                                },
+                                                decoration: InputDecoration(
+                                                    contentPadding:
+                                                        const EdgeInsets.only(
+                                                            left: 50.0),
+                                                    suffixIcon: GestureDetector(
+                                                      onTap: () {
+                                                        _controller.text = '';
+                                                        _node.unfocus();
+                                                        loadData(
+                                                            _controller.text);
+                                                      },
+                                                      child: Icon(
+                                                          AmazingIcon
+                                                              .close_fill,
+                                                          color:
+                                                              textSameModeColor),
+                                                    ),
+                                                    hintText: 'Recherche...',
+                                                    prefixIcon: Icon(
+                                                        AmazingIcon
+                                                            .search_2_line,
+                                                        color:
+                                                            textSameModeColor),
+                                                    hintStyle: TextStyle(
+                                                        color: textSameModeColor
+                                                            .withOpacity(.35),
+                                                        fontSize: 18.0),
+                                                    border: OutlineInputBorder(
+                                                      borderSide:
+                                                          BorderSide.none,
+                                                    )),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            TabBar(
+                              isScrollable: true,
+                              indicatorColor: Colors.white,
+                              onTap: (value) => setState(() {
+                                _currentIndex = value;
+                                loadData(_controller.text);
+                              }),
+                              tabs: [
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.shopping_bag_3_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 0
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Ventes',
+                                                  style: TextStyle(
                                                       color: textSameModeColor),
                                                 ),
-                                                hintText: 'Recherche...',
-                                                prefixIcon: Icon(
-                                                    AmazingIcon.search_2_line,
-                                                    color: textSameModeColor),
-                                                hintStyle: TextStyle(
-                                                    color: textSameModeColor
-                                                        .withOpacity(.35),
-                                                    fontSize: 18.0),
-                                                border: OutlineInputBorder(
-                                                  borderSide: BorderSide.none,
-                                                )),
-                                          ),
-                                        ),
-                                      ),
+                                              ],
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.building_2_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 1
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Sites',
+                                                  style: TextStyle(
+                                                      color: textSameModeColor),
+                                                ),
+                                              ],
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.archive_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 2
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Produits',
+                                                  style: TextStyle(
+                                                      color: textSameModeColor),
+                                                ),
+                                              ],
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.calendar_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 3
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Achats',
+                                                  style: TextStyle(
+                                                      color: textSameModeColor),
+                                                ),
+                                              ],
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.notification_4_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 4
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Notifications',
+                                                  style: TextStyle(
+                                                      color: textSameModeColor),
+                                                ),
+                                              ],
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(AmazingIcon.chat_1_line,
+                                          size: myHeight(context) / 40.0,
+                                          color: textSameModeColor),
+                                      _currentIndex == 5
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width:
+                                                      myWidth(context) / 60.0,
+                                                ),
+                                                Text(
+                                                  'Contacts',
+                                                  style: TextStyle(
+                                                      color: textSameModeColor),
+                                                ),
+                                              ],
+                                            )
+                                          : Container()
                                     ],
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                        ),
-                        TabBar(
-                          isScrollable: true,
-                          indicatorColor: Colors.white,
-                          onTap: (value) => setState(() {
-                            _currentIndex = value;
-                            loadData(_controller.text);
-                          }),
-                          tabs: [
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.shopping_bag_3_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 0
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Ventes',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.building_2_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 1
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Sites',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.archive_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 2
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Produits',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.calendar_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 3
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Achats',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.notification_4_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 4
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Notifications',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              icon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(AmazingIcon.chat_1_line,
-                                      size: myHeight(context) / 40.0,
-                                      color: textSameModeColor),
-                                  _currentIndex == 5
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: myWidth(context) / 60.0,
-                                            ),
-                                            Text(
-                                              'Contacts',
-                                              style: TextStyle(
-                                                  color: textSameModeColor),
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                            ),
+                            )
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                body: _widgetShow)));
+                    body: _widgetShow)),
+            _isLoading
+                ? Container(
+                    width: myWidth(context),
+                    height: myHeight(context),
+                    color: textSameModeColor.withOpacity(.89),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            new AlwaysStoppedAnimation<Color>(gradient1),
+                      ),
+                    ))
+                : Container(),
+          ],
+        ));
   }
 }

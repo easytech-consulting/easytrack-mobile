@@ -94,7 +94,7 @@ class _SupplierPageState extends State<SupplierPage> {
                                                     width:
                                                         myWidth(context) / 1.4,
                                                     child: Text(
-                                                      '${capitalize(_suppliers[index].street)}',
+                                                      '${capitalize(_suppliers[index].name)}',
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
@@ -125,7 +125,7 @@ class _SupplierPageState extends State<SupplierPage> {
                                                       40,
                                                 ),
                                                 Text(
-                                                  '${_suppliers[index].town}, Cameroun',
+                                                  '${_suppliers[index].town ?? 'ND'}, Cameroun',
                                                   style: TextStyle(
                                                       color: Colors.black54,
                                                       fontSize:
@@ -151,7 +151,7 @@ class _SupplierPageState extends State<SupplierPage> {
                                                       40,
                                                 ),
                                                 Text(
-                                                  '${_suppliers[index].tel1}',
+                                                  '${_suppliers[index].tel1 ?? 'ND'}',
                                                   style: TextStyle(
                                                       color: Colors.black54,
                                                       fontSize:

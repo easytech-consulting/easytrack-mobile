@@ -6,6 +6,7 @@ import 'package:easytrack/models/purchase.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/models/supplier_with_id.dart';
 import 'package:easytrack/models/user_with_id.dart';
+import 'package:easytrack/services/purchaseService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -31,10 +32,6 @@ class _PurchasePageState extends State<PurchasePage> {
     _initiators = [];
     _validators = [];
     _isLoading = false;
-    allPurchasesData = globalPurchases;
-    _purchases = _checkAllPurchases(allPurchasesData)
-        .map((sale) => Purchase.fromJson(sale))
-        .toList();
   }
 
   showBill(_supplier, _site, _purchase, _initiator, {validator}) {
@@ -258,135 +255,167 @@ class _PurchasePageState extends State<PurchasePage> {
             backgroundColor: Colors.white,
             body: Stack(
               children: [
-                CustomScrollView(
-                  slivers: [
-                    sliverHeader2(context, 'Mon site', 'Mes achats', 3),
-                    _sites == null || _sites.length == 0
-                        ? SliverList(
-                            delegate: SliverChildListDelegate.fixed([
-                              Container(
+                FutureBuilder(
+                  future: fetchPurchases(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      allPurchasesData = snapshot.data;
+                      _purchases = _checkAllPurchases(allPurchasesData)
+                          .map((sale) => Purchase.fromJson(sale))
+                          .toList();
+                      globalPurchases = allPurchasesData;
+                      return CustomScrollView(
+                        slivers: [
+                          sliverHeader2(context, 'Mon site', 'Mes achats', 3),
+                          _sites == null || _sites.length == 0
+                              ? SliverList(
+                                  delegate: SliverChildListDelegate.fixed([
+                                    Container(
+                                      height: myHeight(context) / 1.5,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Aucun achat',
+                                        style: TextStyle(
+                                            fontSize: myHeight(context) / 50.0),
+                                      ),
+                                    )
+                                  ]),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                    return Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: index == 0
+                                                ? 0.0
+                                                : myHeight(context) / 100.0,
+                                            horizontal:
+                                                myHeight(context) / 40.0),
+                                        child: Container(
+                                            height: myHeight(context) / 6.5,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(
+                                                        myHeight(context) /
+                                                            70.0)),
+                                                border: Border.all(
+                                                    color: Colors.black12)),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(
+                                                  myHeight(context) / 60.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: <Widget>[
+                                                  Row(
+                                                    children: <Widget>[
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showBill(
+                                                              _suppliers[index],
+                                                              _sites[index],
+                                                              _purchases[index],
+                                                              _initiators[
+                                                                  index],
+                                                              validator:
+                                                                  _validators[
+                                                                      index]);
+                                                        },
+                                                        child: Container(
+                                                          width:
+                                                              myWidth(context) /
+                                                                  1.4,
+                                                          child: Text(
+                                                            'P0 - ${_purchases[index].code}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                fontSize: screenSize(
+                                                                            context)
+                                                                        .height /
+                                                                    35,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Spacer(),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    capitalize(
+                                                        _suppliers[index].name),
+                                                    style: TextStyle(
+                                                        color: Colors.black54,
+                                                        fontSize:
+                                                            screenSize(context)
+                                                                    .height /
+                                                                42.0),
+                                                  ),
+                                                  Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                        _purchases[index]
+                                                                .alreadyDelivered
+                                                            ? 'Paye'
+                                                            : 'Non paye',
+                                                        style: TextStyle(
+                                                            color: _purchases[
+                                                                        index]
+                                                                    .alreadyDelivered
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                            fontSize: screenSize(
+                                                                        context)
+                                                                    .height /
+                                                                45.0),
+                                                      ),
+                                                      Spacer(),
+                                                      Text(
+                                                        '${formatDate(DateTime.parse(_purchases[index].createdAt))}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black54,
+                                                            fontSize: screenSize(
+                                                                        context)
+                                                                    .height /
+                                                                62.0),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            )));
+                                  }, childCount: _purchases.length),
+                                )
+                        ],
+                      );
+                    }
+                    return CustomScrollView(
+                      slivers: [
+                        sliverHeader2(context, 'Mon site', 'Mes achats', 3),
+                        SliverList(
+                          delegate: SliverChildListDelegate.fixed([
+                            Container(
                                 height: myHeight(context) / 1.5,
                                 width: double.infinity,
                                 alignment: Alignment.center,
-                                child: Text(
-                                  'Aucun achat',
-                                  style: TextStyle(
-                                      fontSize: myHeight(context) / 50.0),
-                                ),
-                              )
-                            ]),
-                          )
-                        : SliverList(
-                            delegate:
-                                SliverChildBuilderDelegate((context, index) {
-                              return Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: index == 0
-                                          ? 0.0
-                                          : myHeight(context) / 100.0,
-                                      horizontal: myHeight(context) / 40.0),
-                                  child: Container(
-                                      height: myHeight(context) / 6.5,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                  myHeight(context) / 70.0)),
-                                          border: Border.all(
-                                              color: Colors.black12)),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(
-                                            myHeight(context) / 60.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                InkWell(
-                                                  onTap: () {
-                                                    showBill(
-                                                        _suppliers[index],
-                                                        _sites[index],
-                                                        _purchases[index],
-                                                        _initiators[index],
-                                                        validator:
-                                                            _validators[index]);
-                                                  },
-                                                  child: Container(
-                                                    width:
-                                                        myWidth(context) / 1.4,
-                                                    child: Text(
-                                                      'P0 - ${_purchases[index].code}',
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          fontSize: screenSize(
-                                                                      context)
-                                                                  .height /
-                                                              35,
-                                                          fontWeight:
-                                                              FontWeight.w500),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Spacer(),
-                                                InkWell(
-                                                    /* onTap: () =>
-                                                              _show(index),
-                                                           */
-                                                    child: Icon(
-                                                  AmazingIcon.more_2_fill,
-                                                  size: 25.0,
-                                                  color: Colors.black,
-                                                ))
-                                              ],
-                                            ),
-                                            Text(
-                                              capitalize(
-                                                  _suppliers[index].name),
-                                              style: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize: screenSize(context)
-                                                          .height /
-                                                      42.0),
-                                            ),
-                                            Row(
-                                              children: <Widget>[
-                                                Text(
-                                                  _purchases[index]
-                                                          .alreadyDelivered
-                                                      ? 'Paye'
-                                                      : 'Non paye',
-                                                  style: TextStyle(
-                                                      color: _purchases[index]
-                                                              .alreadyDelivered
-                                                          ? Colors.green
-                                                          : Colors.red,
-                                                      fontSize:
-                                                          screenSize(context)
-                                                                  .height /
-                                                              45.0),
-                                                ),
-                                                Spacer(),
-                                                Text(
-                                                  '${formatDate(DateTime.parse(_purchases[index].createdAt))}',
-                                                  style: TextStyle(
-                                                      color: Colors.black54,
-                                                      fontSize:
-                                                          screenSize(context)
-                                                                  .height /
-                                                              62.0),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      )));
-                            }, childCount: _purchases.length),
-                          )
-                  ],
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(
+                                    gradient1,
+                                  ),
+                                ))
+                          ]),
+                        )
+                      ],
+                    );
+                  },
                 ),
                 _isLoading
                     ? Container(

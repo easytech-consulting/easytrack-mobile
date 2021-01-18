@@ -79,12 +79,8 @@ class _SplashPageState extends State<SplashPage> {
             site = Site.fromJson(await getUserSite());
           }
           await logUserOnFirebase();
-          loadInitialData().then((value) {
-            pushInitialDataOnFirebase();
-            _refreshData();
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MainPage()));
-          });
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => MainPage()));
         } else {
           Navigator.pushNamed(context, '/login');
         }
@@ -102,15 +98,6 @@ class _SplashPageState extends State<SplashPage> {
 
   _navigation() {
     _redirection();
-  }
-
-  _refreshData() {
-    Timer(Duration(minutes: 15), () {
-      print('launch from splash navigation');
-      loadInitialData().then((value) {
-        pushInitialDataOnFirebase();
-      });
-    });
   }
 
   @override

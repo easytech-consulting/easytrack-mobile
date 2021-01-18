@@ -151,6 +151,11 @@ class _NotificationPageState extends State<NotificationsPage> {
   List dataShow, allData;
   Future futureNotifications;
 
+  initData(datas) {
+    allData = datas;
+    dataShow = loadData(allData, index);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -158,23 +163,19 @@ class _NotificationPageState extends State<NotificationsPage> {
         statusBarColor: Color(0xFFF8F8F8),
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
-    allData = globalNotifications;
-    globalNotifications = allData;
-    dataShow = loadData(allData, index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F8F8),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(myWidth(context) / 20,
-                  myHeight(context) / 80, myWidth(context) / 20, 0.0),
-              child: Column(
-                children: [
+        backgroundColor: Color(0xFFF8F8F8),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(myWidth(context) / 20,
+                    myHeight(context) / 80, myWidth(context) / 20, 0.0),
+                child: Column(children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -197,88 +198,118 @@ class _NotificationPageState extends State<NotificationsPage> {
                     ],
                   ),
                   Expanded(
-                      child: dataShow == null || dataShow.length == 0
-                          ? Center(
-                              child: Text('Aucune notification'),
-                            )
-                          : ListView.builder(
-                              itemCount: dataShow.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                      top: index == 0
-                                          ? myHeight(context) / 30
-                                          : myHeight(context) / 50),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          GradientIcon(
-                                              AmazingIcon.message_2_line,
-                                              myHeight(context) / 22,
-                                              notificationGradient[index % 5]),
-                                          SizedBox(
-                                            width: myWidth(context) / 25.0,
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    _showDetails(
-                                                        dataShow[index]);
-                                                  },
-                                                  child: Text(
-                                                    dataShow[index]['text'],
-                                                    style: TextStyle(
-                                                        fontSize:
-                                                            myHeight(context) /
-                                                                40,
-                                                        fontWeight: dataShow[
-                                                                        index][
-                                                                    'is_active'] ==
-                                                                0
-                                                            ? FontWeight.w500
-                                                            : FontWeight.w600),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
+                      child: FutureBuilder(
+                          future: fetchNotifications(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              globalNotifications = snapshot.data;
+                              initData(snapshot.data);
+                              return dataShow == null || dataShow.length == 0
+                                  ? Center(
+                                      child: Text('Aucune notification'),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: dataShow.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                              top: index == 0
+                                                  ? myHeight(context) / 30
+                                                  : myHeight(context) / 50),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  GradientIcon(
+                                                      AmazingIcon
+                                                          .message_2_line,
+                                                      myHeight(context) / 22,
+                                                      notificationGradient[
+                                                          index % 5]),
+                                                  SizedBox(
+                                                    width:
+                                                        myWidth(context) / 25.0,
                                                   ),
-                                                ),
-                                                SizedBox(
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            _showDetails(
+                                                                dataShow[
+                                                                    index]);
+                                                          },
+                                                          child: Text(
+                                                            dataShow[index]
+                                                                ['text'],
+                                                            style: TextStyle(
+                                                                fontSize: myHeight(
+                                                                        context) /
+                                                                    40,
+                                                                fontWeight: dataShow[index]
+                                                                            [
+                                                                            'is_active'] ==
+                                                                        0
+                                                                    ? FontWeight
+                                                                        .w500
+                                                                    : FontWeight
+                                                                        .w600),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: myHeight(
+                                                                  context) /
+                                                              200.0,
+                                                        ),
+                                                        Text(
+                                                          '${formatDate(DateTime.parse(dataShow[index]["created_at"]))}',
+                                                          style: TextStyle(
+                                                              fontSize: myHeight(
+                                                                      context) /
+                                                                  50,
+                                                              color: Colors
+                                                                  .black54),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
                                                   height:
-                                                      myHeight(context) / 200.0,
-                                                ),
-                                                Text(
-                                                  '${formatDate(DateTime.parse(dataShow[index]["created_at"]))}',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          myHeight(context) /
-                                                              50,
-                                                      color: Colors.black54),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-                                              ],
-                                            ),
+                                                      myHeight(context) / 50),
+                                              Divider(
+                                                color: Colors.black
+                                                    .withOpacity(.05),
+                                                thickness: 2,
+                                              )
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      SizedBox(height: myHeight(context) / 50),
-                                      Divider(
-                                        color: Colors.black.withOpacity(.05),
-                                        thickness: 2,
-                                      )
-                                    ],
-                                  ),
-                                );
-                              })),
+                                        );
+                                      });
+                            }
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(
+                                  gradient1,
+                                ),
+                              ),
+                            );
+                          })),
                   dataShow == null || dataShow.length >= allData.length
                       ? Container(
                           height: 0.0,
@@ -312,21 +343,19 @@ class _NotificationPageState extends State<NotificationsPage> {
                                 ),
                               )),
                         )
-                ],
+                ]),
               ),
-            ),
-            !loading
-                ? Container(height: 0.0)
-                : Container(
-                    color: Colors.white.withOpacity(.9),
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(gradient1),
-                    ),
-                  )
-          ],
-        ),
-      ),
-    );
+              !loading
+                  ? Container(height: 0.0)
+                  : Container(
+                      color: Colors.white.withOpacity(.9),
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(gradient1),
+                      ),
+                    )
+            ],
+          ),
+        ));
   }
 }

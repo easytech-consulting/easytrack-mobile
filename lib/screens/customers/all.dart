@@ -52,7 +52,7 @@ class _CustomerPageState extends State<CustomerPage> {
                                 width: double.infinity,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  'Aucun fournisseur',
+                                  'Aucun client',
                                   style: TextStyle(
                                       fontSize: myHeight(context) / 50.0),
                                 ),
@@ -109,14 +109,6 @@ class _CustomerPageState extends State<CustomerPage> {
                                                   ),
                                                 ),
                                                 Spacer(),
-                                                InkWell(
-                                                    /*  onTap: () => _showBu(index),
-                                                    */
-                                                    child: Icon(
-                                                  AmazingIcon.more_2_fill,
-                                                  size: 25.0,
-                                                  color: Colors.black,
-                                                ))
                                               ],
                                             ),
                                             Row(

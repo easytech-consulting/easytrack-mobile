@@ -64,35 +64,6 @@ class _UpdateSalesPageState extends State<UpdateSalesPage> {
       _isLoading = true;
     });
     await updateSale(params, saleData['id']).then((response) async {
-      Map allData;
-      Map toRemove;
-      await FirebaseFirestore.instance.collection('sales').get().then((value) {
-        value.docs.forEach((element) {
-          for (var item in element.data()['sales']) {
-            if (item['code'] == saleData['code']) {
-              allData = element.data();
-              toRemove = item;
-            }
-          }
-        });
-      });
-      setState(() {
-        _isLoading = false;
-      });
-      List _sales = allData['sales'];
-      int index =
-          _sales.indexWhere((element) => element['code'] == toRemove['code']);
-      print(response['sale']['paying_method']);
-
-      _sales.removeAt(index);
-      toRemove['products'] = response['sale']['products'];
-      _sales.insert(index, toRemove);
-      await FirebaseFirestore.instance
-          .collection('sales')
-          .where('email', isEqualTo: allData['email'])
-          .get()
-          .then(
-              (value) => value.docs.first.reference.update({'sales': _sales}));
       setState(() {
         _isLoading = false;
       });

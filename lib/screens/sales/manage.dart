@@ -23,7 +23,7 @@ class _ManageSalesState extends State<ManageSales> {
   TextEditingController _searchController = TextEditingController();
   FocusNode _searchNode = FocusNode();
 
-  Stream _companySales;
+  Future _companySales;
   Map product, currentSite;
   List _sales, _sites, _salesToShow, sitesToShow, products;
   List allSalesData;
@@ -34,28 +34,15 @@ class _ManageSalesState extends State<ManageSales> {
 
   _deleteFunction(Map sale) async {
     Navigator.pop(context);
-    Map allData;
-    Map toRemove;
-    await FirebaseFirestore.instance.collection('sales').get().then((value) {
-      value.docs.forEach((element) {
-        for (var item in element.data()['sales']) {
-          if (item['code'] == sale['code']) {
-            allData = element.data();
-            toRemove = item;
-          }
-        }
+    setState(() {
+      _isLoading = true;
+    });
+    await deleteSales(sale['id']).then((value) {
+      setState(() {
+        _companySales = fetchSales();
+        _isLoading = false;
       });
     });
-
-    List _sales = allData['sales'];
-    _sales.removeWhere((element) => element['code'] == toRemove['code']);
-    await FirebaseFirestore.instance
-        .collection('sales')
-        .where('email', isEqualTo: allData['email'])
-        .get()
-        .then((value) => value.docs.first.reference.update({'sales': _sales}));
-
-    deleteSales(sale['id']);
   }
 
   _showDetails(sale) {
@@ -730,7 +717,7 @@ class _ManageSalesState extends State<ManageSales> {
   @override
   void initState() {
     super.initState();
-    _companySales = FirebaseFirestore.instance.collection('sales').snapshots();
+    _companySales = fetchSales();
     _salesToShow = [];
     _sites = [];
     _currentIndex = 0;
@@ -740,36 +727,17 @@ class _ManageSalesState extends State<ManageSales> {
   }
 
   _changeSaleStatus(int newStatus, Map sale) async {
-    Map allData;
-    Map toRemove;
-    await FirebaseFirestore.instance.collection('sales').get().then((value) {
-      value.docs.forEach((element) {
-        for (var item in element.data()['sales']) {
-          if (item['code'] == sale['code']) {
-            allData = element.data();
-            toRemove = item;
-          }
-        }
-      });
+    setState(() {
+      _isLoading = true;
     });
-
-    List _sales = allData['sales'];
-    var _sale =
-        _sales.firstWhere((element) => element['code'] == toRemove['code']);
-    _sale['status'] = newStatus;
-    int index =
-        _sales.indexWhere((element) => element['code'] == toRemove['code']);
-    _sales.removeAt(index);
-    _sales.insert(index, _sale);
-    await FirebaseFirestore.instance
-        .collection('sales')
-        .where('email', isEqualTo: allData['email'])
-        .get()
-        .then((value) => value.docs.first.reference.update({'sales': _sales}));
-
     Map<String, dynamic> params = Map();
     params['status'] = newStatus.toString();
-    changeSaleState(params, sale['id']);
+    changeSaleState(params, sale['id']).then((value) {
+      setState(() {
+        _companySales = fetchSales();
+        _isLoading = false;
+      });
+    });
   }
 
   _validateSale(sale) async {
@@ -777,35 +745,8 @@ class _ManageSalesState extends State<ManageSales> {
       _isLoading = true;
     });
     await validateSale(sale['id']).then((success) async {
-      Map allData;
-      Map toRemove;
-      await FirebaseFirestore.instance.collection('sales').get().then((value) {
-        value.docs.forEach((element) {
-          for (var item in element.data()['sales']) {
-            if (item['code'] == sale['code']) {
-              allData = element.data();
-              toRemove = item;
-            }
-          }
-        });
-      });
-
-      List _sales = allData['sales'];
-      var _sale =
-          _sales.firstWhere((element) => element['code'] == toRemove['code']);
-      _sale['validator'] = success['sale']['validator'];
-      _sale['status'] = 2;
-      int index =
-          _sales.indexWhere((element) => element['code'] == toRemove['code']);
-      _sales.removeAt(index);
-      _sales.insert(index, _sale);
-      await FirebaseFirestore.instance
-          .collection('sales')
-          .where('email', isEqualTo: allData['email'])
-          .get()
-          .then(
-              (value) => value.docs.first.reference.update({'sales': _sales}));
       setState(() {
+        _companySales = fetchSales();
         _isLoading = false;
       });
     });
@@ -816,34 +757,8 @@ class _ManageSalesState extends State<ManageSales> {
       _isLoading = true;
     });
     await invalidateSale(sale['id']).then((success) async {
-      Map allData;
-      Map toRemove;
-      await FirebaseFirestore.instance.collection('sales').get().then((value) {
-        value.docs.forEach((element) {
-          for (var item in element.data()['sales']) {
-            if (item['code'] == sale['code']) {
-              allData = element.data();
-              toRemove = item;
-            }
-          }
-        });
-      });
-
-      List _sales = allData['sales'];
-      var _sale =
-          _sales.firstWhere((element) => element['code'] == toRemove['code']);
-      _sale['validator'] = null;
-      int index =
-          _sales.indexWhere((element) => element['code'] == toRemove['code']);
-      _sales.removeAt(index);
-      _sales.insert(index, _sale);
-      await FirebaseFirestore.instance
-          .collection('sales')
-          .where('email', isEqualTo: allData['email'])
-          .get()
-          .then(
-              (value) => value.docs.first.reference.update({'sales': _sales}));
       setState(() {
+        _companySales = fetchSales();
         _isLoading = false;
       });
     });
@@ -1415,19 +1330,18 @@ class _ManageSalesState extends State<ManageSales> {
                     height: myHeight(context) / 100.0,
                   ),
                   Expanded(
-                    child: StreamBuilder(
-                        stream: _companySales,
+                    child: FutureBuilder(
+                        future: _companySales,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             if (user.isAdmin == 1) {
-                              globalSales =
-                                  snapshot.data.docs[0].data()['sales'];
+                              globalSales = snapshot.data;
                               allSalesData = globalSales;
                               _sales = _checkAllSales(allSalesData);
                             } else {
                               globalSales = [];
-                              for (var item in snapshot.data.docs) {
-                                globalSales.add(item.data());
+                              for (var item in snapshot.data) {
+                                globalSales.add(item);
                               }
                               allSalesData = globalSales;
                               _sales = _checkAllSales(allSalesData);

@@ -64,11 +64,7 @@ class _LoginPageState extends State<LoginPage> {
           await fetchUserDetails(userId).then((user) async {
             if (user != null) {
               await logUserOnFirebase();
-              await loadInitialData().then((value) {
-                pushInitialDataOnFirebase();
-                _synchronisation();
-                Navigator.pushReplacementNamed(context, '/home');
-              });
+              Navigator.pushReplacementNamed(context, '/home');
             } else {
               _retrieveUserDataError();
             }
@@ -81,14 +77,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
     }
-  }
-
-  _synchronisation() {
-    Timer(Duration(minutes: 15), () {
-      loadInitialData().then((value) {
-        pushInitialDataOnFirebase();
-      });
-    });
   }
 
   _showErrorMessage() {

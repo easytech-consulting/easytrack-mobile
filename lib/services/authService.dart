@@ -14,11 +14,12 @@ Future<bool> login(Map<String, dynamic> params) async {
       storeTokenExpireDate(data['expires_at']);
       response = true;
     }
-
+    print('\n\n\n\n\n\n\n\nResponse status ${res.body}');
     errorStatusCode = res.statusCode;
     return response;
   } catch (e) {
     errorStatusCode = 0;
+    print('Login exception $e');
     throw Exception('Login exception: $e');
   }
 }

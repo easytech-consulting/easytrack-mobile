@@ -60,8 +60,6 @@ class _SitePageState extends State<SitePage> {
     _sitestreetNode = new FocusNode();
     _sitephone1Node = new FocusNode();
     _sitephone2Node = new FocusNode();
-    _allSitesData = globalSites;
-    _sites = _allSitesData.map((site) => Site.fromJson(site)).toList();
   }
 
   _attemptUpdate(Site site) async {
@@ -1324,8 +1322,16 @@ class _SitePageState extends State<SitePage> {
             key: _scaffoldKey,
             body: Stack(
               children: [
-                !_valueHasChange
-                    ? CustomScrollView(
+                FutureBuilder(
+                  future: _companySites,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      _allSitesData = snapshot.data;
+                      _sites = _allSitesData
+                          .map((site) => Site.fromJson(site))
+                          .toList();
+                      globalSites = _allSitesData;
+                      return CustomScrollView(
                         slivers: [
                           sliverHeader(context, 'Gestion', 'Mes sites', 1,
                               canAdd: true, onClick: _createSite),
@@ -1479,206 +1485,27 @@ class _SitePageState extends State<SitePage> {
                                   }, childCount: _sites.length),
                                 )
                         ],
-                      )
-                    : FutureBuilder(
-                        future: _companySites,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.done &&
-                              snapshot.hasData) {
-                            _allSitesData = snapshot.data;
-                            _sites = _allSitesData
-                                .map((site) => Site.fromJson(site))
-                                .toList();
-
-                            globalSites = _allSitesData;
-                            return CustomScrollView(
-                              slivers: [
-                                sliverHeader(context, 'Gestion', 'Mes sites', 1,
-                                    canAdd: true, onClick: _createSite),
-                                _sites == null || _sites.length == 0
-                                    ? SliverList(
-                                        delegate:
-                                            SliverChildListDelegate.fixed([
-                                          Container(
-                                            height: myHeight(context) / 1.5,
-                                            width: double.infinity,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              'Aucun site',
-                                              style: TextStyle(
-                                                  fontSize:
-                                                      myHeight(context) / 50.0),
-                                            ),
-                                          )
-                                        ]),
-                                      )
-                                    : SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                            (context, index) {
-                                          return Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: index == 0
-                                                      ? myHeight(context) / 50.0
-                                                      : myHeight(context) /
-                                                          100.0,
-                                                  horizontal:
-                                                      myHeight(context) / 40.0),
-                                              child: Container(
-                                                  height:
-                                                      myHeight(context) / 6.5,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius
-                                                          .all(Radius.circular(
-                                                              myHeight(context) /
-                                                                  70.0)),
-                                                      border: Border.all(
-                                                          color:
-                                                              Colors.black12)),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.all(
-                                                        myHeight(context) /
-                                                            60.0),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: <Widget>[
-                                                        Row(
-                                                          children: <Widget>[
-                                                            InkWell(
-                                                              onTap: () =>
-                                                                  _showDetails(
-                                                                _sites[index],
-                                                              ),
-                                                              child: Container(
-                                                                width: myWidth(
-                                                                        context) /
-                                                                    1.4,
-                                                                child: Text(
-                                                                  '${capitalize(_sites[index].street)}',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          screenSize(context).height /
-                                                                              35,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Spacer(),
-                                                            InkWell(
-                                                                onTap: () =>
-                                                                    _show(
-                                                                        index),
-                                                                child: Icon(
-                                                                  AmazingIcon
-                                                                      .more_2_fill,
-                                                                  size: 25.0,
-                                                                  color: Colors
-                                                                      .black,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: <Widget>[
-                                                            Icon(
-                                                              AmazingIcon
-                                                                  .map_pin_2_line,
-                                                              color: Colors
-                                                                  .black54,
-                                                              size: myHeight(
-                                                                      context) /
-                                                                  40.0,
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenSize(
-                                                                          context)
-                                                                      .width /
-                                                                  40,
-                                                            ),
-                                                            Text(
-                                                              '${_sites[index].town}, Cameroun',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize:
-                                                                      screenSize(context)
-                                                                              .height /
-                                                                          42.0),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: <Widget>[
-                                                            Icon(
-                                                              AmazingIcon
-                                                                  .phone_line,
-                                                              color: Colors
-                                                                  .black54,
-                                                              size: myHeight(
-                                                                      context) /
-                                                                  40.0,
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenSize(
-                                                                          context)
-                                                                      .width /
-                                                                  40,
-                                                            ),
-                                                            Text(
-                                                              '${_sites[index].tel1}',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize:
-                                                                      screenSize(context)
-                                                                              .height /
-                                                                          42.0),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )));
-                                        }, childCount: _sites.length),
-                                      )
-                              ],
-                            );
-                          }
-                          return CustomScrollView(
-                            slivers: [
-                              sliverHeader(context, 'Gestion', 'Mes sites', 1,
-                                  canAdd: true, onClick: () {}),
-                              SliverList(
-                                delegate: SliverChildListDelegate([
-                                  Container(
-                                    alignment: Alignment.center,
-                                    height: myHeight(context) / 1.5,
-                                    child: CircularProgressIndicator(
-                                      valueColor:
-                                          AlwaysStoppedAnimation(gradient1),
-                                    ),
-                                  )
-                                ]),
-                              )
-                            ],
-                          );
-                        },
-                      ),
+                      );
+                    }
+                    return CustomScrollView(
+                      slivers: [
+                        sliverHeader(context, 'Gestion', 'Mes sites', 1,
+                            canAdd: true, onClick: () {}),
+                        SliverList(
+                          delegate: SliverChildListDelegate([
+                            Container(
+                              alignment: Alignment.center,
+                              height: myHeight(context) / 1.5,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(gradient1),
+                              ),
+                            )
+                          ]),
+                        )
+                      ],
+                    );
+                  },
+                ),
                 _isLoading
                     ? Container(
                         width: myWidth(context),

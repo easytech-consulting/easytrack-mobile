@@ -265,12 +265,6 @@ class SubSearchSites extends StatelessWidget {
                                     ),
                                   ),
                                   Spacer(),
-                                  InkWell(
-                                      child: Icon(
-                                    AmazingIcon.more_2_fill,
-                                    size: 25.0,
-                                    color: Colors.black,
-                                  ))
                                 ],
                               ),
                               Row(

@@ -149,9 +149,11 @@ getThemeMode() async {
   return prefs.getBool('is_dark_mode') ?? false;
 }
 
-final String endPoint = 'https://www.easytrack237.com/api';
+final String endPoint = 'http://easytrack237.com/api';
+// final String endPoint = 'https://easytracknew-easytrackdev.azurewebsites.net/api';
 
-final String websiteUrl = 'https://www.easytrack237.com';
+// final String websiteUrl = 'https://easytracknew-easytrackdev.azurewebsites.net';
+final String websiteUrl = 'http://easytrack237.com';
 
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
@@ -371,7 +373,7 @@ Future<bool> onWillPop(context) async {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30.0))),
               content: Container(
-                  height: myHeight(context) / 2.5,
+                  height: myHeight(context) / 2.3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -461,88 +463,3 @@ int allSales,
     allIncomes,
     dailyIncomes;
 
-Future<bool> loadInitialData() async {
-  print('debut de l\'initialisation des valeurs');
-  if (user.isAdmin == 1) {
-    globalStats = [];
-    globalStats.add(await fetchStats().then((value) => value));
-  } else {
-    globalStats = await fetchStats().then((value) => value);
-  }
-
-  globalContacts = await fetchContacts().then((value) => value);
-
-  globalProducts = await fetchProductsOfSnack().then((value) => value);
-
-  await fetchSiteOfCompany().then((value) => value).then((value) async {
-    if (user.isAdmin == 1) {
-      globalSites = [];
-      globalSites.add(value);
-      globalFirstTeam =
-          await fetchTeamsOfSites(globalSites[0]['site_id']).then((value) => value);
-    } else {
-      globalSites = value;
-      globalFirstTeam =
-          await fetchTeamsOfSites(value[0]['site_id']).then((value) => value);
-    }
-  });
-
-  globalNotifications = await fetchNotifications().then((value) => value);
-
-  globalSales = await fetchSales().then((value) => value);
-
-  globalPurchases = await fetchPurchases().then((value) => value);
-
-  globalCategories = await fetchCategories().then((value) => value);
-
-  return true;
-}
-
-pushInitialDataOnFirebase() async {
-  FirebaseFirestore.instance.collection('sales').get().then((value) async {
-    value.docs.forEach((element) {
-      print(element.reference);
-      element.reference.delete();
-    });
-    print('push on firebase');
-    if (user.isAdmin == 1) {
-      DocumentReference documentReference =
-          FirebaseFirestore.instance.collection('sales').doc();
-
-      Map<String, dynamic> params = {
-        'company_id': '2',
-        'created_at': DateTime.now(),
-        'deleted_at': null,
-        'email': site.email,
-        'id': site.id,
-        'is_active': '1',
-        'name': site.name,
-        'phone1': site.tel1,
-        'phone2': site.tel2,
-        'slug': site.slug,
-        'street': site.street,
-        'town': site.town,
-        'sales': globalSales
-      };
-
-      FirebaseFirestore.instance.runTransaction((transaction) async {
-        transaction.set(
-          documentReference,
-          params,
-        );
-      });
-    } else {
-      for (var sale in globalSales) {
-        DocumentReference documentReference =
-            FirebaseFirestore.instance.collection('sales').doc();
-
-        FirebaseFirestore.instance.runTransaction((transaction) async {
-          transaction.set(
-            documentReference,
-            sale,
-          );
-        });
-      }
-    }
-  });
-}

@@ -4,6 +4,7 @@ import 'package:easytrack/commons/header.dart';
 import 'package:easytrack/data.dart';
 import 'package:easytrack/models/site_with_id.dart';
 import 'package:easytrack/services/externalService.dart';
+import 'package:easytrack/services/saleService.dart';
 import 'package:easytrack/styles/style.dart';
 import 'package:flutter/material.dart';
 
@@ -379,11 +380,12 @@ class _SalePageState extends State<SalePage> {
       body: SafeArea(
         child: Stack(
           children: <Widget>[
-            StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('sales').snapshots(),
+            FutureBuilder(
+              future:
+                  fetchSales(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  globalSales = snapshot.data;
                   return CustomScrollView(
                     slivers: [
                       sliverHeader2(context, 'Mon site', 'Mes ventes', 0),
